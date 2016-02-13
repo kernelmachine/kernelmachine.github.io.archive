@@ -7,8 +7,9 @@ permalink:           pretty
 title:               suchin
 tagline:             a blog
 url:                 http://suchin.co
-paginate:            1
+paginate:            10
 baseurl:             ""
+about:               "about"
 
 # Gems
 gems:
