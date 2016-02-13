@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="http://suchin.co/atom.xml" rel="self"/>
  <link href="http://suchin.co/"/>
- <updated>2016-02-13T12:02:24-05:00</updated>
+ <updated>2016-02-13T12:22:51-05:00</updated>
  <id>http://suchin.co</id>
  <author>
    <name>Mark Otto</name>
@@ -17,11 +17,11 @@
    <link href="http://suchin.co/2016/02/13/online-learning/"/>
    <updated>2016-02-13T00:00:00-05:00</updated>
    <id>http://suchin.co/2016/02/13/online-learning</id>
-   <content type="html">&lt;pre&gt;&lt;code class=&quot;python&quot;&gt;
-import pandas as pd
-urls = [&#39;http://google.com&#39;]
-pd.DataFrame({&#39;url&#39;:urls})
-&lt;/code&gt;&lt;/pre&gt;
+   <content type="html">
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pandas&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pd&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;urls&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;http://google.com&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DataFrame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;url&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urls&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
 &lt;p&gt;when &lt;script type=&quot;math/tex&quot;&gt;x + y&lt;/script&gt; we have&lt;/p&gt;
 </content>
  </entry>
