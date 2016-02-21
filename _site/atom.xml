@@ -4,25 +4,120 @@
  <title>suchin</title>
  <link href="http://suchin.co/atom.xml" rel="self"/>
  <link href="http://suchin.co/"/>
- <updated>2016-02-13T12:22:51-05:00</updated>
+ <updated>2016-02-15T23:14:11-05:00</updated>
  <id>http://suchin.co</id>
  <author>
-   <name>Mark Otto</name>
-   <email>markdotto@gmail.com</email>
+   <name>Suchin Gururangan</name>
+   <email></email>
  </author>
 
  
  <entry>
-   <title>Online learning algorithms</title>
+   <title>Internet-wide security data</title>
+   <link href="http://suchin.co/2016/02/15/replacing-bgp-ranking/"/>
+   <updated>2016-02-15T00:00:00-05:00</updated>
+   <id>http://suchin.co/2016/02/15/replacing-bgp-ranking</id>
+   <content type="html">&lt;p&gt;Security is one of few disciplines that has a &lt;em&gt;lot&lt;/em&gt; of associated data&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Learning Representations</title>
+   <link href="http://suchin.co/2016/02/14/learning-representations/"/>
+   <updated>2016-02-14T00:00:00-05:00</updated>
+   <id>http://suchin.co/2016/02/14/learning-representations</id>
+   <content type="html">&lt;p&gt;&lt;em&gt;This post is 1st in a series on representation learning.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;I’ve stated before that feature engineering is often the most time-consuming
+and difficult process of building machine learning services.&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt; The reality is that many learning algorithms are dependent on the supply of diverse and balanced training data to perform well, and this type of data is unavailable in most contexts. In the case of security, even building a simple classifier of good and bad URLs requires an incredible effort to gather malicious and benign sources of URLs, which are, suprisingly, hard to come by.&lt;/p&gt;
+
+&lt;p&gt;Furthermore, feature engineering is mediated by humans, and we’re biased and limited in scope.&lt;/p&gt;
+
+&lt;p&gt;So what makes a representation &lt;em&gt;good&lt;/em&gt;? In the following, let &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; be some learning algorithm.&lt;/p&gt;
+
+&lt;h3 id=&quot;smoothness-and-predictability&quot;&gt;Smoothness and predictability&lt;/h3&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;|| f(x) - f(y) || \le || x - y ||&lt;/script&gt;
+
+&lt;h3 id=&quot;natural-clusters&quot;&gt;Natural clusters&lt;/h3&gt;
+
+&lt;h3 id=&quot;invariance&quot;&gt;Invariance&lt;/h3&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f(x) \approx f(y) \implies f(x + \epsilon) \approx f(y)&lt;/script&gt;
+
+&lt;p&gt;In other words, the representation must be able to withstand small perturbations of the data.&lt;/p&gt;
+
+&lt;h3 id=&quot;multiple-balanced-explanatory-factors&quot;&gt;Multiple, balanced explanatory factors&lt;/h3&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+f(x) = F x = f_1 x + f_2 x + f_3 x + ...  \text{ where } n &lt;&lt; \infty %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;We wan
+### Feature disentanglement&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;det(F) = 0&lt;/script&gt;
+
+&lt;h3 id=&quot;expressive-power&quot;&gt;Expressive power&lt;/h3&gt;
+
+&lt;p&gt;Not only should features be independent from one another, but they should also span the basis.&lt;/p&gt;
+
+&lt;p&gt;These criteria are very difficult to come by for most problems.&lt;/p&gt;
+
+&lt;p&gt;What if we could automate feature engineering? This is the basic premise around &lt;em&gt;representation learning&lt;/em&gt;, a sub-discipline of machine learning that involve algorithms that find the best representation of data to feed into a model.&lt;/p&gt;
+
+&lt;p&gt;This series of blog posts will revolve around algorithms that help us find the best representation of data to feed into a model.&lt;/p&gt;
+
+&lt;div class=&quot;footnotes&quot;&gt;
+  &lt;ol&gt;
+    &lt;li id=&quot;fn:1&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;https://community.rapid7.com/community/infosec/blog/2016/01/04/applying-machine-learning-to-security-problems&quot;&gt;blog post at rapid7 community&lt;/a&gt; &lt;a href=&quot;#fnref:1&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Online Learning</title>
    <link href="http://suchin.co/2016/02/13/online-learning/"/>
    <updated>2016-02-13T00:00:00-05:00</updated>
    <id>http://suchin.co/2016/02/13/online-learning</id>
-   <content type="html">
+   <content type="html">&lt;hr /&gt;
+&lt;p&gt;layout: post
+title: Low-memory machine learning
+–&lt;/p&gt;
+
+&lt;p&gt;The cloud has given machine learning practitioners unprecedented strength to build and test models with less concern about memory and CPU usage. In the future, it’s going to be even better. Amazon will be introducing X1 instances this year, with 2 TB of memory &lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+
+&lt;p&gt;But crazy instances are expensive, and non-trivial to set up. GRAPH showing what’d you’d be paying for.&lt;/p&gt;
+
+&lt;p&gt;So ideally we’d want to use the smallest instance possible, but a lack of memory can spell the death of machine learning models. Say you have a dataframe of 1 million samples with 20 &lt;code class=&quot;highlighter-rouge&quot;&gt;float64&lt;/code&gt; features each. A &lt;code class=&quot;highlighter-rouge&quot;&gt;float64&lt;/code&gt; element takes 8 bytes. This dataframe will have a size of:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;10e^6 \cdot 20 \cdot 8 = 160,000,000 \text{ bytes} ~= 160 \text{ gigabytes!}&lt;/script&gt;
+
+&lt;p&gt;The smallest EC2 instance we could use for this data is BLAH, which would cost BLAH.&lt;/p&gt;
+
+&lt;p&gt;What are some solutions?&lt;/p&gt;
+
+&lt;h3 id=&quot;sparse-matrices&quot;&gt;Sparse matrices&lt;/h3&gt;
+
+&lt;h3 id=&quot;online-learning&quot;&gt;Online learning&lt;/h3&gt;
+
+&lt;h3 id=&quot;parallelization&quot;&gt;Parallelization&lt;/h3&gt;
+
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pandas&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pd&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;urls&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;http://google.com&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;pd&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DataFrame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;url&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urls&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;when &lt;script type=&quot;math/tex&quot;&gt;x + y&lt;/script&gt; we have&lt;/p&gt;
+
+&lt;div class=&quot;footnotes&quot;&gt;
+  &lt;ol&gt;
+    &lt;li id=&quot;fn:1&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;http://techcrunch.com/2015/10/08/aws-announces-x1-instances-for-ec2-with-2tb-of-memory-launching-next-year/&quot;&gt;Lardinois, Frederic. “AWS Announces X1 Instances For EC2 With 2TB Of Memory, Launching Next Year.” TechCrunch, 8 Oct. 2015.&lt;/a&gt; &lt;a href=&quot;#fnref:1&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;
 </content>
  </entry>
  

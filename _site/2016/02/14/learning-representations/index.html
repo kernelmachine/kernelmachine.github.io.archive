@@ -10,7 +10,7 @@
 
   <title>
     
-      suchin &middot; a blog
+      Learning Representations &middot; suchin
     
   </title>
 
@@ -42,31 +42,10 @@
       </header>
 
       <main>
-        <div class="posts">
-  
-  <article class="post">
-    <h1 class="post-title">
-      <a href="/2016/02/15/replacing-bgp-ranking/">
-        Internet-wide security data
-      </a>
-    </h1>
-
-    <time datetime="2016-02-15T00:00:00-05:00" class="post-date">15 Feb 2016</time>
-
-    <p>Security is one of few disciplines that has a <em>lot</em> of associated data</p>
-
-  </article>
-  
-  <article class="post">
-    <h1 class="post-title">
-      <a href="/2016/02/14/learning-representations/">
-        Learning Representations
-      </a>
-    </h1>
-
-    <time datetime="2016-02-14T00:00:00-05:00" class="post-date">14 Feb 2016</time>
-
-    <p><em>This post is 1st in a series on representation learning.</em></p>
+        <article class="post">
+  <h1 class="post-title">Learning Representations</h1>
+  <time datetime="2016-02-14T00:00:00-05:00" class="post-date">14 Feb 2016</time>
+  <p><em>This post is 1st in a series on representation learning.</em></p>
 
 <p>I’ve stated before that feature engineering is often the most time-consuming
 and difficult process of building machine learning services.<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> The reality is that many learning algorithms are dependent on the supply of diverse and balanced training data to perform well, and this type of data is unavailable in most contexts. In the case of security, even building a simple classifier of good and bad URLs requires an incredible effort to gather malicious and benign sources of URLs, which are, suprisingly, hard to come by.</p>
@@ -115,66 +94,43 @@ f(x) = F x = f_1 x + f_2 x + f_3 x + ...  \text{ where } n << \infty %]]></scrip
   </ol>
 </div>
 
-  </article>
-  
-  <article class="post">
-    <h1 class="post-title">
-      <a href="/2016/02/13/online-learning/">
-        Online Learning
-      </a>
-    </h1>
+</article>
 
-    <time datetime="2016-02-13T00:00:00-05:00" class="post-date">13 Feb 2016</time>
-
-    <hr />
-<p>layout: post
-title: Low-memory machine learning
-–</p>
-
-<p>The cloud has given machine learning practitioners unprecedented strength to build and test models with less concern about memory and CPU usage. In the future, it’s going to be even better. Amazon will be introducing X1 instances this year, with 2 TB of memory <sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>.</p>
-
-<p>But crazy instances are expensive, and non-trivial to set up. GRAPH showing what’d you’d be paying for.</p>
-
-<p>So ideally we’d want to use the smallest instance possible, but a lack of memory can spell the death of machine learning models. Say you have a dataframe of 1 million samples with 20 <code class="highlighter-rouge">float64</code> features each. A <code class="highlighter-rouge">float64</code> element takes 8 bytes. This dataframe will have a size of:</p>
-
-<script type="math/tex; mode=display">10e^6 \cdot 20 \cdot 8 = 160,000,000 \text{ bytes} ~= 160 \text{ gigabytes!}</script>
-
-<p>The smallest EC2 instance we could use for this data is BLAH, which would cost BLAH.</p>
-
-<p>What are some solutions?</p>
-
-<h3 id="sparse-matrices">Sparse matrices</h3>
-
-<h3 id="online-learning">Online learning</h3>
-
-<h3 id="parallelization">Parallelization</h3>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="s">'http://google.com'</span><span class="p">]</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">'url'</span><span class="p">:</span><span class="n">urls</span><span class="p">})</span></code></pre></figure>
-
-<p>when <script type="math/tex">x + y</script> we have</p>
-
-<div class="footnotes">
-  <ol>
-    <li id="fn:1">
-      <p><a href="http://techcrunch.com/2015/10/08/aws-announces-x1-instances-for-ec2-with-2tb-of-memory-launching-next-year/">Lardinois, Frederic. “AWS Announces X1 Instances For EC2 With 2TB Of Memory, Launching Next Year.” TechCrunch, 8 Oct. 2015.</a> <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
-    </li>
-  </ol>
-</div>
-
-  </article>
-  
-</div>
-
-<div class="pagination">
-  
-    <a class="pagination-item older" href="/page2">Older</a>
-  
-  
-    <span class="pagination-item newer">Newer</span>
-  
-</div>
+<!-- 
+<aside class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/02/15/replacing-bgp-ranking/">
+            Internet-wide security data
+            <small><time datetime="2016-02-15T00:00:00-05:00">15 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/02/13/online-learning/">
+            Online Learning
+            <small><time datetime="2016-02-13T00:00:00-05:00">13 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/02/12/hello-world/">
+            Hello, World!
+            <small><time datetime="2016-02-12T00:00:00-05:00">12 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</aside>
+ -->
 
       </main>
 

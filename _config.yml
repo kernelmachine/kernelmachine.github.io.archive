@@ -7,7 +7,7 @@ permalink:           pretty
 title:               suchin
 tagline:             a blog
 url:                 http://suchin.co
-paginate:            10
+paginate:            3
 baseurl:             ""
 about:               "about"
 
@@ -24,11 +24,13 @@ sass:
 
 # About/contact
 author:
-  name:              Mark Otto
-  url:               https://twitter.com/mdo
-  email:             markdotto@gmail.com
-
+  name:              Suchin Gururangan
+  url:               https://suchin.co
+  email:
+  
 # Custom vars
-version:             2.0.0
+version:             1.0.0
 github:
-  repo:              https://github.com/poole/poole
+  repo:              https://github.com/pegasos1/pegasos1.github.io
+
+markdown: kramdown

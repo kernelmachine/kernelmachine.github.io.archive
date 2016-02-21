@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>
+    
+      Learning Representations &middot; suchin
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/highlight.pack.js"></script>
+  <!-- <link rel="stylesheet" href="/googlecode.css"> -->
+
+  <script>hljs.initHighlightingOnLoad();</script>
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/public/square-outline.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/atom+xml" title="suchin" href="/atom.xml">
+</head>
+
+
+  <body>
+
+    <div class="container content">
+      <header class="masthead">
+        <h3 class="masthead-title">
+          <a href="/" title="Home">suchin</a>
+          <small><a href="/about" style="text-decoration: none; color: #C0C0C0">a blog</a></small>
+        </h3>
+      </header>
+
+      <main>
+        <article class="post">
+  <h1 class="post-title">Learning Representations</h1>
+  <time datetime="2016-02-14T00:00:00-05:00" class="post-date">14 Feb 2016</time>
+  <p><em>This post is 1st in a series on representation learning.</em></p>
+
+<p>I’ve outlined before that feature engineering is often the most time-consuming
+and difficult process of building most machine learning services.<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> The unfortunate reality is that many top performing learning algorithms are supervised in nature, depending on the supply of diverse and balanced training data to perform well. This is type of data is unavailable in most contexts. Furthermore, feature engineering is mediated by humans, and we’re biased and limited in scope.</p>
+
+<p>What makes a representation <em>good</em>?</p>
+
+<h3 id="smoothness-and-predictability">Smoothness and predictability</h3>
+
+<script type="math/tex; mode=display">x \rightarrow y \implies f(x) \rightarrow f(y)</script>
+
+<h3 id="natural-clusters">Natural clusters</h3>
+
+<h3 id="multiple-balanced-explanatory-factors">Multiple, balanced explanatory factors</h3>
+
+<h3 id="simple-relationships">Simple relationships</h3>
+
+<h3 id="expressive-power">Expressive power</h3>
+
+<h2 id="invariance">Invariance</h2>
+
+<p>These criteria are very difficult to come by for most problems.</p>
+
+<p>What if we could automate feature engineering? This is the basic premise around <em>representation learning</em>, a sub-discipline of machine learning that involve algorithms that find the best representation of data to feed into a model.</p>
+
+<p>This series of blog posts will revolve around algorithms that help us find the best representation of data to feed into a model.</p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p><a href="https://community.rapid7.com/community/infosec/blog/2016/01/04/applying-machine-learning-to-security-problems">blog post at rapid7 community</a> <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+</article>
+
+
+<aside class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/02/13/online-learning/">
+            Online Learning
+            <small><time datetime="2016-02-13T00:00:00-05:00">13 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/02/12/hello-world/">
+            Hello, World!
+            <small><time datetime="2016-02-12T00:00:00-05:00">12 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</aside>
+
+
+      </main>
+
+      <footer class="footer">
+        <small>
+          &copy; <time datetime="2016-02-14T11:01:33-05:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+        </small>
+      </footer>
+    </div>
+
+  </body>
+</html>
