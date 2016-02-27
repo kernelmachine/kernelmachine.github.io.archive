@@ -10,7 +10,7 @@
 
   <title>
     
-      suchin &middot; a blog
+      Applying Machine Learning to Security Problems &middot; suchin
     
   </title>
 
@@ -42,50 +42,10 @@
       </header>
 
       <main>
-        <div class="posts">
-  
-  <article class="post">
-    <h1 class="post-title">
-      <a href="/2016/02/17/parallel-and-block-algorithms/">
-        Parallel and Block algorithms in Rust
-      </a>
-    </h1>
-
-    <time datetime="2016-02-17T00:00:00-05:00" class="post-date">17 Feb 2016</time>
-
-    <p>Intro</p>
-
-<p>Standard matrix multiplication between two <script type="math/tex">n \times n</script> matrices <script type="math/tex">A</script> and <script type="math/tex">B</script> involves <script type="math/tex">2n^3</script> operations:</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-  <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
-      <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="n">B</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">j</span><span class="p">]</span></code></pre></figure>
-
-<p>Block operations</p>
-
-<p>Parallel Array operations in Python</p>
-
-<p>The most interesting parallelization library in Python comes from Dask[^1].</p>
-
-<p>Quick description of dask and how it works.</p>
-
-<p>Parallelization in Rust</p>
-
-<p>Rust is cooler! Native parallelization framework possible via Rayon + NDArray.</p>
-
-  </article>
-  
-  <article class="post">
-    <h1 class="post-title">
-      <a href="/2016/02/16/applying-machine-learning-to-security-problems/">
-        Applying Machine Learning to Security Problems
-      </a>
-    </h1>
-
-    <time datetime="2016-02-16T00:00:00-05:00" class="post-date">16 Feb 2016</time>
-
-    <p>Anomaly detection and remediation is a hard and expensive process ridden with
+        <article class="post">
+  <h1 class="post-title">Applying Machine Learning to Security Problems</h1>
+  <time datetime="2016-02-16T00:00:00-05:00" class="post-date">16 Feb 2016</time>
+  <p>Anomaly detection and remediation is a hard and expensive process ridden with
 false alarms and rabbit holes. The security community has been increasingly
 interested in the potential for data-driven tools to filter out noise and automatically
 detect malicious activity in large networks. However, while capable
@@ -232,107 +192,43 @@ them</p>
   </ol>
 </div>
 
-  </article>
-  
-  <article class="post">
-    <h1 class="post-title">
-      <a href="/2016/02/15/maps-of-IPv4/">
-        Maps of IPv4
-      </a>
-    </h1>
+</article>
 
-    <time datetime="2016-02-15T00:00:00-05:00" class="post-date">15 Feb 2016</time>
-
-    <p>Here at Rapid7 we have incredible access to internet-scale data via projects Sonar<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> and Heisenberg<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup>.
-Investigating these data gives us a birds eye view of the current state of the Internet, public scanning activity, and the network security landscape.</p>
-
-<p>Recently, I’ve become interested in extending these resources to include maps of IPV4 allocation and network providers.</p>
-
-<p>But first, a primer on IPv4, the fourth version of the Internet Protocol.</p>
-
-<p>The birth of the Internet, nicely documented by various books<sup id="fnref:3"><a href="#fn:3" class="footnote">3</a></sup>, involved the allocation of a fixed number of IP addresses. Because IPV4 addresses are 32-bit, IPV4 contains:</p>
-
-<script type="math/tex; mode=display">2^{32} = 4, 294, 967, 296 \text{ IP addresses.}</script>
-
-<p>Public demand for IP addresses lead to the exhaustion of allocable IPv4 addresses in 2011, something thought impossible at the Internet’s inception.</p>
-
-<p>In fact, the Internet is a large marketplace of territory. Service providers sell continguous sets of IP addresses at fixes prices that depend on the number of IP addresses in the block.</p>
-
-<p>Let’s take a look at the process of splitting an IP block. An IP block has two components: a base address and a prefix. The base address is fixed, and the prefix is a mask that determines how many variants of the base address exist in the block.</p>
-
-<p>For example, an IP address: 127.3.25/25 is denoted by the following prefix and address:</p>
-
-<script type="math/tex; mode=display">\text { 1 1 1 1 1 1 1 1 }  \text { 1 1 1 1 1 1 1 1 } \text { 1 1 1 1 1 1 1 1 } \text { 1 0 0 0 0 0 0 0 }</script>
-
-<script type="math/tex; mode=display">\text {  0 1 1 1 1 0 1 0  }  \text { 0 0 0 0 0 0 1 1 } \text { 0 0 0 1 1 0 1 0 } \text { 1 1 1 1 1 1 1 1 }</script>
-
-<p>To split this IP block in half, we simply increment the prefix to 26, resulting in the following prefix and address:</p>
-
-<script type="math/tex; mode=display">\text { 1 1 1 1 1 1 1 1 }  \text { 1 1 1 1 1 1 1 1 } \text { 1 1 1 1 1 1 1 1 } \text { 1 1 0 0 0 0 0 0 }</script>
-
-<script type="math/tex; mode=display">\text {  0 1 1 1 1 0 1 0  }  \text { 0 0 0 0 0 0 1 1 } \text { 0 0 0 1 1 0 1 0 } \text { 1 1 1 1 1 1 1 1 }</script>
-
-<p>The mask locks the IP address bit to a value, so a larger prefix implies a smaller set of routable space for IP blocks. What does this all suggest?</p>
-
-<p>Security incident response commonly involves looking at origin autonomous system of a malicious link. The distribution of autonomous systems across the Internet follows a particularly interesting map:</p>
-
-<p><em>IPV4 MAP</em></p>
-
-<p>We can look at the maximum number of routable addresses in each AS with the following code:</p>
-
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">as_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">asn</span><span class="p">):</span>
-
-    <span class="n">ipblock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_block</span><span class="p">(</span><span class="n">asn</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">ipblock</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-
-        <span class="k">return</span> <span class="bp">None</span>
-
-    <span class="n">mask_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="n">ip</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'/'</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ipblock</span><span class="p">]</span>
-
-    <span class="n">sizes</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">32</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">mask_lengths</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span></code></pre></figure>
-
-<p><em>FIGURE</em></p>
-
-<p>However, due to the frequent splitting of IP blocks we must remember that a <em>large AS does not necessarily suggest a large IP block</em>. For either the large AS could have a few large IP blocks, or a ton of small ones.</p>
-
-<p>Let’s take a look at an AS that has split since 2007:</p>
-
-<p><em>FIGURE</em></p>
-
-<p>Phishing sites pulled from cleanmx<sup id="fnref:4"><a href="#fn:4" class="footnote">4</a></sup> show up more often when the IP blocks are smaller.</p>
-
-<div class="footnotes">
-  <ol>
-    <li id="fn:1">
-      <p>(https://sonar.labs.rapid7.com/) <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:2">
-      <p>(https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots) <a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:3">
-      <p>[History of the Internet] <a href="#fnref:3" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:4">
-      <p>[Cleanmx archive] (http://cleanmx.org) <a href="#fnref:4" class="reversefootnote">&#8617;</a></p>
-    </li>
-  </ol>
-</div>
-
-  </article>
-  
-</div>
-
-<div class="pagination">
-  
-    <a class="pagination-item older" href="/page3">Older</a>
-  
-  
-    <a class="pagination-item newer" href="/">Newer</a>
-  
-</div>
+<!-- 
+<aside class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/02/20/security-data/">
+            Security Data
+            <small><time datetime="2016-02-20T00:00:00-05:00">20 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/02/19/Implementing-the-DataFrame/">
+            Implementing the DataFrame in Rust
+            <small><time datetime="2016-02-19T00:00:00-05:00">19 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/02/18/Type-Safe-Matrix-Computations/">
+            Making Compile-Time Guarantees for Matrix Computations
+            <small><time datetime="2016-02-18T00:00:00-05:00">18 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</aside>
+ -->
 
       </main>
 

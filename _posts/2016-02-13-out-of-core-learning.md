@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Low-memory machine learning
+title: Out-of-Core Learning
 --
 
 The cloud has given machine learning practitioners unprecedented strength to build and test models with less concern about memory and CPU usage. In the future, it's going to be even better. Amazon will be introducing X1 instances this year, with 2 TB of memory [^1].

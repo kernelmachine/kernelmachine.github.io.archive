@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="http://suchin.co/atom.xml" rel="self"/>
  <link href="http://suchin.co/"/>
- <updated>2016-02-15T23:14:11-05:00</updated>
+ <updated>2016-02-27T14:25:28-05:00</updated>
  <id>http://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -13,11 +13,298 @@
 
  
  <entry>
-   <title>Internet-wide security data</title>
-   <link href="http://suchin.co/2016/02/15/replacing-bgp-ranking/"/>
+   <title>Security Data</title>
+   <link href="http://suchin.co/2016/02/20/security-data/"/>
+   <updated>2016-02-20T00:00:00-05:00</updated>
+   <id>http://suchin.co/2016/02/20/security-data</id>
+   <content type="html">
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Implementing the DataFrame in Rust</title>
+   <link href="http://suchin.co/2016/02/19/Implementing-the-DataFrame/"/>
+   <updated>2016-02-19T00:00:00-05:00</updated>
+   <id>http://suchin.co/2016/02/19/Implementing-the-DataFrame</id>
+   <content type="html">&lt;p&gt;The pandas dataframe is a horrible data structure from a type perspective. It’s a structure
+in which floats, ints, and strings can co-exist. This makes the concept of a dataframe less straightforward
+to port to type-safe languages like Rust.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Making Compile-Time Guarantees for Matrix Computations</title>
+   <link href="http://suchin.co/2016/02/18/Type-Safe-Matrix-Computations/"/>
+   <updated>2016-02-18T00:00:00-05:00</updated>
+   <id>http://suchin.co/2016/02/18/Type-Safe-Matrix-Computations</id>
+   <content type="html">&lt;p&gt;Numpy is a great library, a core libra&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Parallel and Block algorithms in Rust</title>
+   <link href="http://suchin.co/2016/02/17/parallel-and-block-algorithms/"/>
+   <updated>2016-02-17T00:00:00-05:00</updated>
+   <id>http://suchin.co/2016/02/17/parallel-and-block-algorithms</id>
+   <content type="html">&lt;p&gt;Intro&lt;/p&gt;
+
+&lt;p&gt;Standard matrix multiplication between two &lt;script type=&quot;math/tex&quot;&gt;n \times n&lt;/script&gt; matrices &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;B&lt;/script&gt; involves &lt;script type=&quot;math/tex&quot;&gt;2n^3&lt;/script&gt; operations:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;B&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Block operations&lt;/p&gt;
+
+&lt;p&gt;Parallel Array operations in Python&lt;/p&gt;
+
+&lt;p&gt;The most interesting parallelization library in Python comes from Dask[^1].&lt;/p&gt;
+
+&lt;p&gt;Quick description of dask and how it works.&lt;/p&gt;
+
+&lt;p&gt;Parallelization in Rust&lt;/p&gt;
+
+&lt;p&gt;Rust is cooler! Native parallelization framework possible via Rayon + NDArray.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Applying Machine Learning to Security Problems</title>
+   <link href="http://suchin.co/2016/02/16/applying-machine-learning-to-security-problems/"/>
+   <updated>2016-02-16T00:00:00-05:00</updated>
+   <id>http://suchin.co/2016/02/16/applying-machine-learning-to-security-problems</id>
+   <content type="html">&lt;p&gt;Anomaly detection and remediation is a hard and expensive process ridden with
+false alarms and rabbit holes. The security community has been increasingly
+interested in the potential for data-driven tools to filter out noise and automatically
+detect malicious activity in large networks. However, while capable
+of overcoming the limitations of static, rule-based techniques, machine learning
+is not a silver bullet solution to detecting and responding to attacks. In this
+post, we will detail two obstacles in applying machine learning to security, with
+attention to how to solve them.&lt;/p&gt;
+
+&lt;p&gt;At its core, the (supervised) learning process is two-fold: training a model on
+known data and testing it on unknown samples. In particular, adaptable models
+require a continuous flow of labeled data to train with. Unfortunately, the
+creation of such labeled data is the most expensive and time-consuming part
+of the data science process. Data is usually messy, incomplete, and inconsistent.
+While there are many tools to experiment with different algorithms and
+their parameters, there are few tools to help one develop clean, comprehensive
+datasets. Often times this means asking practitioners with deep domain expertise
+to help label existing data elements. You can also try to purchase “good” data,
+but this can be hard to come by in the security context (and may go stale very quickly).
+You can also try to use a combination of unsupervised and supervised learning called—unsurprisingly—semi-supervised learning&lt;/p&gt;
+
+&lt;p&gt;On top of that, bias in training data can hamper the effectiveness of a model
+to discern between output classes. In the security context, data bias can be
+interpreted in two ways.&lt;/p&gt;
+
+&lt;p&gt;First, attack methodologies are becoming more dynamic than ever before. If a
+predictive model is trained on known patterns and vulnerabilities, it may not
+necessarily detect an unprecedented attack that does not conform to to those
+1trends. If a predictive model is trained on known patterns and vulnerabilities
+(i.e. using features from malware that is file-system resident),
+it may not necessarily detect an unprecedented attack that does not conform
+ to those trends (i.e. misses features from malware that is only memory resident).&lt;/p&gt;
+
+&lt;p&gt;Bias can sneak up on you, as well. You may think you can use the Alexa listings to,
+say, obtain a list of benign domains, but that assumption may turn out to be a bad
+idea since there is no guarantee that those sites are clean. Getting good ground
+truth in security is hard.&lt;/p&gt;
+
+&lt;p&gt;Second, data bias also comes in the form of &lt;em&gt;class representation&lt;/em&gt;. To understand
+class representation bias, one can look to a core foundation of statistics: Bayes
+theorem.&lt;/p&gt;
+
+&lt;p&gt;Bayes theorem describes the probability of event A given event B:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;P(A | B) = \frac { P (A) P(B | A)}{P(B)}&lt;/script&gt;
+
+&lt;p&gt;Expanding the probability P (B) for the set of two mutually exclusive outcomes,
+we arrive at the following equation:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;P (B) = (A 1 )P (B|A 1 ) + (\neg A 2 )P (B|\neg A 2 )&lt;/script&gt;
+
+&lt;p&gt;Combining the above equations, we arrive at the following alternative statement
+of Bayes’ theorem:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;P (A|B) = \frac{P (A)P (B|A)} {P (A 1 )P (B|A 1 ) + P (\neg A 2 )P (B|\neg A 2 )}&lt;/script&gt;
+
+&lt;p&gt;Let’s apply this theorem to a concrete security problem to show the emergent
+issues of training predictive models on biased data.&lt;/p&gt;
+
+&lt;p&gt;Suppose company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; has &lt;script type=&quot;math/tex&quot;&gt;1000&lt;/script&gt; employees, and a security vendor has deployed an
+intrusion detection system (IDS) alerting the company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; when it detects a malicious
+URL sent to an employee’s inbox. Suppose there are &lt;script type=&quot;math/tex&quot;&gt;10&lt;/script&gt; malicious URLs
+sent to employees of company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; per day. Finally, suppose the IDS analyzes
+&lt;script type=&quot;math/tex&quot;&gt;10000&lt;/script&gt; incoming URLs to company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; per day.&lt;/p&gt;
+
+&lt;p&gt;Let &lt;script type=&quot;math/tex&quot;&gt;I&lt;/script&gt;denote an incident (an incoming malicious URL) and &lt;script type=&quot;math/tex&quot;&gt;\neg I&lt;/script&gt; denote a non-
+incident (an incoming benign URL). Similarly, let &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; denote an alarm (the
+IDS classifies incoming URL as malicious) and &lt;script type=&quot;math/tex&quot;&gt;\neg A&lt;/script&gt; denote a non-alarm (the
+IDS classifies URL as benign). That means &lt;script type=&quot;math/tex&quot;&gt;P (A|I) = P (\text{hit})&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;P (A| \neg I) =
+P (\text{false alarm})&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;What’s the probability that an alarm is associated with a real incident? In other
+words, how much can we trust the IDS under these conditions?&lt;/p&gt;
+
+&lt;p&gt;Using Bayes’ Theorem from above, we know:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;P (I|A) = \frac{P (I)P (A|I)}{P (I)P (A|I) + P (\neg I)P (A|\neg I)}&lt;/script&gt;
+
+&lt;p&gt;Put another way,&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;P (\text{IDS is accurate}) = \frac{P (\text{incident})P (\text{hit})}{P (\text{incident})P (\text{hit}) + P (\text{non-incident})P (\text{false alarm})}&lt;/script&gt;
+
+&lt;p&gt;Now let’s calculate &lt;script type=&quot;math/tex&quot;&gt;P(\text{incident})&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;P(\text{non-incident})&lt;/script&gt;, given the parameters of
+the IDS problem we defined above:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;P(\text{incident}) =\frac{\text{10 incidents per day}}{\text{10000 audits per day}}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;P (\text{non-incident}) = 1 − P (\text{incident}) = 0.999&lt;/script&gt;
+
+&lt;p&gt;These probabilities emphasize the bias present in the distribution of analyzed
+URLs. The IDS has little sense of what incidents entail, as it is trained on very
+few examples of it. Plugging the probabilities into the equation above, we find
+that:&lt;/p&gt;
+
+&lt;p&gt;Thus, to have reasonable confidence in an IDS under these biased conditions,
+we must have not only unrealistically high hit rate, but also unrealistically low
+false positive rate. For example, for an IDS to be &lt;script type=&quot;math/tex&quot;&gt;80&lt;/script&gt; percent accurate, even with
+a best case scenario of a 100 percent hit rate, the IDS’ false alarm rate must be
+&lt;script type=&quot;math/tex&quot;&gt;4 \times 10^{−4}&lt;/script&gt; . In other words, only &lt;script type=&quot;math/tex&quot;&gt;4&lt;/script&gt; out of &lt;script type=&quot;math/tex&quot;&gt;10000&lt;/script&gt; alarms can be false
+positives to achieve this accuracy.&lt;/p&gt;
+
+&lt;p&gt;In the real world, detection hit rates are much lower and false alarm rates are
+much higher. Thus, class representation bias in the security context can make
+machine learning algorithms inaccurate and untrustworthy. When models are
+trained on only a few examples of one class but many examples of another, the
+bar for reasonable accuracy is extremely high, and in some cases unachievable.
+Predictive algorithms run the risk of being ”the boy who cried wolf” – annoying
+and prone to desensitizing security professionals to incident alerts. That last thing
+you want to do is create a fancy new system that only exacerbates the problem that
+was identified at the core of the Target/Home Depot breaches.&lt;/p&gt;
+
+&lt;p&gt;Data scientists can avoid these obstacles with a few measures:&lt;/p&gt;
+
+&lt;p&gt;1) Data scientists should pay particular attention to training models with large
+and balanced data that are representative of all output classes. Take balanced
+subsamples of your data if necessary, and understand your data&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+
+&lt;p&gt;2) Data scientists should focus on getting a plethora of labeled data. Amazon’s
+Mechanical Turk is a useful tool for this. Look at open sourced data, and encourage
+data gathering expeditions.&lt;/p&gt;
+
+&lt;p&gt;3) Encourage security expertise on the team. Domain expertise is pretty important
+to the performance of machine learning algorithms applied in the security
+space. To keep up with the changing threat landscape, one must have security
+experience.&lt;/p&gt;
+
+&lt;p&gt;4) Incorporate unsupervised methods into the solution of the data science problem.
+Focus on organization, presentation, visualization, filtering of data - not
+just prediction.&lt;/p&gt;
+
+&lt;p&gt;5) Weigh the trade-off between accuracy vs. coverage.&lt;/p&gt;
+
+&lt;p&gt;Machine learning has the potential to change how we detect and respond to
+malicious activity in our networks. Machine learning can weed out signal from
+noise to help incident responders focus on what’s important. It can help administrators
+discover patterns in network activity never seen before. However, when applying these
+algorithms to security we must be aware of caveats of the approach, so we may overcome
+them&lt;/p&gt;
+
+&lt;div class=&quot;footnotes&quot;&gt;
+  &lt;ol&gt;
+    &lt;li id=&quot;fn:1&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;http://divac.ist.temple.edu/~vucetic/documents/vucetic01ecml.pdf&quot;&gt;Classification on Biased Data&lt;/a&gt; &lt;a href=&quot;#fnref:1&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Maps of IPv4</title>
+   <link href="http://suchin.co/2016/02/15/maps-of-IPv4/"/>
    <updated>2016-02-15T00:00:00-05:00</updated>
-   <id>http://suchin.co/2016/02/15/replacing-bgp-ranking</id>
-   <content type="html">&lt;p&gt;Security is one of few disciplines that has a &lt;em&gt;lot&lt;/em&gt; of associated data&lt;/p&gt;
+   <id>http://suchin.co/2016/02/15/maps-of-IPv4</id>
+   <content type="html">&lt;p&gt;Here at Rapid7 we have incredible access to internet-scale data via projects Sonar&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt; and Heisenberg&lt;sup id=&quot;fnref:2&quot;&gt;&lt;a href=&quot;#fn:2&quot; class=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;.
+Investigating these data gives us a birds eye view of the current state of the Internet, public scanning activity, and the network security landscape.&lt;/p&gt;
+
+&lt;p&gt;Recently, I’ve become interested in extending these resources to include maps of IPV4 allocation and network providers.&lt;/p&gt;
+
+&lt;p&gt;But first, a primer on IPv4, the fourth version of the Internet Protocol.&lt;/p&gt;
+
+&lt;p&gt;The birth of the Internet, nicely documented by various books&lt;sup id=&quot;fnref:3&quot;&gt;&lt;a href=&quot;#fn:3&quot; class=&quot;footnote&quot;&gt;3&lt;/a&gt;&lt;/sup&gt;, involved the allocation of a fixed number of IP addresses. Because IPV4 addresses are 32-bit, IPV4 contains:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;2^{32} = 4, 294, 967, 296 \text{ IP addresses.}&lt;/script&gt;
+
+&lt;p&gt;Public demand for IP addresses lead to the exhaustion of allocable IPv4 addresses in 2011, something thought impossible at the Internet’s inception.&lt;/p&gt;
+
+&lt;p&gt;In fact, the Internet is a large marketplace of territory. Service providers sell continguous sets of IP addresses at fixes prices that depend on the number of IP addresses in the block.&lt;/p&gt;
+
+&lt;p&gt;Let’s take a look at the process of splitting an IP block. An IP block has two components: a base address and a prefix. The base address is fixed, and the prefix is a mask that determines how many variants of the base address exist in the block.&lt;/p&gt;
+
+&lt;p&gt;For example, an IP address: 127.3.25/25 is denoted by the following prefix and address:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\text { 1 1 1 1 1 1 1 1 }  \text { 1 1 1 1 1 1 1 1 } \text { 1 1 1 1 1 1 1 1 } \text { 1 0 0 0 0 0 0 0 }&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\text {  0 1 1 1 1 0 1 0  }  \text { 0 0 0 0 0 0 1 1 } \text { 0 0 0 1 1 0 1 0 } \text { 1 1 1 1 1 1 1 1 }&lt;/script&gt;
+
+&lt;p&gt;To split this IP block in half, we simply increment the prefix to 26, resulting in the following prefix and address:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\text { 1 1 1 1 1 1 1 1 }  \text { 1 1 1 1 1 1 1 1 } \text { 1 1 1 1 1 1 1 1 } \text { 1 1 0 0 0 0 0 0 }&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\text {  0 1 1 1 1 0 1 0  }  \text { 0 0 0 0 0 0 1 1 } \text { 0 0 0 1 1 0 1 0 } \text { 1 1 1 1 1 1 1 1 }&lt;/script&gt;
+
+&lt;p&gt;The mask locks the IP address bit to a value, so a larger prefix implies a smaller set of routable space for IP blocks. What does this all suggest?&lt;/p&gt;
+
+&lt;p&gt;Security incident response commonly involves looking at origin autonomous system of a malicious link. The distribution of autonomous systems across the Internet follows a particularly interesting map:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;IPV4 MAP&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;We can look at the maximum number of routable addresses in each AS with the following code:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;as_size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;asn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;ipblock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;as_block&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;asn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ipblock&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;mask_lengths&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ip&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;/&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ip&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ipblock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;sizes&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;lambda&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;32&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mask_lengths&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sizes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;em&gt;FIGURE&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;However, due to the frequent splitting of IP blocks we must remember that a &lt;em&gt;large AS does not necessarily suggest a large IP block&lt;/em&gt;. For either the large AS could have a few large IP blocks, or a ton of small ones.&lt;/p&gt;
+
+&lt;p&gt;Let’s take a look at an AS that has split since 2007:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;FIGURE&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Phishing sites pulled from cleanmx&lt;sup id=&quot;fnref:4&quot;&gt;&lt;a href=&quot;#fn:4&quot; class=&quot;footnote&quot;&gt;4&lt;/a&gt;&lt;/sup&gt; show up more often when the IP blocks are smaller.&lt;/p&gt;
+
+&lt;div class=&quot;footnotes&quot;&gt;
+  &lt;ol&gt;
+    &lt;li id=&quot;fn:1&quot;&gt;
+      &lt;p&gt;(https://sonar.labs.rapid7.com/) &lt;a href=&quot;#fnref:1&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:2&quot;&gt;
+      &lt;p&gt;(https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots) &lt;a href=&quot;#fnref:2&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:3&quot;&gt;
+      &lt;p&gt;[History of the Internet] &lt;a href=&quot;#fnref:3&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:4&quot;&gt;
+      &lt;p&gt;[Cleanmx archive] (http://cleanmx.org) &lt;a href=&quot;#fnref:4&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;
 </content>
  </entry>
  
@@ -78,13 +365,13 @@ f(x) = F x = f_1 x + f_2 x + f_3 x + ...  \text{ where } n &lt;&lt; \infty %]]&g
  </entry>
  
  <entry>
-   <title>Online Learning</title>
-   <link href="http://suchin.co/2016/02/13/online-learning/"/>
+   <title>Out Of Core Learning</title>
+   <link href="http://suchin.co/2016/02/13/out-of-core-learning/"/>
    <updated>2016-02-13T00:00:00-05:00</updated>
-   <id>http://suchin.co/2016/02/13/online-learning</id>
+   <id>http://suchin.co/2016/02/13/out-of-core-learning</id>
    <content type="html">&lt;hr /&gt;
 &lt;p&gt;layout: post
-title: Low-memory machine learning
+title: Out-of-Core Learning
 –&lt;/p&gt;
 
 &lt;p&gt;The cloud has given machine learning practitioners unprecedented strength to build and test models with less concern about memory and CPU usage. In the future, it’s going to be even better. Amazon will be introducing X1 instances this year, with 2 TB of memory &lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
@@ -131,8 +418,7 @@ title: Low-memory machine learning
 &lt;p&gt;This blog will condense and communicate things I read about. It’s a way for me to understand
 material and practice writing, and for readers to learn something new.&lt;/p&gt;
 
-&lt;p&gt;Topics will be all over the place: machine learning to security, programming to novels.
-With time, I hope to hone a voice.&lt;/p&gt;
+&lt;p&gt;Topics will be all over the place: machine learning to security, society to books.&lt;/p&gt;
 
 &lt;p&gt;Thanks for reading!&lt;/p&gt;
 </content>
