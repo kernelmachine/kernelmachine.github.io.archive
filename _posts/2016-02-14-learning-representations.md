@@ -6,7 +6,7 @@ title: Learning Representations
 *This post is 1st in a series on representation learning.*
 
 I've stated before that feature engineering is often the most time-consuming
-and difficult process of building machine learning services.[^1] The reality is that many learning algorithms are dependent on the supply of diverse and balanced training data to perform well, and this type of data is unavailable in most contexts. In the case of security, even building a simple classifier of good and bad URLs requires an incredible effort to gather malicious and benign sources of URLs, which are, suprisingly, hard to come by. 
+and difficult process of building machine learning services.[^1] The reality is that many learning algorithms are dependent on the supply of diverse and balanced training data to perform well, and this type of data is unavailable in most contexts. In the case of security, even building a simple classifier of good and bad URLs requires an incredible effort to gather malicious and benign sources of URLs, which are, suprisingly, hard to come by.
 
 Furthermore, feature engineering is mediated by humans, and we're biased and limited in scope.
 
@@ -29,7 +29,7 @@ In other words, the representation must be able to withstand small perturbations
 
 $$ f(x) = F x = f_1 x + f_2 x + f_3 x + ...  \text{ where } n << \infty $$
 
-We wan
+
 ### Feature disentanglement
 
 $$ det(F) = 0 $$

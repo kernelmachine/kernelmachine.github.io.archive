@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="http://suchin.co/atom.xml" rel="self"/>
  <link href="http://suchin.co/"/>
- <updated>2016-02-27T15:35:15-05:00</updated>
+ <updated>2016-02-27T15:37:58-05:00</updated>
  <id>http://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -452,8 +452,7 @@ and difficult process of building machine learning services.&lt;sup id=&quot;fnr
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 f(x) = F x = f_1 x + f_2 x + f_3 x + ...  \text{ where } n &lt;&lt; \infty %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;We wan
-### Feature disentanglement&lt;/p&gt;
+&lt;h3 id=&quot;feature-disentanglement&quot;&gt;Feature disentanglement&lt;/h3&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;det(F) = 0&lt;/script&gt;
 
