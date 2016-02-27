@@ -7,7 +7,7 @@ permalink:           pretty
 title:               suchin
 tagline:             a blog
 url:                 http://suchin.co
-paginate:            3
+paginate:            1
 baseurl:             ""
 about:               "about"
 
@@ -27,7 +27,7 @@ author:
   name:              Suchin Gururangan
   url:               https://suchin.co
   email:
-  
+
 # Custom vars
 version:             1.0.0
 github:
