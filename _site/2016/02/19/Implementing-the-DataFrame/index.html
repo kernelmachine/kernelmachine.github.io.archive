@@ -45,9 +45,34 @@
         <article class="post">
   <h1 class="post-title">Implementing the DataFrame in Rust</h1>
   <time datetime="2016-02-19T00:00:00-05:00" class="post-date">19 Feb 2016</time>
-  <p>The pandas dataframe is a horrible data structure from a type perspective. It’s a structure
-in which floats, ints, and strings can co-exist. This makes the concept of a dataframe less straightforward
-to port to type-safe languages like Rust.</p>
+  <p>The pandas dataframe is an annoying data structure from a type perspective. It’s a structure
+in which floats, ints, and strings can co-exist.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="gp">&gt;&gt; </span>np.sctypes
+<span class="o">{</span><span class="s1">'complex'</span>: <span class="o">[</span>numpy.complex64,
+            numpy.complex128,
+            numpy.complex192],
+<span class="s1">'float'</span>:   <span class="o">[</span>numpy.float16,
+           numpy.float32,
+           numpy.float64,
+           numpy.float96],
+<span class="s1">'int'</span>:     <span class="o">[</span>numpy.int8,
+            numpy.int16,
+            numpy.int32,
+            numpy.int32,
+            numpy.int64],
+ <span class="s1">'others'</span>: <span class="o">[</span>bool,
+            object,
+            str,
+            unicode,
+            numpy.void],
+ <span class="s1">'uint'</span>: <span class="o">[</span>numpy.uint8,
+          numpy.uint16,
+          numpy.uint32,
+          numpy.uint32,
+          numpy.uint64]
+        <span class="o">}</span></code></pre></figure>
+
 
 </article>
 
@@ -91,7 +116,7 @@ to port to type-safe languages like Rust.</p>
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-02-27T14:49:00-05:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-02-27T15:35:15-05:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>

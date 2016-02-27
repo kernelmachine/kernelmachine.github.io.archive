@@ -3,9 +3,9 @@ layout: post
 title: Out-of-Core Learning
 --
 
-The cloud has given machine learning practitioners unprecedented strength to build and test models with less concern about memory and CPU usage. In the future, it's going to be even better. Amazon will be introducing X1 instances this year, with 2 TB of memory [^1].
+The cloud has given machine learning practitioners unprecedented strength to build and test models with less concern about memory and CPU usage. Amazon will be introducing X1 instances this year, with 2 TB of memory [^1].
 
-But crazy instances are expensive, and non-trivial to set up. GRAPH showing what'd you'd be paying for.
+But powerful instances are expensive, and non-trivial to set up.
 
 So ideally we'd want to use the smallest instance possible, but a lack of memory can spell the death of machine learning models. Say you have a dataframe of 1 million samples with 20 `float64` features each. A `float64` element takes 8 bytes. This dataframe will have a size of:
 
@@ -15,12 +15,7 @@ The smallest EC2 instance we could use for this data is BLAH, which would cost B
 
 What are some solutions?
 
-### Sparse matrices
-
-### Online learning
-
-### Parallelization
-
+### Out-of-Core learning
 
 {% highlight python %}
 
