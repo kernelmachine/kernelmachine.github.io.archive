@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="http://suchin.co/atom.xml" rel="self"/>
  <link href="http://suchin.co/"/>
- <updated>2016-02-27T15:37:58-05:00</updated>
+ <updated>2016-02-27T19:19:57-05:00</updated>
  <id>http://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -17,7 +17,13 @@
    <link href="http://suchin.co/2016/02/20/security-data/"/>
    <updated>2016-02-20T00:00:00-05:00</updated>
    <id>http://suchin.co/2016/02/20/security-data</id>
-   <content type="html">
+   <content type="html">&lt;p&gt;AS/IP Block Data&lt;/p&gt;
+
+&lt;p&gt;Sonar&lt;/p&gt;
+
+&lt;p&gt;BlackList Feeds&lt;/p&gt;
+
+&lt;p&gt;http://www.secrepo.com/&lt;/p&gt;
 </content>
  </entry>
  
@@ -96,13 +102,16 @@ guarantees for code execution.&lt;/p&gt;
 
         &lt;span class=&quot;k&quot;&gt;match&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
             &lt;span class=&quot;nn&quot;&gt;MatrixError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MismatchedDimensions&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nd&quot;&gt;write!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Operation cannot be performed. Mismatched dimensions.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+                &lt;span class=&quot;nd&quot;&gt;write!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Operation cannot be performed.
+                      Mismatched dimensions.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
             &lt;span class=&quot;nn&quot;&gt;MatrixError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NonSquareMatrix&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nd&quot;&gt;write!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Operation cannot be performed. Matrix is not square.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+                &lt;span class=&quot;nd&quot;&gt;write!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Operation cannot be performed.
+                      Matrix is not square.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
             &lt;span class=&quot;nn&quot;&gt;MatrixError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MalformedMatrix&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt;
                 &lt;span class=&quot;nd&quot;&gt;write!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Matrix is malformed.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
             &lt;span class=&quot;nn&quot;&gt;MatrixError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SingularMatrix&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nd&quot;&gt;write!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Operation cannot be performed. Matrix has zero determinant.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+                &lt;span class=&quot;nd&quot;&gt;write!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Operation cannot be performed.
+                      Matrix has zero determinant.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
             &lt;span class=&quot;nn&quot;&gt;MatrixError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LapackComputationError&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt;
                 &lt;span class=&quot;nd&quot;&gt;write!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Failure in the course of computation.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
             &lt;span class=&quot;nn&quot;&gt;MatrixError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LapackInputError&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt;

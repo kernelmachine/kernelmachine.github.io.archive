@@ -39,13 +39,16 @@ impl fmt::Display for MatrixError{
 
         match *self{
             MatrixError::MismatchedDimensions=>
-                write!(f, "Operation cannot be performed. Mismatched dimensions."),
+                write!(f, "Operation cannot be performed.
+                      Mismatched dimensions."),
             MatrixError::NonSquareMatrix=>
-                write!(f, "Operation cannot be performed. Matrix is not square."),
+                write!(f, "Operation cannot be performed.
+                      Matrix is not square."),
             MatrixError::MalformedMatrix =>
                 write!(f, "Matrix is malformed."),
             MatrixError::SingularMatrix =>
-                write!(f, "Operation cannot be performed. Matrix has zero determinant."),
+                write!(f, "Operation cannot be performed.
+                      Matrix has zero determinant."),
             MatrixError::LapackComputationError =>
                 write!(f, "Failure in the course of computation."),
             MatrixError::LapackInputError =>

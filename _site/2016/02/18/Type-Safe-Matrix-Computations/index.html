@@ -79,13 +79,16 @@ guarantees for code execution.</p>
 
         <span class="k">match</span> <span class="o">*</span><span class="k">self</span><span class="p">{</span>
             <span class="nn">MatrixError</span><span class="p">::</span><span class="n">MismatchedDimensions</span><span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Operation cannot be performed. Mismatched dimensions."</span><span class="p">),</span>
+                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Operation cannot be performed.
+                      Mismatched dimensions."</span><span class="p">),</span>
             <span class="nn">MatrixError</span><span class="p">::</span><span class="n">NonSquareMatrix</span><span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Operation cannot be performed. Matrix is not square."</span><span class="p">),</span>
+                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Operation cannot be performed.
+                      Matrix is not square."</span><span class="p">),</span>
             <span class="nn">MatrixError</span><span class="p">::</span><span class="n">MalformedMatrix</span> <span class="k">=&gt;</span>
                 <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Matrix is malformed."</span><span class="p">),</span>
             <span class="nn">MatrixError</span><span class="p">::</span><span class="n">SingularMatrix</span> <span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Operation cannot be performed. Matrix has zero determinant."</span><span class="p">),</span>
+                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Operation cannot be performed.
+                      Matrix has zero determinant."</span><span class="p">),</span>
             <span class="nn">MatrixError</span><span class="p">::</span><span class="n">LapackComputationError</span> <span class="k">=&gt;</span>
                 <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Failure in the course of computation."</span><span class="p">),</span>
             <span class="nn">MatrixError</span><span class="p">::</span><span class="n">LapackInputError</span> <span class="k">=&gt;</span>
@@ -177,7 +180,7 @@ guarantees for code execution.</p>
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-02-27T15:37:58-05:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-02-27T19:19:57-05:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>
