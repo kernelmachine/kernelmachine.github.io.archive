@@ -32,7 +32,9 @@ pub enum MatrixError{
     UnknownError,
     IndexError
 }
+{% endhighlight %}
 
+{% highlight rust %}
 impl fmt::Display for MatrixError{
 
     fn fmt(&self, f : &mut fmt::Formatter ) -> fmt::Result{
@@ -61,19 +63,24 @@ impl fmt::Display for MatrixError{
     }
 }
 
+{% endhighlight %}
 
+{% highlight rust %}
 trait RectMat : Num + Rand + Clone{
-    fn new(e : Vec<f64>, r_size : usize, c_size : usize) -> Result<   Self, MatrixError>;
+    fn new(e : Vec<f64>, r_size : usize, c_size : usize) -> Result<Self, MatrixError>;
     fn random(r_size : usize, c_size: usize) -> Self ;
-    fn replace(&mut self,row: usize, col:usize, value :f64) -> ();
-    fn zeros (r_size : usize, c_size : usize) -> Self;
-    fn diag_mat (a : Vec<f64>) -> Self;
     fn get_element(&self, row : usize, col : usize) -> f64;
-    fn get_ind(&self, row :usize, col : usize) -> usize;
+    fn zeros (r_size : usize, c_size : usize) -> Self;
     fn transpose(&self) -> Self;
     fn diagonal (&self) -> Vec<f64>;
-    fn tri (row_size:usize, col_size : usize, k : usize, upper_or_lower : Triangular) -> Result<Self,MatrixError>;
+    .
+    .
+    .  
 }
+
+{% endhighlight %}
+
+{% highlight rust %}
 
 trait SqMat: RectMat{
     fn new(e : Vec<f64>, r_size : usize, c_size : usize) -> Result<   Self, MatrixError>;
@@ -81,6 +88,10 @@ trait SqMat: RectMat{
     fn identity(row_size : usize) -> Self;
     fn pseudoinverse(a: &mut Self) ->Result<Self,MatrixError>;
 }
+
+{% endhighlight %}
+
+{% highlight rust %}
 
 trait NonSingularMat : SqMat{
     fn inverse(a : &mut Self ) ->Result<Self,MatrixError>;
