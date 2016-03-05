@@ -10,13 +10,13 @@ While these tools have provided value independently, we have recently focused on
 
 A first step in this direction was borne out of an effort to understand the following observation we made from our threat intelligence data: *A small subset of autonomous systems host a disproportionate amount of malicious activity.*
 
-In particular, 200 Autonomous systems hosted 70% of phishing activity from 2007 to 2015, and 100 Autonomous systems hosted 70% of malicious password attempts on Heisenberg honeypots in 2015.
+In particular, $$200$$ Autonomous systems hosted $$70%$$ of phishing activity from 2007 to 2015, and $$100$$ Autonomous systems hosted $$70%$$ of malicious password attempts on Heisenberg honeypots in 2015.
 
 *FIGURE*
 
 We wanted to understand what makes some autonomous systems more likely to host malicious activity.
 
-The topology of IPv4 is characterized by three levels of hierarchy, IP addresses, subnets, and ASes. IP addresses are 32-bit sequences that map blah to blah. Subnets are groups of these IP addresses. Autonomous systems (ASes) are managed blocks of subnets that have independent routing policies. IPv4 is divided into about 65,000 of these ASes, which are managed by universities, public institutions, and private enterprises.
+The topology of IPv4 is characterized by three levels of hierarchy, IP addresses, subnets, and ASes. IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses. Autonomous systems (ASes) are managed blocks of subnets that have independent routing policies. IPv4 is divided into about 65,000 of these ASes, which are managed by universities, public institutions, and private enterprises. There are 200,000,000 subnets on IPv4 today, and 2^32 IP addresses.
 
 We gathered historical data on the mapping between IP addresses and ASes from 2007 to 2015 to generate a longitudinal map of IPv4.
 
@@ -24,9 +24,8 @@ We found that IPv4 is fragmenting.
 
 *FIGURE*
 
-IPv4 contains $$2^{32}$$ IP addresses. While a large number, the addressable space in IPv4 has been exhausted -- meaning that growth in Internet access requires the reallocation of existing address space.
 
-This trend is clear in the data. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, we see a rise in the number of small ASes and a decline in the number of large ones.
+This trend is clear in the data. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, we see a rise in the number of small ASes and a decline in the number of large ones. These results make sense given the fact that growth in IPv4 access requires the reallocation of existing address space.
 
 Digging deeper, we analyzed the composition, size, and fragmentation of ASes that have hosted disproportionate amounts of phishing activity since 2007.
 
@@ -34,7 +33,7 @@ We found that xx-small subnets made up 56 $$\pm$$ 3.0 percent of a malicious AS.
 
 Furthermore, malicious ASes were in the 80-90th percentile in size.
 
-Lastly, we wanted to analyze how fragmented malicious ASes were. To compute fragementation, subnets observed in ASes overtime were organized into trees based on the parent-child relationships observed (Figure 3). We then calculated the ratio of the number of root subnets, which have no parents, to the number of subsequent child subnets across the lifetime of the AS. We found that malicious ASes were 10-20% more fragmented than other ASes in IPv4.
+Lastly, we wanted to analyze how fragmented malicious ASes were. To compute fragmentation, subnets observed in ASes overtime were organized into trees based on the parent-child relationships observed (Figure 3). We then calculated the ratio of the number of root subnets, which have no parents, to the number of subsequent child subnets across the lifetime of the AS. We found that malicious ASes were 10-20% more fragmented than other ASes in IPv4.
 
 *FIGURE*
 
