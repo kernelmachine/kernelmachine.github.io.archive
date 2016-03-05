@@ -79,9 +79,9 @@ guarantees for code execution.</p>
     <span class="n">LapackInputError</span><span class="p">,</span>
     <span class="n">UnknownError</span><span class="p">,</span>
     <span class="n">IndexError</span>
-<span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
 
-<span class="k">impl</span> <span class="nn">fmt</span><span class="p">::</span><span class="n">Display</span> <span class="k">for</span> <span class="n">MatrixError</span><span class="p">{</span>
+<figure class="highlight"><pre><code class="language-rust" data-lang="rust"><span class="k">impl</span> <span class="nn">fmt</span><span class="p">::</span><span class="n">Display</span> <span class="k">for</span> <span class="n">MatrixError</span><span class="p">{</span>
 
     <span class="k">fn</span> <span class="nf">fmt</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">f</span> <span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="nn">fmt</span><span class="p">::</span><span class="n">Formatter</span> <span class="p">)</span> <span class="k">-&gt;</span> <span class="nn">fmt</span><span class="p">::</span><span class="n">Result</span><span class="p">{</span>
 
@@ -107,30 +107,28 @@ guarantees for code execution.</p>
                 <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="s">"Unknown error, please submit bug."</span><span class="p">)</span>
         <span class="p">}</span>
     <span class="p">}</span>
-<span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
 
-
-<span class="k">trait</span> <span class="n">RectMat</span> <span class="p">:</span> <span class="nb">Num</span> <span class="o">+</span> <span class="n">Rand</span> <span class="o">+</span> <span class="n">Clone</span><span class="p">{</span>
-    <span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">e</span> <span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">r_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">c_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span>   <span class="n">Self</span><span class="p">,</span> <span class="n">MatrixError</span><span class="o">&gt;</span><span class="p">;</span>
+<figure class="highlight"><pre><code class="language-rust" data-lang="rust"><span class="k">trait</span> <span class="n">RectMat</span> <span class="p">:</span> <span class="nb">Num</span> <span class="o">+</span> <span class="n">Rand</span> <span class="o">+</span> <span class="n">Clone</span><span class="p">{</span>
+    <span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">e</span> <span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">r_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">c_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">Self</span><span class="p">,</span> <span class="n">MatrixError</span><span class="o">&gt;</span><span class="p">;</span>
     <span class="k">fn</span> <span class="nf">random</span><span class="p">(</span><span class="n">r_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">c_size</span><span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span> <span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">replace</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">,</span><span class="n">row</span><span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">usize</span><span class="p">,</span> <span class="n">value</span> <span class="p">:</span><span class="nb">f64</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="p">();</span>
-    <span class="k">fn</span> <span class="nf">zeros</span> <span class="p">(</span><span class="n">r_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">c_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">diag_mat</span> <span class="p">(</span><span class="n">a</span> <span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
     <span class="k">fn</span> <span class="nf">get_element</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">row</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">col</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span><span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">get_ind</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">row</span> <span class="p">:</span><span class="n">usize</span><span class="p">,</span> <span class="n">col</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">usize</span><span class="p">;</span>
+    <span class="k">fn</span> <span class="nf">zeros</span> <span class="p">(</span><span class="n">r_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">c_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
     <span class="k">fn</span> <span class="nf">transpose</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
     <span class="k">fn</span> <span class="nf">diagonal</span> <span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">tri</span> <span class="p">(</span><span class="n">row_size</span><span class="p">:</span><span class="n">usize</span><span class="p">,</span> <span class="n">col_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">k</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">upper_or_lower</span> <span class="p">:</span> <span class="n">Triangular</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">Self</span><span class="p">,</span><span class="n">MatrixError</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="p">}</span>
+    <span class="err">.</span>
+    <span class="err">.</span>
+    <span class="err">.</span>  
+<span class="p">}</span></code></pre></figure>
 
-<span class="k">trait</span> <span class="n">SqMat</span><span class="p">:</span> <span class="n">RectMat</span><span class="p">{</span>
+<figure class="highlight"><pre><code class="language-rust" data-lang="rust"><span class="k">trait</span> <span class="n">SqMat</span><span class="p">:</span> <span class="n">RectMat</span><span class="p">{</span>
     <span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">e</span> <span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">r_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">c_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span>   <span class="n">Self</span><span class="p">,</span> <span class="n">MatrixError</span><span class="o">&gt;</span><span class="p">;</span>
     <span class="k">fn</span> <span class="nf">diag_mat</span> <span class="p">(</span><span class="n">a</span> <span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
     <span class="k">fn</span> <span class="nf">identity</span><span class="p">(</span><span class="n">row_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
     <span class="k">fn</span> <span class="nf">pseudoinverse</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Self</span><span class="p">)</span> <span class="k">-&gt;</span><span class="n">Result</span><span class="o">&lt;</span><span class="n">Self</span><span class="p">,</span><span class="n">MatrixError</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
 
-<span class="k">trait</span> <span class="n">NonSingularMat</span> <span class="p">:</span> <span class="n">SqMat</span><span class="p">{</span>
+<figure class="highlight"><pre><code class="language-rust" data-lang="rust"><span class="k">trait</span> <span class="n">NonSingularMat</span> <span class="p">:</span> <span class="n">SqMat</span><span class="p">{</span>
     <span class="k">fn</span> <span class="nf">inverse</span><span class="p">(</span><span class="n">a</span> <span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Self</span> <span class="p">)</span> <span class="k">-&gt;</span><span class="n">Result</span><span class="o">&lt;</span><span class="n">Self</span><span class="p">,</span><span class="n">MatrixError</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="p">}</span></code></pre></figure>
 
@@ -163,7 +161,7 @@ guarantees for code execution.</p>
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-02-27T19:19:57-05:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-03-04T09:37:34-05:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>
+    
+      Maps of IPv4 &middot; suchin
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/highlight.pack.js"></script>
+  <!-- <link rel="stylesheet" href="/googlecode.css"> -->
+
+  <script>hljs.initHighlightingOnLoad();</script>
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/public/square-outline.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/atom+xml" title="suchin" href="/atom.xml">
+</head>
+
+
+  <body>
+
+    <div class="container content">
+      <header class="masthead">
+        <h3 class="masthead-title">
+          <a href="/" title="Home" style="text-decoration: none;">suchin</a>
+          <small><a href="/about" style="text-decoration: none; color: #C0C0C0">writings</a></small>
+        </h3>
+      </header>
+
+      <main>
+        <article class="post">
+  <h1 class="post-title">Maps of IPv4</h1>
+  <time datetime="2016-02-15T00:00:00-05:00" class="post-date">15 Feb 2016</time>
+  <p>Here at Rapid7 we have incredible access to internet-scale data via projects Sonar<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> and Heisenberg<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup>.
+Investigating these data gives us a birds eye view of the current state of the Internet, public scanning activity, and the network security landscape.</p>
+
+<p>Recently, I’ve become interested in extending these resources to include maps of IPV4 allocation and network providers.</p>
+
+<p>But first, a primer on IPv4, the fourth version of the Internet Protocol.</p>
+
+<p>The birth of the Internet, nicely documented by various books<sup id="fnref:3"><a href="#fn:3" class="footnote">3</a></sup>, involved the allocation of a fixed number of IP addresses. Because IPV4 addresses are 32-bit, IPV4 contains:</p>
+
+<script type="math/tex; mode=display"> 2^{32} = 4, 294, 967, 296 \text{ IP addresses.}</script>
+
+<p>Public demand for IP addresses lead to the exhaustion of allocable IPv4 addresses in 2011, something thought impossible at the Internet’s inception.</p>
+
+<p>In fact, the Internet is a large marketplace of territory. Service providers sell continguous sets of IP addresses at fixes prices that depend on the number of IP addresses in the block.</p>
+
+<p>Let’s take a look at the process of splitting an IP block. An IP block has two components: a base address and a prefix. The base address is fixed, and the prefix is a mask that determines how many variants of the base address exist in the block.</p>
+
+<p>For example, an IP address: 127.3.25/25 is denoted by the following prefix and address:</p>
+
+<script type="math/tex; mode=display"> \text { 1 1 1 1 1 1 1 1 }  \text { 1 1 1 1 1 1 1 1 } \text { 1 1 1 1 1 1 1 1 } \text { 1 0 0 0 0 0 0 0 } </script>
+
+<script type="math/tex; mode=display"> \text {  0 1 1 1 1 0 1 0  }  \text { 0 0 0 0 0 0 1 1 } \text { 0 0 0 1 1 0 1 0 } \text { 1 1 1 1 1 1 1 1 } </script>
+
+<p>To split this IP block in half, we simply increment the prefix to 26, resulting in the following prefix and address:</p>
+
+<script type="math/tex; mode=display"> \text { 1 1 1 1 1 1 1 1 }  \text { 1 1 1 1 1 1 1 1 } \text { 1 1 1 1 1 1 1 1 } \text { 1 1 0 0 0 0 0 0 } </script>
+
+<script type="math/tex; mode=display"> \text {  0 1 1 1 1 0 1 0  }  \text { 0 0 0 0 0 0 1 1 } \text { 0 0 0 1 1 0 1 0 } \text { 1 1 1 1 1 1 1 1 } </script>
+
+<p>The mask locks the IP address bit to a value, so a larger prefix implies a smaller set of routable space for IP blocks. What does this all suggest?</p>
+
+<p>Security incident response commonly involves looking at origin autonomous system of a malicious link. The distribution of autonomous systems across the Internet follows a particularly interesting map:</p>
+
+<p><em>IPV4 MAP</em></p>
+
+<p>We can look at the maximum number of routable addresses in each AS with the following code:</p>
+
+<div>
+  <pre><code class="python">def as_size(self,asn):
+
+    ipblock = self.as_block(asn)
+
+    if ipblock is None:
+
+        return None
+
+    mask_lengths = [ip.split('/')[1] for ip in ipblock]
+
+    sizes = map(lambda x: 2 ** (32 - int(x)), mask_lengths)
+
+    return sum(sizes)</code></pre>
+</div>
+
+<p><em>FIGURE</em></p>
+
+<p>However, due to the frequent splitting of IP blocks we must remember that a <em>large AS does not necessarily suggest a large IP block</em>. For either the large AS could have a few large IP blocks, or a ton of small ones.</p>
+
+<p>Let’s take a look at an AS that has split since 2007:</p>
+
+<p><em>FIGURE</em></p>
+
+<p>Phishing sites pulled from cleanmx<sup id="fnref:4"><a href="#fn:4" class="footnote">4</a></sup> show up more often when the IP blocks are smaller.</p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p>(https://sonar.labs.rapid7.com/) <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:2">
+      <p>(https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots) <a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:3">
+      <p>[History of the Internet] <a href="#fnref:3" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:4">
+      <p>[Cleanmx archive] (http://cleanmx.org) <a href="#fnref:4" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+</article>
+
+<!-- 
+<aside class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/02/20/security-data/">
+            Security Data
+            <small><time datetime="2016-02-20T00:00:00-05:00">20 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/02/19/Implementing-the-DataFrame/">
+            Implementing the DataFrame in Rust
+            <small><time datetime="2016-02-19T00:00:00-05:00">19 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/02/18/Type-Safe-Matrix-Computations/">
+            Making Compile-Time Guarantees for Matrix Computations
+            <small><time datetime="2016-02-18T00:00:00-05:00">18 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</aside>
+ -->
+
+      </main>
+
+      <footer class="footer">
+        <small>
+          &copy; <time datetime="2016-03-04T09:24:46-05:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+        </small>
+      </footer>
+    </div>
+
+  </body>
+</html>
