@@ -28,7 +28,7 @@ of total addressable space) and the shrinking in the number of large autonomous 
 
 Digging deeper, we analyzed the composition, size, and fragmentation of autonomous systems that have hosted disproportionate amounts of phishing activity since 2007.
 
-These malicious ASes contained on average 56 $$\plusorminus$$ 3.0 percent xx-small subnets.
+These malicious ASes contained on average 56 $$\pm$$ 3.0 percent xx-small subnets.
 
 Furthermore, these malicious ASes were in the 80-90th percentile in the size distribution across IPv4.
 
