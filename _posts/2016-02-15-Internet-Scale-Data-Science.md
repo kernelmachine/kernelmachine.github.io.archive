@@ -24,7 +24,7 @@ We found that IPv4 is fragmenting.
 
 *FIGURE*
 
-IPv4 contains 2^{32} IP addresses. While a large number, the addressable space in IPv4 was exhausted -- meaning that growth in Internet access requires the reallocation of existing address space.
+IPv4 contains $$2^{32}$$ IP addresses. While a large number, the addressable space in IPv4 has been exhausted -- meaning that growth in Internet access requires the reallocation of existing address space.
 
 This trend is clear in the data. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, we see a rise in the number of small ASes and a decline in the number of large ones.
 
