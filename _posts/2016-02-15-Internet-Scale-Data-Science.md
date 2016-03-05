@@ -4,42 +4,50 @@ title: Internet-Scale Data Science
 comments: true
 ---
 
-The OCTO Team is a group of researchers working on diverse projects about the Internet. Projects Sonar and Heisenberg give us unprecedented
-view on the macro-scale of the Internet and network security landscape. Our nascent machine learning projects can dynamically detect malicious URLs and certificates,
-classify certificates to their likely origin infrastructure. Our ground truth about the internet is growing with threat intelligence datasets general resolution of malicious activity to IPs, subnets, and autonomous systems.
+At Rapid7, we are building tools that give us insight into the threat landscape across the Internet. We are working on Projects Sonar[^1] and Heisenberg[^2] which give us global exposure to common vulnerabilities and patterns in offensive attacks. Our nascent machine learning projects can detect and characterize malicious URLs and certificates. Our threat intelligence repository is growing with datasets that resolve malicious activity to address blocks and autonomous systems.
 
-Much of our recent research has involved understanding not only how these services can be strengthened independently, but also integrated. These services all give unique perspectives on the network threat landscape, and with these tools and resources, Internet-Scale data science is born.
+While these tools have provided value independently, we have recently focused on using these tools in concert to give unique perspectives on the state of the Internet.
 
-Our first exploration into the synergy of OCTO tools was borne out of an effort to understand the following observation:
+A first step in this direction was borne out of an effort to understand the following observation we made from our threat intelligence data: *A small subset of autonomous systems host a disproportionate amount of malicious activity.*
 
-Our threat intelligence suggests that a small subset of autonomous systems host a disproportionate amount of phishing activity. In particular, 200 Autuonomous Systems hosted 70% of phishing activity from 2007-2015, and 100 Autonomous Systems hosted 70% of malicious password attempts on Heisenberg honeypots in 2015 (Figure 1).
+In particular, 200 Autonomous systems hosted 70% of phishing activity from 2007 to 2015, and 100 Autonomous systems hosted 70% of malicious password attempts on Heisenberg honeypots in 2015.
 
-How could we use OCTO tools to answer: why? What makes some autonomous systems more likely to host malicious activity than not?
+*FIGURE*
 
-By analyzing historical IP -> ASN tables that dated from 2005, we found that IPv4 is generally fragmenting. IPv4 contains:
+We wanted to understand what makes some autonomous systems more likely to host malicious activity.
 
-$$ 2^{32} = 4, 294, 967, 296 \text{ IP addresses,}$$
+The topology of IPv4 is characterized by three levels of hierarchy, IP addresses, subnets, and ASes. IP addresses are 32-bit sequences that map blah to blah. Subnets are groups of these IP addresses. Autonomous systems (ASes) are managed blocks of subnets that have independent routing policies. IPv4 is divided into about 65,000 of these ASes, which are managed by universities, public institutions, and private enterprises.
 
-and public demand for IP addresses lead to the exhaustion of allocable IPv4 addresses in 2011, something thought impossible at the Internet's inception.
+We gathered historical data on the mapping between IP addresses and ASes from 2007 to 2015 to generate a longitudinal map of IPv4.
 
-This means that growth of IPv4 requires reallocation of finite resources rather than allocation of existing ones. We witnessed this trend in growth  over the past decade,
-in which the number of autonomous systems have been growing in tandem with a rise in the number of small autonomous systems (those with $$\le$$ 25th percentile
-of total addressable space) and the shrinking in the number of large autonomous systems (those with $$\ge$$ 75th percentile$$ of total addressable space).
+We found that IPv4 is fragmenting.
 
-Digging deeper, we analyzed the composition, size, and fragmentation of autonomous systems that have hosted disproportionate amounts of phishing activity since 2007.
+*FIGURE*
 
-These malicious ASes contained on average 56 $$\pm$$ 3.0 percent xx-small subnets.
+IPv4 contains 2^{32} IP addresses. While a large number, the addressable space in IPv4 was exhausted -- meaning that growth in Internet access requires the reallocation of existing address space.
 
-Furthermore, these malicious ASes were in the 80-90th percentile in the size distribution across IPv4.
+This trend is clear in the data. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, we see a rise in the number of small ASes and a decline in the number of large ones.
 
-Lastly, these ASes were 10-20% more fragmented than other ASes in IPv4. To compute fragementation, we built *subnet division trees* which pools sets of subnets observed in ASes overtime into separate pools based on the parent-child relationships observed.
+Digging deeper, we analyzed the composition, size, and fragmentation of ASes that have hosted disproportionate amounts of phishing activity since 2007.
 
-We used other tools in the OCTO arsenal to further characterize these ASes. Our AS WHOIS parser showed no particular skew in registration location, time, or ownership - suggesting that these ASes originate from similar distributions as the rest of IPv4, perhaps allowing them to float under the radar better. We also used Sonar's historical forward-DNS service and our automated phishing detection tools to characterize other domains that have mapped to these ASes. There were concentrated lexical and server features of hosted domains, like the fact that wordpress-strings were over-represented in the domain, or that GoDaddy was by far the most popular registrar for these malicious sites.
+We found that xx-small subnets made up 56 $$\pm$$ 3.0 percent of a malicious AS.
 
-Lastly, we wanted to characterize the distribution of device use across malicious autonomous systems. Using our automated certificate classification tool, we found that particular autonomous systems are skewed to use specific devices (Figure 3), suggesting a deliberate use of specific  malicious infrastructure, perhaps based on cost structure.
+Furthermore, malicious ASes were in the 80-90th percentile in size.
 
-In summary, this research proesents the following results:
-  1) There exist sinkholes in IPv4 -- few ASes host a disproportionate amount of malicious activity.
+Lastly, we wanted to analyze how fragmented malicious ASes were. To compute fragementation, subnets observed in ASes overtime were organized into trees based on the parent-child relationships observed (Figure 3). We then calculated the ratio of the number of root subnets, which have no parents, to the number of subsequent child subnets across the lifetime of the AS. We found that malicious ASes were 10-20% more fragmented than other ASes in IPv4.
+
+*FIGURE*
+
+These results suggest that malicious ASes are large and deeply fragmented into small subnets.
+
+We used other tools in the OCTO arsenal to further characterize these ASes. Our AS WHOIS parser showed no particular skew in the location, time, or ownership of AS registration, suggesting that these ASes originate from similar distributions as the rest of IPv4.  We also used Sonar's historical forward-DNS service and our automated phishing detection tools to characterize other domains that have mapped to these ASes. There were concentrated lexical and server features of hosted domains, like the fact that 'wordpress' sites were over-represented, or that GoDaddy was by far the most popular registrar for these malicious sites.
+
+Lastly, we wanted to characterize the distribution of devices used across malicious ASes. Using our automated certificate classification tool, we found that malicious autonomous systems were skewed to use specific devices, suggesting a deliberate use of malicious infrastructure, perhaps based on cost structure or end goals.
+
+*FIGURE*
+
+In summary, this research presents the following results:
+  1) There exist sinkholes in IPv4 -- a small subset of ASes that host a disproportionate amount of malicious activity.
   2) Smaller subnets and ASes are becoming more ubiquitous in IPv4.
   3) Malicious ASes are likely large and deeply fragmented
   4) There is a concentrated use of specific infrastructure in malicious ASes
@@ -47,22 +55,7 @@ In summary, this research proesents the following results:
 
 Futher work is required to characterize the exact cost structure of buying subnets, registering autonomous systems, and setting up malicious infrastructure. This work would help us further understand why these trends in macro-scale malicious activity exist.
 
-This research presents the first foray into the integration of many diverse Rapid7 internet-scale tools and resources to produce interesting macro-scale research on the state of the Internet. We hope that this type of research inspires further analysis of similar flavor.
-Here at Rapid7 we have incredible access to internet-scale data via projects Sonar[^1] and Heisenberg[^2]. The data science team is
-Investigating these data gives us a birds eye view of the current state of the Internet and network security landscape.
-
-Much of our research has involved extending these resources
-Recently, I've become interested in extending these resources to include maps of IPV4 allocation and network providers.
-
-But first, a primer on IPv4, the fourth version of the Internet Protocol.
-
-The birth of the Internet, nicely documented by various books[^3], involved the allocation of a fixed number of IP addresses. Because IPV4 addresses are 32-bit, IPV4 contains:
-
-$$ 2^{32} = 4, 294, 967, 296 \text{ IP addresses.}$$
-
-Public demand for IP addresses lead to the exhaustion of allocable IPv4 addresses in 2011, something thought impossible at the Internet's inception.
-
-In fact, the Internet is a large marketplace of territory. Service providers sell continguous sets of IP addresses at fixes prices that depend on the number of IP addresses in the block.
+This research presents our team's first foray into the integration of many powerful Rapid7 tools to do interesting Internet-scale data science. We hope that this type of research inspires further analysis of similar flavor.
 
 Let's take a look at the process of splitting an IP block. An IP block has two components: a base address and a prefix. The base address is fixed, and the prefix is a mask that determines how many variants of the base address exist in the block.
 
@@ -78,31 +71,7 @@ $$ \text { 1 1 1 1 1 1 1 1 }  \text { 1 1 1 1 1 1 1 1 } \text { 1 1 1 1 1 1 1 1 
 
 $$ \text {  0 1 1 1 1 0 1 0  }  \text { 0 0 0 0 0 0 1 1 } \text { 0 0 0 1 1 0 1 0 } \text { 1 1 1 1 1 1 1 1 } $$
 
-The mask locks the IP address bit to a value, so a larger prefix implies a smaller set of routable space for IP blocks. What does this all suggest?
-
-Security incident response commonly involves looking at origin autonomous system of a malicious link. The distribution of autonomous systems across the Internet follows a particularly interesting map:
-
-  *IPV4 MAP*
-
-We can look at the maximum number of routable addresses in each AS with the following code:
-
-{% highlight python %}
-
-def as_size(self,asn):
-
-    ipblock = self.as_block(asn)
-
-    if ipblock is None:
-
-        return None
-
-    mask_lengths = [ip.split('/')[1] for ip in ipblock]
-
-    sizes = map(lambda x: 2 ** (32 - int(x)), mask_lengths)
-
-    return sum(sizes)
-
-{% endhighlight %}
+The mask locks the IP address bit to a value, so a larger prefix implies a smaller set of routable space for IP blocks.
 
 
 
