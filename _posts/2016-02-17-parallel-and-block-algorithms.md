@@ -19,16 +19,24 @@ for i in range(0, n):
 
 However, when you make a simple change to the order of operations in the loop, you can achieve much faster computations.
 
+
+{% highlight python %}
+for i in range(0, n):
+  for j in range(0,n):
+    for k in range(0,n):
+      C[i,j] = C[i,j] + A[i,k]B[k,j]
+{% endhighlight %}
+
+Performance benefits are rooted in optimized cache performance. Cache locality (temporal/spatial), memory efficiency vs computing
+efficiency.
+
+
 ###  Blocks and Parallelization
+Gaussian etc
 
-### Parallelized Matrix multiplication
-
-###  Parallel Array operations in Python
-
-The most interesting parallelization library in Python comes from Dask[^1].
-
-Quick description of dask and how it works.
 
 ### Parallelization in Rust
 
-Rust is cooler! Native parallelization framework possible via Rayon + NDArray.
+pub fn parallel_matrix_multiplication(M : Matrix){
+  M.split_
+}
