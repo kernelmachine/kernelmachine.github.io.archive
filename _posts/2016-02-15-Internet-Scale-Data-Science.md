@@ -17,7 +17,7 @@ A first step in this direction was borne out of an effort to understand the foll
 
 In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015.
 
-![IPv4 fragmentation](http://pegasos1.github.com/public/20160215/fig2.png)
+![IPv4 fragmentation](http://pegasos1.github.com/public/20160215/fig1.png)
 
 We wanted to understand what makes some autonomous systems more likely to host malicious activity.
 
