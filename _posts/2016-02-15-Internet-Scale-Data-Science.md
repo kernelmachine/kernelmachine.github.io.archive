@@ -17,7 +17,7 @@ A first step in this direction was borne out of an effort to understand the foll
 
 In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015.
 
-![IPv4 fragmentation](http://pegasos1.github.com/public/20160215/fig1.png)
+![Phishing Activity](http://pegasos1.github.com/public/20160215/fig1.png)
 
 We wanted to understand what makes some autonomous systems more likely to host malicious activity.
 
@@ -40,7 +40,7 @@ Furthermore, malicious ASes were in the 80-90th percentile in size.
 
 Lastly, we wanted to analyze how fragmented malicious ASes were. To compute fragmentation, subnets observed in ASes overtime were organized into trees based on the parent-child relationships observed (Figure 3). We then calculated the ratio of the number of root subnets, which have no parents, to the number of subsequent child subnets across the lifetime of the AS. We found that malicious ASes were 10-20% more fragmented than other ASes in IPv4.
 
-*FIGURE*
+![AS fragmentation](http://pegasos1.github.com/public/20160215/fig3.png)
 
 These results suggest that malicious ASes are large and deeply fragmented into small subnets.
 
@@ -51,7 +51,7 @@ We used other tools in the OCTO arsenal to further characterize these ASes. Our 
 
 Lastly, we wanted to characterize the distribution of devices used across malicious ASes. Using our automated certificate classification tool, we found that malicious autonomous systems were skewed to use specific devices, suggesting a deliberate use of malicious infrastructure, perhaps based on cost structure or end goals.
 
-![HighCharts](https://fd-files-production.s3.amazonaws.com/111774/hIHabkQQ-k-6YXDO_gVZqA?X-Amz-Expires=300&X-Amz-Date=20160306T160024Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIA2QBI5WP5HA3ZEA/20160306/us-east-1/s3/aws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=e21d74081a91d6cdbff127554661050b96ba3b08ab81c498cfce8e11bff4671e)
+![malicious infrastructure](https://fd-files-production.s3.amazonaws.com/111774/hIHabkQQ-k-6YXDO_gVZqA?X-Amz-Expires=300&X-Amz-Date=20160306T160024Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIA2QBI5WP5HA3ZEA/20160306/us-east-1/s3/aws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=e21d74081a91d6cdbff127554661050b96ba3b08ab81c498cfce8e11bff4671e)
 
 ### Conclusion
 
