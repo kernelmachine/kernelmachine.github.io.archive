@@ -51,7 +51,7 @@ We used other tools in the OCTO arsenal to further characterize these ASes. Our 
 
 Lastly, we wanted to characterize the distribution of devices used across malicious ASes. Using our automated certificate classification tool, we found that malicious autonomous systems were skewed to use specific devices, suggesting a deliberate use of malicious infrastructure, perhaps based on cost structure or end goals.
 
-*FIGURE*
+![HighCharts](http://54.91.144.97:10003/cleanmx_scans.html)
 
 ### Conclusion
 
