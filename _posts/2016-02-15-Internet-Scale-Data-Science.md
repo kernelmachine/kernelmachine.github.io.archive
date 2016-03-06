@@ -4,18 +4,16 @@ title: Internet-Scale Data Science
 comments: true
 ---
 
-At Rapid7, we are building tools that give us insight into the threat landscape across the Internet. We are working on Projects Sonar[^1] and Heisenberg[^2] which give us global exposure to common vulnerabilities and patterns in offensive attacks. Our nascent machine learning projects can detect and characterize malicious URLs and certificates. Our threat intelligence repository is growing with datasets that resolve malicious activity to address blocks and autonomous systems.
+At Rapid7, we're building tools that give us insight into the threat landscape across the Internet. We're working on Projects Sonar[^1] and Heisenberg[^2] which give us global exposure to common vulnerabilities and patterns in offensive attacks. Our nascent machine learning projects can detect and characterize malicious URLs and certificates. Our threat intelligence repository is growing with datasets that resolve malicious activity to address blocks and autonomous systems.
 
 While these tools have provided value independently, we have recently focused on using these tools in concert to provide unique perspectives on the state of the Internet.
 
 ### IPv4 Topology
-First, a quick primer on IPv4, the fourth version of the Internet Protocol. The topology of IPv4 is characterized by three levels of hierarchy: IP addresses, subnets, and autonomous systems (ASes). IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses, and ASes are managed blocks of subnets that have independent routing policies. IPv4 is divided into about 65,000 of these ASes, which are managed by universities, public institutions, and private enterprises. There are 200,000,000 subnets on IPv4 today, and 2^32 IP addresses.
+First, a quick primer on IPv4, the fourth version of the Internet Protocol. The topology of IPv4 is characterized by three levels of hierarchy: IP addresses, subnets, and autonomous systems (ASes). IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses, and ASes are blocks of subnets managed by universities, public institutions, and private enterprises. IPv4 is divided into about 65,000 ASes, 200,000,000 subnets, and 2^32 IP addresses.
 
 ### IPv4 Sinkholes
 
-A first step in this direction was borne out of an effort to understand the following observation we made from our threat intelligence data: *A small subset of autonomous systems host a disproportionate amount of malicious activity.*
-
-In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015.
+Our first step in the direction of Internet-scale data science was borne out of an effort to understand the following observation we made from threat intelligence data: *A small subset of autonomous systems host a disproportionate amount of malicious activity.* In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015.
 
 ![Phishing Activity](http://pegasos1.github.io/public/20160215/fig1.png)
 
