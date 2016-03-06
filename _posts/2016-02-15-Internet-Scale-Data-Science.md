@@ -15,9 +15,9 @@ First, a quick primer on IPv4, the fourth version of the Internet Protocol. The 
 
 A first step in this direction was borne out of an effort to understand the following observation we made from our threat intelligence data: *A small subset of autonomous systems host a disproportionate amount of malicious activity.*
 
-In particular, $$200$$ Autonomous systems hosted $$70%$$ of phishing activity from 2007 to 2015, and $$100$$ Autonomous systems hosted $$70%$$ of malicious password attempts on Heisenberg honeypots in 2015.
+In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015.
 
-*FIGURE*
+![IPv4 fragmentation](http://pegasos1.github.com/public/20160215/fig2.png)
 
 We wanted to understand what makes some autonomous systems more likely to host malicious activity.
 
@@ -29,7 +29,7 @@ We gathered historical data on the mapping between IP addresses and ASes from 20
 
 We found that IPv4 is fragmenting. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, we see a rise in the number of small ASes and a decline in the number of large ones. These results make sense given the fact that growth in IPv4 access requires the reallocation of existing address space.
 
-![IPv4 fragmentation](http://pegasos1.github.com/public/fig1.png)
+![IPv4 fragmentation](http://pegasos1.github.com/public/20160215/fig2.png)
 
 ### AS Fragmentation
 Digging deeper, we analyzed the composition, size, and fragmentation of ASes that have hosted disproportionate amounts of phishing activity since 2007.
