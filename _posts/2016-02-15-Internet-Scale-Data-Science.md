@@ -9,7 +9,7 @@ At Rapid7, we're building tools that help us investigate the threat landscape ac
 We have recently focused our research on how these tools can work together to provide unique insight on the state of the Internet. The analysis of the Internet in its entirety can help researchers to identify stable, macro level trends in seemingly random patterns in individual attacks between IP addresses. In this post, we'll present the beginning of these explorations.
 
 ### IPv4 Topology
-First, a quick primer on IPv4, the fourth version of the Internet Protocol. The topology of IPv4 is characterized by three levels of hierarchy, from smallest to largest: IP addresses, subnets, and autonomous systems (ASes). IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses, and ASes are blocks of subnets managed by public institutions and private enterprises. IPv4 is divided into about 65,000 ASes, 200,000,000 subnets, and 2^32 IP addresses.
+First, a quick primer on IPv4, the fourth version of the Internet Protocol. The topology of IPv4 is characterized by three levels of hierarchy, from smallest to largest: IP addresses, subnets, and autonomous systems (ASes). IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses, and ASes are blocks of subnets managed by public institutions and private enterprises. IPv4 is divided into about 65,000 ASes, 200,000,000 subnets, and $$2^32$$ IP addresses.
 
 ### Malicious ASes
 
@@ -59,7 +59,7 @@ We wanted to characterize the distribution of devices and infrastructure used ac
   4) There is a concentrated use of specific infrastructure in malicious ASes
 
 
-Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes. 
+Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes.
 
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
