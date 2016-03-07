@@ -66,4 +66,4 @@ This research represents an example of how Internet-scale data science can provi
 
 [^1]: (https://sonar.labs.rapid7.com/)
 [^2]:(https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
-[^3]: [Cleanmx archive] (http://cleanmx.org)
+[^3]: (http://cleanmx.org)
