@@ -64,6 +64,6 @@ Further work is required to characterize the exact cost structure of buying subn
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
 
-[^1]: (https://sonar.labs.rapid7.com/)
-[^2]:(https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
+[^1]:[Sonar intro](https://sonar.labs.rapid7.com/)
+[^2]:[Heisenberg intro](https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
 [^3]:[Cleanmx archive](http://cleanmx.org)
