@@ -6,7 +6,7 @@ comments: true
 
 At Rapid7, we're building tools that help us investigate the threat landscape across the Internet. We're working on Projects Sonar[^1] and Heisenberg[^2] which give us global exposure to common vulnerabilities and patterns in offensive attacks. Our nascent machine learning projects can detect and characterize phishing URLs and SSL certificates. Our threat intelligence repository is growing with datasets that resolve malicious activity to address blocks and autonomous systems.
 
-We have recently focused our research on how these tools can work together to provide unique insight on the state of the Internet. The analysis of the Internet in its entirety can help researchers to identify stable, macro level trends in seemingly random patterns in individual attacks between IP addresses. In this post, we'll present the beginning of these explorations.
+We have recently focused our research on how these tools can work together to provide unique insight on the state of the Internet. The analysis of the Internet in its entirety can help researchers identify stable, macro level trends in the individual attacks between IP addresses. In this post, we'll present the beginning of these explorations.
 
 ### IPv4 Topology
 First, a quick primer on IPv4, the fourth version of the Internet Protocol. The topology of IPv4 is characterized by three levels of hierarchy, from smallest to largest: IP addresses, subnets, and autonomous systems (ASes). IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses, and ASes are blocks of subnets managed by public institutions and private enterprises. IPv4 is divided into about 65,000 ASes, 200,000,000 subnets, and $$2^{32}$$ IP addresses.
