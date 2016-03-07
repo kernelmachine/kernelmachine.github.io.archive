@@ -50,7 +50,7 @@ We wanted to characterize the distribution of devices and infrastructure used ac
 
  Our research presents the following results:
 
-  1) There exist sinkholes in IPv4 -- a small subset of ASes that host a disproportionate amount of malicious activity.
+  1) A small subset of ASes host a disproportionate amount of malicious activity.
 
   2) Smaller subnets and ASes are becoming more ubiquitous in IPv4.
 
