@@ -59,7 +59,7 @@ We wanted to characterize the distribution of devices and infrastructure used ac
   4) There is a concentrated use of specific infrastructure in malicious ASes
 
 
-Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes. This work would help us further understand why these larger attack trends exist.
+Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes. 
 
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
