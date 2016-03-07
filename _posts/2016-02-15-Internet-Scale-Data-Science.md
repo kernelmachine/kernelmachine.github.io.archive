@@ -1,6 +1,6 @@
 ---
 layout: post
-title: The Topology of Malicious Activity across IPv4
+title: The Topology of Malicious Activity on IPv4
 comments: true
 ---
 
