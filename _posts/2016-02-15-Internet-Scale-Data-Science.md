@@ -4,17 +4,16 @@ title: Internet-Scale Data Science
 comments: true
 ---
 
-At Rapid7, we're building tools that help us investigate the threat landscape across the Internet. We're working on Projects Sonar[^1] and Heisenberg[^2] which give us global exposure to common vulnerabilities and patterns in offensive attacks. Our nascent machine learning projects can detect and characterize malicious URLs and certificates. Our threat intelligence repository is growing with datasets that resolve malicious activity to address blocks and autonomous systems.
+At Rapid7, we're building tools that help us investigate the threat landscape across the Internet. We're working on Projects Sonar[^1] and Heisenberg[^2] which give us global exposure to common vulnerabilities and patterns in offensive attacks. Our nascent machine learning projects can detect and characterize phishing URLs and SSL certificates. Our threat intelligence repository is growing with datasets that resolve malicious activity to address blocks and autonomous systems.
 
-While these tools have provided value independently, we have recently focused on using these tools in concert -- in an effort to gain unique insight into the state of the Internet. Investigating the Internet in its entirety allows security researchers to investigate stable trends in the threat landscape that are emergent properties of seemingly disorganized, random patterns on the level of IP addresses and domains. In this post, we'll present the first of these explorations.
+We have recently focused our research on how these tools can work together to provide unique insight into the state of the Internet. The analysis of the Internet in its entirety can allow researchers to identify stable trends in the threat landscape that are emergent properties of seemingly disorganized, random patterns in individual attacks between IP addresses. In this post, we'll present the beginning of these explorations.
 
 ### IPv4 Topology
-First, a quick primer on IPv4, the fourth version of the Internet Protocol. The topology of IPv4 is characterized by three levels of hierarchy: IP addresses, subnets, and autonomous systems (ASes). IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses, and ASes are blocks of subnets managed by universities, public institutions, and private enterprises. IPv4 is divided into about 65,000 ASes, 200,000,000 subnets, and 2^32 IP addresses.
+First, a quick primer on IPv4, the fourth version of the Internet Protocol. The topology of IPv4 is characterized by three levels of hierarchy: IP addresses, subnets, and autonomous systems (ASes). IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses, and ASes are blocks of subnets managed by public institutions and private enterprises. IPv4 is divided into about 65,000 ASes, 200,000,000 subnets, and 2^32 IP addresses.
 
 ### IPv4 Sinkholes
 
-
-Longitudinal data on phishing activity across IPv4 presented an interesting trend: *a small subset of autonomous systems host a disproportionate amount of malicious activity.* In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015. We wanted to understand what makes some autonomous systems more likely to host malicious activity.
+Longitudinal data on phishing activity across IPv4 presented an interesting trend: *a small subset of autonomous systems have hosted a disproportionate amount of malicious activity.* In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015 (data: cleanmx archives). We wanted to understand what makes some autonomous systems more likely to host malicious activity.
 
 
 ![Phishing Activity](http://pegasos1.github.io/public/20160215/fig1.png)
@@ -22,7 +21,7 @@ Longitudinal data on phishing activity across IPv4 presented an interesting tren
 
 ### IPv4 Fragmentation
 
-We gathered historical data on the mapping between IP addresses and ASes from 2007 to 2015 to generate a longitudinal map of IPv4. This map clearly suggested that IPv4 has been fragmenting. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that growth in IPv4 access requires the reallocation of existing address space, due to the fact that  IPv4 address space is finite and exhausted.
+We gathered historical data on the mapping between IP addresses and ASes from 2007 to 2015 to generate a longitudinal map of IPv4. This map clearly suggested that IPv4 has been fragmenting. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that IPV4 address space is finite and has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller blocks.
 
 ![IPv4 fragmentation](http://pegasos1.github.io/public/20160215/fig2.png)
 
