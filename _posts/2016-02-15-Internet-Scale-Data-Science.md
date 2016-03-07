@@ -21,7 +21,7 @@ Longitudinal data on phishing activity across IPv4 presented an interesting tren
 
 ### IPv4 Fragmentation
 
-We gathered historical data on the mapping between IP addresses and ASes from 2007 to 2015 to generate a longitudinal map of IPv4. This map clearly suggested that IPv4 has been fragmenting. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that IPV4 address space is finite and exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.
+We gathered historical data on the mapping between IP addresses and ASes from 2007 to 2015 to generate a longitudinal map of IPv4. This map clearly suggested that IPv4 has been fragmenting. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.
 
 ![IPv4 fragmentation](http://pegasos1.github.io/public/20160215/fig2.png)
 
@@ -59,7 +59,7 @@ We wanted to characterize the distribution of devices and infrastructure used ac
   4) There is a concentrated use of specific infrastructure in malicious ASes
 
 
-Further work is required to characterize the exact cost structure of buying subnets, registering autonomous systems, and setting up malicious infrastructure. This work would help us further understand why these trends in macro-scale malicious activity exist.
+Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes. This work would help us further understand why these larger attack trends exist.
 
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
