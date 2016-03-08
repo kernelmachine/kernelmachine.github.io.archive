@@ -15,7 +15,7 @@ expensive and time-consuming part of the data science process. Data is usually m
 While there are many tools to experiment with different algorithms and
 their parameters, there are few tools to help one develop clean, comprehensive
 datasets. Often times this means asking practitioners with deep domain expertise
-to help label existing data elements. Licensed clean, structured data be hard to come by 
+to help label existing data elements. Licensed clean, structured data be hard to come by
 in the security context, and may go stale very quickly.
 
 On top of that, bias in training data can hamper the effectiveness of a model
@@ -47,12 +47,12 @@ $$ P(A | B) = \frac { P (A) P(B | A)}{P(B)} $$
 Expanding the probability P (B) for the set of two mutually exclusive outcomes,
 we arrive at the following equation:
 
-$$ P (B) = (A 1 )P (B|A 1 ) + (\neg A 2 )P (B|\neg A 2 ) $$
+$$ P (B) = (A_1 )P (B|A_1 ) + (\neg A_2 )P (B|\neg A_2 ) $$
 
 Combining the above equations, we arrive at the following alternative statement
 of Bayes’ theorem:
 
-$$ P (A|B) = \frac{P (A)P (B|A)} {P (A 1 )P (B|A 1 ) + P (\neg A 2 )P (B|\neg A 2 )} $$
+$$ P (A|B) = \frac{P (A)P (B|A)} {P (A_1 )P (B|A_1 ) + P (\neg A_2 )P (B|\neg A_2 )} $$
 
 Let’s apply this theorem to a concrete security problem to show the emergent
 issues of training predictive models on biased data.
