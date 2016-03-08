@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Internet-Scale Data Science
+title: The Topology of Malicious Activity on IPv4
 comments: true
 ---
 
@@ -13,7 +13,7 @@ First, a quick primer on IPv4, the fourth version of the Internet Protocol. The 
 
 ### Malicious ASes
 
-Longitudinal data on phishing activity across IPv4 presented an interesting trend: *a small subset of autonomous systems have hosted a disproportionate amount of malicious activity.* In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015 (data: cleanmx archives). We wanted to understand what makes some autonomous systems more likely to host malicious activity.
+Longitudinal data on phishing activity across IPv4 presented an interesting trend: *a small subset of autonomous systems have hosted a disproportionate amount of malicious activity.* In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015 (data: cleanmx archives[^3]). We wanted to understand what makes some autonomous systems more likely to host malicious activity.
 
 
 ![Phishing Activity](http://pegasos1.github.io/public/20160215/fig1.png)
@@ -64,7 +64,6 @@ Further work is required to characterize the exact cost structure of buying subn
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
 
-[^1]: (https://sonar.labs.rapid7.com/)
-[^2]:(https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
-[^3]: [History of the Internet]
-[^4]: [Cleanmx archive] (http://cleanmx.org)
+[^1]:[Sonar intro](https://sonar.labs.rapid7.com/)
+[^2]:[Heisenberg intro](https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
+[^3]:[Cleanmx archive](http://cleanmx.org)
