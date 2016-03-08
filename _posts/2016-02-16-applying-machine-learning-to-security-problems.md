@@ -120,7 +120,7 @@ Data scientists can avoid these obstacles with a few measures:
 3) **Encourage data gathering expeditions.**
 
 4) **Encourage security expertise on the team.**
-
+  
 5) **Weigh the trade-off between accuracy vs. coverage}**. The effects of false positives are particularly
 detrimental in the security space, meaning that for some applications it may be more useful to sacrifice
 the volume of accurate classifications for higher confidence.
