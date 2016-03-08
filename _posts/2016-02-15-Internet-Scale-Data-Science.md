@@ -35,9 +35,11 @@ We inferred the the size of an AS by calculating its maximum amount of addressab
 
 To compute fragmentation, subnets observed in ASes overtime were organized into trees based on parent-child relationships (Figure 3). We then calculated the ratio of the number of root subnets, which have no parents, to the number of subsequent child subnets across the lifetime of the AS. We found that malicious ASes were 10-20% more fragmented than other ASes in IPv4.
 
+These results suggest that malicious ASes are large and deeply fragmented into small subnets. ARIN fee schedules showed that smaller subnets are significantly less expensive to purchase.
+
 ![AS fragmentation](http://pegasos1.github.io/public/20160215/fig3.png)
 
-These results suggest that malicious ASes are large and deeply fragmented into small subnets. ARIN fee schedules showed that smaller subnets are significantly less expensive to purchase.
+
 
 
 ### Malicious Infrastructure
