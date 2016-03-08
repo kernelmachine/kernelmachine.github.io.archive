@@ -15,8 +15,8 @@ expensive and time-consuming part of the data science process. Data is usually m
 While there are many tools to experiment with different algorithms and
 their parameters, there are few tools to help one develop clean, comprehensive
 datasets. Often times this means asking practitioners with deep domain expertise
-to help label existing data elements. One can also try to purchase clean, structured data,
-but can be hard to come by in the security context (and may go stale very quickly).
+to help label existing data elements. Licensed clean, structured data be hard to come by 
+in the security context, and may go stale very quickly.
 
 On top of that, bias in training data can hamper the effectiveness of a model
 to discern between output classes. In the security context, data bias can be
@@ -111,20 +111,20 @@ and prone to desensitizing security professionals to incident alerts.
 
 Data scientists can avoid these obstacles with a few measures:
 
-1) Data scientists should pay particular attention to training models with large
-and balanced data that are representative of all output classes. Take balanced
+1) **Data scientists should pay particular attention to training models with large
+and balanced datasets that are representative of all output classes.** Take balanced
 subsamples of your data if necessary.
 
-2) Data scientists should focus on getting a plethora of labeled data. Look at open sourced data, and encourage
-data gathering expeditions.
+2) **Data scientists should focus on getting a plethora of labeled data.** Look at open sourced data, and encourage
+data gathering expeditions. Easier said than done.
 
-3) Encourage security expertise on the team.
+3) **Encourage security expertise on the team.**
 
-4) Incorporate unsupervised methods into the solution of the data science problem.
+4) **Incorporate unsupervised methods into the solution of the data science problem.**
 Focus on organization, presentation, visualization, filtering of data - not
 just prediction.
 
-5) Weigh the trade-off between accuracy vs. coverage. The effects of false positives are particularly
+5) **Weigh the trade-off between accuracy vs. coverage}**. The effects of false positives are particularly
 detrimental in the security space, meaning that for some applications it may be more useful to sacrifice
 the volume of accurate classifications for higher confidence.
 
