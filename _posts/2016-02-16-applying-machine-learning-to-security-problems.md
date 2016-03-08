@@ -35,7 +35,7 @@ say, obtain a list of benign domains, but that assumption may turn out to be a b
 idea since there is no guarantee that those sites are clean. Getting good ground
 truth in security is hard.
 
-Second, data bias also comes in the form of *class representation*. To understand
+Second, data bias also comes in the form of *class representation*[^1]. To understand
 class representation bias, one can look to a core foundation of statistics: Bayes
 theorem.
 
@@ -113,10 +113,9 @@ Data scientists can avoid these obstacles with a few measures:
 
 1) Data scientists should pay particular attention to training models with large
 and balanced data that are representative of all output classes. Take balanced
-subsamples of your data if necessary, and understand your data[^1].
+subsamples of your data if necessary.
 
-2) Data scientists should focus on getting a plethora of labeled data. Amazon’s
-Mechanical Turk is a useful tool for this. Look at open sourced data, and encourage
+2) Data scientists should focus on getting a plethora of labeled data. Look at open sourced data, and encourage
 data gathering expeditions.
 
 3) Encourage security expertise on the team.
@@ -125,7 +124,9 @@ data gathering expeditions.
 Focus on organization, presentation, visualization, filtering of data - not
 just prediction.
 
-5) Weigh the trade-off between accuracy vs. coverage.
+5) Weigh the trade-off between accuracy vs. coverage. The effects of false positives are particularly
+detrimental in the security space, meaning that for some applications it may be more useful to sacrifice
+the volume of accurate classifications for higher confidence.
 
 Machine learning has the potential to change how we detect and respond to
 malicious activity in our networks. Machine learning can weed out signal from
