@@ -111,18 +111,15 @@ and prone to desensitizing security professionals to incident alerts.
 
 Data scientists can avoid these obstacles with a few measures:
 
-1) **Data scientists should pay particular attention to training models with large
-and balanced datasets that are representative of all output classes.** Take balanced
-subsamples of your data if necessary.
+1) **Apply structure to your data with supervised and semi-supervised learning.**
 
-2) **Data scientists should focus on getting a plethora of labeled data.** Look at open sourced data, and encourage
-data gathering expeditions. Easier said than done.
+2) **Take balanced subsamples.**
 
-3) **Encourage security expertise on the team.**
+2) **Focus on organization, presentation, visualization, filtering of data - not just prediction.**
 
-4) **Incorporate unsupervised methods into the solution of the data science problem.**
-Focus on organization, presentation, visualization, filtering of data - not
-just prediction.
+3) **Encourage data gathering expeditions.**
+
+4) **Encourage security expertise on the team.**
 
 5) **Weigh the trade-off between accuracy vs. coverage}**. The effects of false positives are particularly
 detrimental in the security space, meaning that for some applications it may be more useful to sacrifice
