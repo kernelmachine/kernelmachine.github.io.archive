@@ -23,6 +23,9 @@ Longitudinal data on phishing activity across IPv4 presented an interesting tren
 
 We gathered historical data on the mapping between IP addresses and ASes from 2007 to 2015 to generate a longitudinal map of IPv4. This map clearly suggested that IPv4 has been fragmenting. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.
 
+![AS fragmentation](http://pegasos1.github.io/public/20160215/fig3.png)
+
+
 ![IPv4 fragmentation](http://pegasos1.github.io/public/20160215/fig2.png)
 
 ### AS Fragmentation
@@ -37,7 +40,8 @@ To compute fragmentation, subnets observed in ASes overtime were organized into 
 
 These results suggest that malicious ASes are large and deeply fragmented into small subnets. ARIN fee schedules showed that smaller subnets are significantly less expensive to purchase.
 
-![AS fragmentation](http://pegasos1.github.io/public/20160215/fig3.png)
+
+![topologies](http://pegasos1.github.io/public/20160215/fig5.png)
 
 
 
