@@ -24,10 +24,7 @@ Longitudinal data on phishing activity across IPv4 presented an interesting tren
 
 ### IPv4 Fragmentation
 
-We gathered historical data on the mapping between IP addresses and ASes from 2007 to 2015 to generate a longitudinal map of IPv4. This map clearly suggested that IPv4 has been fragmenting. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.
-
-
-
+We gathered historical data the mapping between IP addresses and ASes from 2007 to 2015 to understand the history of IPv4. The trends we saw clearly suggested that IPv4 has been fragmenting. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.
 
 
 ![IPv4 fragmentation](http://pegasos1.github.io/public/20160215/fig2.png)
@@ -36,18 +33,16 @@ We gathered historical data on the mapping between IP addresses and ASes from 20
 
 Digging deeper into the Internet hierarchy, we analyzed the composition, size, and fragmentation of malicious ASes.
 
-ARIN, one of the primary registrars of ASes, categorizes subnets based on the number of IP addresses they contain. We found that the smallest subnets available made up on average 56 $$\pm$$ 3.0 percent of a malicious AS.
+ARIN, one of the primary registrars of ASes, categorizes subnets based on the number of IP addresses they contain.[^4] We found that the smallest subnets available made up on average 56 $$\pm$$ 3.0 percent of a malicious AS.
 
 We inferred the the size of an AS by calculating its maximum amount of addressable space. Malicious ASes were in the 80-90th percentile in size across IPv4.  
 
 To compute fragmentation, subnets observed in ASes overtime were organized into trees based on parent-child relationships (Figure 3). We then calculated the ratio of the number of root subnets, which have no parents, to the number of subsequent child subnets across the lifetime of the AS. We found that malicious ASes were 10-20% more fragmented than other ASes in IPv4.
 
-These results suggest that malicious ASes are large and deeply fragmented into small subnets. ARIN fee schedules showed that smaller subnets are significantly less expensive to purchase.
+These results suggest that malicious ASes are large and deeply fragmented into small subnets. ARIN fee schedules showed that smaller subnets are significantly less expensive to purchase.[^4] The inexpensive nature of small subnets may allow malicious registrars to purchase many IP blocks for traffic redirection or proxy servers to better float under the radar.
 
 
 ![topologies](http://pegasos1.github.io/public/20160215/fig5.png)
-
-
 
 
 ### Malicious Infrastructure
@@ -77,3 +72,4 @@ This research represents an example of how Internet-scale data science can provi
 [^1]:[Sonar intro](https://sonar.labs.rapid7.com/)
 [^2]:[Heisenberg intro](https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
 [^3]:[Cleanmx archive](http://cleanmx.org)
+[^4]:[ARIN fee schedules](https://www.arin.net/fees/fee_schedule.html)
