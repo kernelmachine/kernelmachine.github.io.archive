@@ -113,17 +113,19 @@ Data scientists can avoid these obstacles with a few measures:
 
 1) **Apply structure to your data with supervised and semi-supervised learning.**
 
-2) **Take balanced subsamples.** See scikit learn's stratified data splitting functions [^2].
+2) **Undersample minority, oversample minority** See scikit learn's stratified data splitting functions [^2] and this repo [^3].
 
-2) **Focus on organization, presentation, visualization, filtering of data - not just prediction.** Data Science is not just
+3) **Generate synthetic data from minority class via algorithms like SMOTE** See this repo[^3] again.
+
+4) **Focus on organization, presentation, visualization, filtering of data - not just prediction.** Data Science is not just
 machine learning.
 
-3) **Encourage data gathering expeditions.** Easier said than done.
+5) **Encourage data gathering expeditions.** Easier said than done.
 
-4) **Encourage security expertise on the team.** Security expertise can help you think of viable solutions to problems when
+6) **Encourage security expertise on the team.** Security expertise can help you think of viable solutions to problems when
 data is insufficient.
 
-5) **Weigh the trade-off between accuracy vs. coverage**. The effects of false positives are particularly
+7) **Weigh the trade-off between accuracy vs. coverage**. The effects of false positives are particularly
 detrimental in the security space, meaning that for some applications it may be more useful to sacrifice
 the volume of accurate classifications for higher confidence.
 
@@ -135,3 +137,4 @@ algorithms to security we must be aware of caveats of the approach.
 
 [^1]:[Classification on Biased Data](http://divac.ist.temple.edu/~vucetic/documents/vucetic01ecml.pdf)
 [^2]:[Sklearn's Stratified K-Fold](http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedKFold.html#sklearn.cross_validation.StratifiedKFold)
+[^3]:[Handling Imbalanced Data](https://github.com/fmfn/UnbalancedDataset)
