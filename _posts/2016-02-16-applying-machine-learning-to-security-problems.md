@@ -113,7 +113,7 @@ Data scientists can avoid these obstacles with a few measures:
 
 1) **Apply structure to your data with supervised and semi-supervised learning.**
 
-2) **Undersample minority, oversample minority** See scikit learn's stratified data splitting functions [^2] and this repo [^3].
+2) **Undersample minority, oversample minority** See scikit learn's stratified data splitting functions [^2] and this repo [^3]
 
 3) **Generate synthetic data from minority class via algorithms like SMOTE** See this repo[^3] again.
 
