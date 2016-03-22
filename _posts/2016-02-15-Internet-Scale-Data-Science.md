@@ -96,8 +96,8 @@ and Service Management (CNSM), 2011 7th International Conference on, Paris, 2011
 [^4]:[B. Stone­Gross, C. Kruegel, K. Almeroth, A. Moser and E. Kirda, “FIRE: FInding Rogue nEtworks”;
 doi: 10.1109/ACSAC.2009.29]()
 [^5]:[C. A. Shue, A. J. Kalafut and M. Gupta, “Abnormally Malicious Autonomous Systems and Their
-Internet Connectivity,”; doi: 10.1109/TNET.2011.2157699()
+Internet Connectivity,”; doi: 10.1109/TNET.2011.2157699]()
 [^6]:[A. J. Kalafut, C. A. Shue and M. Gupta, “Malicious Hubs: Detecting Abnormally Malicious
-Autonomous Systems,”; doi: 10.1109/INFCOM.2010.5462220()
+Autonomous Systems,”; doi: 10.1109/INFCOM.2010.5462220]()
 [^7]:[Cleanmx archive](http://cleanmx.org)
 [^8]:[ARIN fee schedules](https://www.arin.net/fees/fee_schedule.html)
