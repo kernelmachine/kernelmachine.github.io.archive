@@ -91,7 +91,7 @@ This research represents an example of how Internet-scale data science can provi
 
 [^1]:[Sonar intro](https://sonar.labs.rapid7.com/)
 [^2]:[Heisenberg intro](https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
-[^3]:[G. C. M. Moura, R. Sadre and A. Pras, _Internet Bad Neighborhoods: The spam case,“_ Network and Service Management (CNSM), 2011 7th International Conference on, Paris, 2011, pp. 1­8.]()
+[^3]:[G. C. M. Moura, R. Sadre and A. Pras, Internet Bad Neighborhoods: The spam case,“ Network and Service Management (CNSM), 2011 7th International Conference on, Paris, 2011, pp. 1­8.]()
 [^4]:[B. Stone­Gross, C. Kruegel, K. Almeroth, A. Moser and E. Kirda, “FIRE: FInding Rogue nEtworks”; doi: 10.1109/ACSAC.2009.29]()
 [^5]:[C. A. Shue, A. J. Kalafut and M. Gupta, “Abnormally Malicious Autonomous Systems and Their Internet Connectivity,”; doi: 10.1109/TNET.2011.2157699]()
 [^6]:[A. J. Kalafut, C. A. Shue and M. Gupta, “Malicious Hubs: Detecting Abnormally Malicious Autonomous Systems,”; doi: 10.1109/INFCOM.2010.5462220]()
