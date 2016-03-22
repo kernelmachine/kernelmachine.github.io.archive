@@ -16,7 +16,7 @@ First, a quick primer on IPv4, the fourth version of the Internet Protocol. The 
 
 ### Malicious ASes
 There has been a great deal of academic and industry focus on identifying malicious activity across
-autonomous systems^[3], and for good reasons. Well over 50% of “good” Internet traffic comes
+autonomous systems, and for good reasons. Well over 50% of “good” Internet traffic comes
 from a small subset of large, ocean-like ASes pushing content from Netflix, Google, Facebook, Apple and Amazon. Despite this centralized cloud content, we saw that the internet has become substantially more fragmented over time, enabling those with malicious intent to stake their claim in less friendly waters. In fact, our longitudinal data on phishing activity across IPv4 presented an interesting trend: *a small subset of autonomous systems have regularly hosted a disproportionate
 amount of malicious activity*. In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015
 (data: cleanmx archives[^7]). We wanted to understand what makes some autonomous systems more
