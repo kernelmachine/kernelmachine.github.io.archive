@@ -51,6 +51,19 @@ These results suggest that malicious ASes are large and deeply fragmented into s
 
 
 
+
+
+### Further work
+Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes.
+
+We'd also like to understand the network and system characteristics that cause attackers to choose to co-­opt a specific autonomous system over another. For example, we used Sonar’s historical forward­DNS service and our phishing detection algorithms to characterize all domains that have mapped to these ASes in the past two years. Domains hosted in malicious ASes had features that suggested deliberate use of specific infrastructure. For example, 'wordpress' sites were over-represented in some malicious ASes (like AS4808), and GoDaddy was by far the most popular registrar for malicious sites across the board.
+
+We can also use our SSL Certificate classifier to understand the distribution of devices hosted in ASes across IPv4, as seen below.
+
+![malicious infrastructure](http://pegasos1.github.io/public/20160215/fig4.png)
+
+Each square above shows the probability distribution of device counts of a particular type. Most ASes host fewer than 100 devices across a majority of categories. Are there skews in the presence of specific devices to propagate phishing attacks from these malicious ASes?
+
 ### Conclusion
 
  Our research presents the following results:
@@ -60,20 +73,7 @@ These results suggest that malicious ASes are large and deeply fragmented into s
   2) Smaller subnets and ASes are becoming more ubiquitous in IPv4.
 
   3) Malicious ASes are likely large and deeply fragmented
-
-  4) There is a concentrated use of specific infrastructure in malicious ASes
-
-### Further work
-Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes. We'd also like to understand what network and system characteristics
-cause attackers to choose to co-­opt one device in one autonomous system over another.
-
-For example, we used Sonar’s historical forward­DNS service and our phishing detection algorithms to characterize all domains that have mapped to these ASes in the past two years. Domains hosted in malicious ASes had features that suggested deliberate use of specific infrastructure. For example, 'wordpress' sites were over-represented in some malicious ASes (like AS4808), and GoDaddy was by far the most popular registrar for malicious sites across the board.
-
-![malicious infrastructure](http://pegasos1.github.io/public/20160215/fig4.png)
-
-The above chart shows the results of our SSL certificate classifier on actual certificates retrieved from autonomous systems across IPv4, gathered via Project Sonar. Each square shows the probability distribution of device counts of a particular
-type. Most ASes host fewer than 100 devices across a majority of categories. Are thre skews in the presence of specific devices to propagate phishing attacks from these malicious ASes?
-
+  
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
 
