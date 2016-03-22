@@ -21,6 +21,7 @@ from a small subset of large, ocean-like ASes pushing content from Netflix, Goog
 amount of malicious activity*. In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015
 (data: cleanmx archives[^7]). We wanted to understand what makes some autonomous systems more
 likely to host malicious activity.
+
 ![IPv4 fragmentation](http://pegasos1.github.io/public/20160215/fig2.png)
 
 
