@@ -73,7 +73,7 @@ Each square above shows the probability distribution of device counts of a parti
   2) Smaller subnets and ASes are becoming more ubiquitous in IPv4.
 
   3) Malicious ASes are likely large and deeply fragmented
-  
+
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
 
