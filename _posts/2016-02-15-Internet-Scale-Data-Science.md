@@ -41,13 +41,13 @@ We gathered historical data the mapping between IP addresses and ASes from 2007 
 
 Digging deeper into the Internet hierarchy, we analyzed the composition, size, and fragmentation of malicious ASes.
 
-ARIN, one of the primary registrars of ASes, categorizes subnets based on the number of IP addresses they contain.[^4] We found that the smallest subnets available made up on average 56 $$\pm$$ 3.0 percent of a malicious AS.
+ARIN, one of the primary registrars of ASes, categorizes subnets based on the number of IP addresses they contain.[^8] We found that the smallest subnets available made up on average 56 $$\pm$$ 3.0 percent of a malicious AS.
 
 We inferred the the size of an AS by calculating its maximum amount of addressable space. Malicious ASes were in the 80-90th percentile in size across IPv4.  
 
 To compute fragmentation, subnets observed in ASes overtime were organized into trees based on parent-child relationships (Figure 3). We then calculated the ratio of the number of root subnets, which have no parents, to the number of subsequent child subnets across the lifetime of the AS. We found that malicious ASes were 10-20% more fragmented than other ASes in IPv4.
 
-These results suggest that malicious ASes are large and deeply fragmented into small subnets. ARIN fee schedules showed that smaller subnets are significantly less expensive to purchase.[^4] The inexpensive nature of small subnets may allow malicious registrars to purchase many IP blocks for traffic redirection or proxy servers to better float under the radar.
+These results suggest that malicious ASes are large and deeply fragmented into small subnets. ARIN fee schedules showed that smaller subnets are significantly less expensive to purchase.[^8] The inexpensive nature of small subnets may allow malicious registrars to purchase many IP blocks for traffic redirection or proxy servers to better float under the radar.
 
 
 ![topologies](http://pegasos1.github.io/public/20160215/fig5.png)
