@@ -91,9 +91,9 @@ This research represents an example of how Internet-scale data science can provi
 
 [^1]:[Sonar intro](https://sonar.labs.rapid7.com/)
 [^2]:[Heisenberg intro](https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
-[^3]:[G. C. M. Moura, R. Sadre and A. Pras, Internet Bad Neighborhoods: The spam case,“ Network and Service Management (CNSM), 2011 7th International Conference on, Paris, 2011, pp. 1­8.](http://pegasos1.github.io)
-[^4]:[B. Stone­Gross, C. Kruegel, K. Almeroth, A. Moser and E. Kirda, “FIRE: FInding Rogue nEtworks”; doi: 10.1109/ACSAC.2009.29]()
-[^5]:[C. A. Shue, A. J. Kalafut and M. Gupta, “Abnormally Malicious Autonomous Systems and Their Internet Connectivity,”; doi: 10.1109/TNET.2011.2157699]()
-[^6]:[A. J. Kalafut, C. A. Shue and M. Gupta, “Malicious Hubs: Detecting Abnormally Malicious Autonomous Systems,”; doi: 10.1109/INFCOM.2010.5462220]()
+[^3]:[Internet Bad Neighborhoods: The spam case](http://pegasos1.github.io)
+[^4]:[FIRE: FInding Rogue nEtworks](http://pegasos1.github.io)
+[^5]:[Abnormally Malicious Autonomous Systems and Their Internet Connectivity](http://pegasos1.github.io)
+[^6]:[Malicious Hubs: Detecting Abnormally Malicious Autonomous Systems](http://pegasos1.github.io)
 [^7]:[Cleanmx archive](http://cleanmx.org)
 [^8]:[ARIN fee schedules](https://www.arin.net/fees/fee_schedule.html)
