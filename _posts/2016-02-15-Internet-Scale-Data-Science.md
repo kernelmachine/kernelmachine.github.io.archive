@@ -28,7 +28,7 @@ likely to host malicious activity.
 
 ### IPv4 Fragmentation
 
-We gathered historical data the mapping between IP addresses and ASes from 2007 to 2015 to understand the history of IPv4. The trends we saw clearly suggested that IPv4 has been fragmenting; in fact, the total number of ASes has grown about 60% in the past decade. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.
+We gathered historical data the mapping between IP addresses and ASes from 2007 to 2015 to understand the history of IPv4. The trends we saw clearly suggested that IPv4 has been fragmenting; the total number of ASes has grown about 60% in the past decade. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.
 
 ![AS fragmentation](http://pegasos1.github.io/public/20160215/fig3.png)
 
@@ -50,22 +50,6 @@ These results suggest that malicious ASes are large and deeply fragmented into s
 ![topologies](http://pegasos1.github.io/public/20160215/fig5.png)
 
 
-### Malicious Infrastructure
-
-We wanted to see how this autonomous system fragmentation fit with the proliferation of phishing sites
-and decided to try to characterize the distribution of devices and infrastructure used across what we've
-determined to be malicious ASes. We used Sonar’s historical forward­DNS service and our phishing
-detection algorithms to characterize all domains that have mapped to these ASes in the past two years. Domains hosted in malicious ASes had features that suggested deliberate use of specific infrastructure. For example, 'wordpress' sites were over-represented in some malicious ASes (like AS4808), and GoDaddy was by far the most popular registrar for malicious sites across the board. Our certificate classification tool showed similar skews in the presence of specific devices to propagate phishing attacks from these malicious ASes.
-
-![malicious infrastructure](http://pegasos1.github.io/public/20160215/fig4.png)
-
-The above chart shows the results of our SSL certificate classifier on actual certificates retrieved from these
-systems, gathered via Project Sonar. Each square shows the distribution of device counts of a particular
-type across autonomous systems (the sum of the area under each shaded region is 100%, so you can—
-pretty much—read them like fancy histograms). Most ASes host fewer than 100 devices across a majority of categories.
-Some host fewer than 10. Furthermore, a large number—over 1.1M—are hosted at sites that are using what would
-appear to be “good” certificates and there is malicious infrastructure on what seems to be co­opted legitimate services/devices such as printer cams and VPN/firewall gateways. This means attackers are usurping AS resources
-while standing up their own infrastructure.
 
 ### Conclusion
 
@@ -79,9 +63,16 @@ while standing up their own infrastructure.
 
   4) There is a concentrated use of specific infrastructure in malicious ASes
 
-
+### Further work
 Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes. We'd also like to understand what network and system characteristics
 cause attackers to choose to co-­opt one device in one autonomous system over another.
+
+For example, we used Sonar’s historical forward­DNS service and our phishing detection algorithms to characterize all domains that have mapped to these ASes in the past two years. Domains hosted in malicious ASes had features that suggested deliberate use of specific infrastructure. For example, 'wordpress' sites were over-represented in some malicious ASes (like AS4808), and GoDaddy was by far the most popular registrar for malicious sites across the board.
+
+![malicious infrastructure](http://pegasos1.github.io/public/20160215/fig4.png)
+
+The above chart shows the results of our SSL certificate classifier on actual certificates retrieved from autonomous systems across IPv4, gathered via Project Sonar. Each square shows the probability distribution of device counts of a particular
+type. Most ASes host fewer than 100 devices across a majority of categories. Are thre skews in the presence of specific devices to propagate phishing attacks from these malicious ASes?
 
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
