@@ -32,7 +32,7 @@ likely to host malicious activity.
 
 ### IPv4 Fragmentation
 
-We gathered historical data the mapping between IP addresses and ASes from 2007 to 2015 to understand the history of IPv4. The trends we saw clearly suggested that IPv4 has been fragmenting. Since 2005, the total number of ASes has been growing about 70% per year. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.
+We gathered historical data the mapping between IP addresses and ASes from 2007 to 2015 to understand the history of IPv4. The trends we saw clearly suggested that IPv4 has been fragmenting; in fact, the total number of ASes has grown about 60% in the past decade. During the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.
 
 
 ![IPv4 fragmentation](http://pegasos1.github.io/public/20160215/fig2.png)
@@ -55,9 +55,20 @@ These results suggest that malicious ASes are large and deeply fragmented into s
 
 ### Malicious Infrastructure
 
-We wanted to characterize the distribution of devices and infrastructure used across malicious ASes. We used Sonar's historical forward-DNS service and our phishing detection tool to characterize all domains that have mapped to these ASes in the past two years. Domains hosted in malicious ASes had features that suggested deliberate use of specific infrastructure. For example, 'wordpress' sites were over-represented in some malicious ASes (like AS4808), and GoDaddy was by far the most popular registrar for malicious sites across the board. Our certificate classification tool showed similar skews in the presence of specific devices to propagate phishing attacks from these malicious ASes.
+We wanted to see how this autonomous system fragmentation fit with the proliferation of phishing sites
+and decided to try to characterize the distribution of devices and infrastructure used across what we've
+determined to be malicious ASes. We used Sonar’s historical forward­DNS service and our phishing
+detection algorithms to characterize all domains that have mapped to these ASes in the past two years. Domains hosted in malicious ASes had features that suggested deliberate use of specific infrastructure. For example, 'wordpress' sites were over-represented in some malicious ASes (like AS4808), and GoDaddy was by far the most popular registrar for malicious sites across the board. Our certificate classification tool showed similar skews in the presence of specific devices to propagate phishing attacks from these malicious ASes.
 
 ![malicious infrastructure](http://pegasos1.github.io/public/20160215/fig4.png)
+
+The above chart shows the results of our SSL certificate classifier on actual certificates retrieved from these
+systems, gathered via Project Sonar. Each square shows the distribution of device counts of a particular
+type across autonomous systems (the sum of the area under each shaded region is 100%, so you can—
+pretty much—read them like fancy histograms). Most ASes host fewer than 100 devices across a majority of categories.
+Some host fewer than 10. Furthermore, a large number—over 1.1M—are hosted at sites that are using what would
+appear to be “good” certificates and there is malicious infrastructure on what seems to be co­opted legitimate services/devices such as printer cams and VPN/firewall gateways. This means attackers are usurping AS resources
+while standing up their own infrastructure.
 
 ### Conclusion
 
@@ -72,12 +83,21 @@ We wanted to characterize the distribution of devices and infrastructure used ac
   4) There is a concentrated use of specific infrastructure in malicious ASes
 
 
-Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes.
+Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes. We'd also like to understand what network and system characteristics
+cause attackers to choose to co-­opt one device in one autonomous system over another.
 
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
 
 [^1]:[Sonar intro](https://sonar.labs.rapid7.com/)
 [^2]:[Heisenberg intro](https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
-[^3]:[Cleanmx archive](http://cleanmx.org)
-[^4]:[ARIN fee schedules](https://www.arin.net/fees/fee_schedule.html)
+[^3]:G. C. M. Moura, R. Sadre and A. Pras, _Internet Bad Neighborhoods: The spam case,“_ Network
+and Service Management (CNSM), 2011 7th International Conference on, Paris, 2011, pp. 1­8.
+[^4]:B. Stone­Gross, C. Kruegel, K. Almeroth, A. Moser and E. Kirda, “FIRE: FInding Rogue nEtworks”;
+doi: 10.1109/ACSAC.2009.29
+[^5]:C. A. Shue, A. J. Kalafut and M. Gupta, “Abnormally Malicious Autonomous Systems and Their
+Internet Connectivity,”; doi: 10.1109/TNET.2011.2157699
+[^6]:A. J. Kalafut, C. A. Shue and M. Gupta, “Malicious Hubs: Detecting Abnormally Malicious
+Autonomous Systems,”; doi: 10.1109/INFCOM.2010.5462220
+[^7]:[Cleanmx archive](http://cleanmx.org)
+[^8]:[ARIN fee schedules](https://www.arin.net/fees/fee_schedule.html)
