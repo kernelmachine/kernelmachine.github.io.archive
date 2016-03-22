@@ -16,7 +16,7 @@ First, a quick primer on IPv4, the fourth version of the Internet Protocol. The 
 
 ### Malicious ASes
 There has been a great deal of academic and industry focus on identifying malicious activity in­andacross
-autonomous systems^[3-6], and for good reasons. Well over 50% of “good” Internet traffic comes
+autonomous systems^[3,4,5,6], and for good reasons. Well over 50% of “good” Internet traffic comes
 from a small subset of large, well­defined ocean­like ASes pushing content from Netflix, Google,
 Facebook, Apple and Amazon. Despite this centralization “cloud” content, we’ll show that the internet
 has become substantially more fragmented over time, enabling those with malicious intent to stake their
