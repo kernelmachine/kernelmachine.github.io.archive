@@ -78,7 +78,7 @@ Each square above shows the probability distribution of device counts of a parti
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
 
-*Thanks to ![Bob Rudis](http://twitter.com/hrbrmstr) for help with this post.*
+*Thanks to Bob Rudis (@hrbrmstr) for help with this post.*
 
 [^1]:[Sonar intro](https://sonar.labs.rapid7.com/)
 [^2]:[Heisenberg intro](https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
