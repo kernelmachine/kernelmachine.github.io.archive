@@ -112,8 +112,7 @@ Security data scientists can avoid these obstacles with a few measures:
 
 5) **Build models that penalize classification to the majority class.**
 
-6) **Focus on organization, presentation, visualization, filtering of data - not just prediction.** Data Science is not just
-machine learning.
+6) **Focus on organization, presentation, visualization, filtering of data - not just prediction.** 
 
 7) **Encourage data gathering expeditions.**
 
