@@ -110,7 +110,7 @@ Security data scientists can avoid these obstacles with a few measures:
 
 3) **Generate synthetic data from minority class via algorithms like SMOTE.** See this repo[^3] again.
 
-5) **Build your model so that you penalize classification to majority class.**
+5) **Build models that penalize classification to the majority class.**
 
 6) **Focus on organization, presentation, visualization, filtering of data - not just prediction.** Data Science is not just
 machine learning.
