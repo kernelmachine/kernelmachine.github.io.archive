@@ -106,11 +106,11 @@ Security data scientists can avoid these obstacles with a few measures:
 
 1) **Apply structure to data with supervised and semi-supervised learning.**
 
-2) **Undersample the majority class and/or oversample the minority class** See scikit learn's stratified data splitting functions [^2] and this repo [^3]
+2) **Undersample the majority class and/or oversample the minority class.** See scikit learn's stratified data splitting functions [^2] and this repo [^3]
 
-3) **Generate synthetic data from minority class via algorithms like SMOTE** See this repo[^3] again.
+3) **Generate synthetic data from minority class via algorithms like SMOTE.** See this repo[^3] again.
 
-5) **Build your model so that you penalize classification to majority class**
+5) **Build your model so that you penalize classification to majority class.**
 
 6) **Focus on organization, presentation, visualization, filtering of data - not just prediction.** Data Science is not just
 machine learning.
@@ -120,7 +120,7 @@ machine learning.
 8) **Encourage security expertise on the team.** Security expertise can help you think of viable solutions to problems when
 data is insufficient.
 
-9) **Weigh the trade-off between accuracy vs. coverage**. The effects of false positives are particularly
+9) **Weigh the trade-off between accuracy vs. coverage.** The effects of false positives are particularly
 detrimental in the security space, meaning that for some applications it may be more useful to sacrifice
 the volume of accurate classifications for higher confidence.
 
