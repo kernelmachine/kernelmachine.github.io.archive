@@ -66,13 +66,13 @@ Our research presents the following results:
 
 Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes.
 
-We'd also like to understand the network and system features that convince attackers to co-opt a specific AS over another. For example, we used Sonar’s historical forward­DNS service and our phishing detection algorithms to characterize all domains that have mapped to these ASes in the past two years. Domains hosted in malicious ASes had features that suggested deliberate use of specific infrastructure. For example, 'wordpress' sites were over-represented in some malicious ASes (like AS4808), and GoDaddy was by far the most popular registrar for malicious sites across the board. Are these features useful for the design and maintenance of attack vectors?
+We'd also like to understand the network and system features that convince attackers to co-opt a specific AS over another. For example, we used Sonar’s historical forward­DNS service and our phishing detection algorithms to characterize the domains that have mapped to these ASes in the past two years. Domains hosted in malicious ASes had features that suggested deliberate use of specific infrastructure. For example, 'wordpress' sites were over-represented in some malicious ASes (like AS4808), and GoDaddy was by far the most popular registrar for malicious sites across the board. Are these features core to the design and sustenance of phishing attacks?
 
-We can also use our SSL Certificate classifier to understand the distribution of devices hosted in ASes across IPv4, as seen below.
+As seen below, it's also possible to analyze SSL certificates to uncover the distribution of devices hosted in ASes across IPv4.
 
 ![malicious infrastructure](http://pegasos1.github.io/public/20160215/fig4.png)
 
-Each square above shows the probability distribution of device counts of a particular type. Most ASes host fewer than 100 devices across a majority of categories. Are there skews in the presence of specific devices to propagate phishing attacks from these malicious ASes?
+Each square above shows the probability distribution of device counts of a particular type. Most ASes host fewer than 100 devices across a majority of categories. Are there skews in the types of devices used to propagate phishing attacks from these malicious ASes?
 
 This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.       
 
