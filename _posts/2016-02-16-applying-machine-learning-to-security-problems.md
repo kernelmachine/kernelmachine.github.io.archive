@@ -15,25 +15,17 @@ expensive and time-consuming part of the data science process. Data is usually m
 While there are many tools to experiment with different algorithms and
 their parameters, there are few tools to help one develop clean, comprehensive
 datasets. Often times this means asking practitioners with deep domain expertise
-to help label existing data elements. Licensed clean, structured data be hard to come by
+to help label existing datasets. Structured data and ground truth be hard to come by
 in the security context, and may go stale very quickly.
 
 On top of that, bias in training data can hamper the effectiveness of a model
 to discern between output classes. In the security context, data bias can be
 interpreted in two ways.
 
-First, attack methodologies are becoming more dynamic than ever before. If a
-predictive model is trained on known patterns and vulnerabilities, it may not
-necessarily detect an unprecedented attack that does not conform to to those
-1trends. If a predictive model is trained on known patterns and vulnerabilities
-(i.e. using features from malware that is file-system resident),
+First, attack methodologies are becoming more dynamic than ever before. If a predictive model is trained on
+known patterns and vulnerabilities (e.g. using features from malware that is file-system resident),
 it may not necessarily detect an unprecedented attack that does not conform
- to those trends (i.e. misses features from malware that is only memory resident).
-
-Bias can sneak up on the security data scientist as well. One may think he can use the Alexa listings to,
-say, obtain a list of benign domains, but that assumption may turn out to be a bad
-idea since there is no guarantee that those sites are clean. Getting good ground
-truth in security is hard.
+ to those trends (e.g. misses features from malware that is only memory resident).
 
 Second, data bias also comes in the form of *class representation*[^1]. To understand
 class representation bias, one can look to a core foundation of statistics: Bayes
@@ -63,9 +55,8 @@ URL sent to an employee’s inbox. Suppose there are $$10$$ malicious URLs
 sent to employees of company $$X$$ per day. Finally, suppose the IDS analyzes
 $$10000$$ incoming URLs to company $$X$$ per day.
 
-Let $$I$$denote an incident (an incoming malicious URL) and $$\neg I$$ denote a non-
-incident (an incoming benign URL). Similarly, let $$A$$ denote an alarm (the
-IDS classifies incoming URL as malicious) and $$\neg A$$ denote a non-alarm (the
+Let $$I$$ denote an incident (an incoming malicious URL) and $$\neg I$$ denote a non-incident (an incoming benign URL).
+Similarly, let $$A$$ denote an alarm (the IDS classifies incoming URL as malicious) and $$\neg A$$ denote a non-alarm (the
 IDS classifies URL as benign). That means $$P (A|I) = P (\text{hit})$$ and $$P (A| \neg I) =
 P (\text{false alarm})$$.
 
@@ -85,7 +76,7 @@ Now let’s calculate $$P(\text{incident})$$ and $$P(\text{non-incident})$$, giv
 the IDS problem we defined above:
 
 
-$$ P(\text{incident}) =\frac{\text{10 incidents per day}}{\text{10000 audits per day}} $$
+$$ P(\text{incident}) =\frac{\text{10 incidents per day}}{\text{10000 audits per day}} = 0.001$$
 
 $$ P (\text{non-incident}) = 1 − P (\text{incident}) = 0.999$$
 
@@ -93,6 +84,8 @@ These probabilities emphasize the bias present in the distribution of analyzed
 URLs. The IDS has little sense of what incidents entail, as it is trained on very
 few examples of it. Plugging the probabilities into the equation above, we find
 that:
+
+$$ P (\text{IDS is accurate}) = \frac{0.001 * P (\text{hit})}{0.001 * P (\text{hit}) + 0.999 * P (\text{false alarm})}$$
 
 Thus, to have reasonable confidence in an IDS under these biased conditions,
 we must have not only unrealistically high hit rate, but also unrealistically low
