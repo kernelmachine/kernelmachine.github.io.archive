@@ -16,7 +16,7 @@ First, a quick primer on IPv4, the fourth version of the Internet Protocol. The 
 
 ### Malicious ASes
 There has been a great deal of academic and industry focus on identifying malicious activity across
-autonomous systems, and for good reasons. Over 50% of “good” Internet traffic comes
+autonomous systems, and for good reasons.[^3][^4][^5][^6] Over 50% of “good” Internet traffic comes
 from large, ocean-like ASes pushing content from companies like Netflix, Google, Facebook, Apple and Amazon.  However, despite this centralized content, the vastness of the Internet enables those with malicious intent to stake their claim in less friendly waters. In fact, our longitudinal data on phishing activity across IPv4 presented an interesting trend: *a small subset of autonomous systems have regularly hosted a disproportionate
 amount of malicious activity*. In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015
 (data: cleanmx archives[^7]). We wanted to understand what makes some autonomous systems more
@@ -82,9 +82,9 @@ This research represents an example of how Internet-scale data science can provi
 
 [^1]:[Sonar intro](https://sonar.labs.rapid7.com/)
 [^2]:[Heisenberg intro](https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
-[^3]:[Internet Bad Neighborhoods: The spam case](http://pegasos1.github.io)
-[^4]:[FIRE: FInding Rogue nEtworks](http://pegasos1.github.io)
-[^5]:[Abnormally Malicious Autonomous Systems and Their Internet Connectivity](http://pegasos1.github.io)
-[^6]:[Malicious Hubs: Detecting Abnormally Malicious Autonomous Systems](http://pegasos1.github.io)
+[^3]:[Internet Bad Neighborhoods: The spam case](http://eprints.eemcs.utwente.nl/20379/01/cnsm2011.pdf)
+[^4]:[FIRE: FInding Rogue nEtworks](http://eprints.eemcs.utwente.nl/20379/01/cnsm2011.pdf)
+[^5]:[Abnormally Malicious Autonomous Systems and Their Internet Connectivity](http://eprints.eemcs.utwente.nl/20379/01/cnsm2011.pdf)
+[^6]:[Malicious Hubs: Detecting Abnormally Malicious Autonomous Systems](http://eprints.eemcs.utwente.nl/20379/01/cnsm2011.pdf)
 [^7]:[Cleanmx archive](http://cleanmx.org)
 [^8]:[ARIN fee schedules](https://www.arin.net/fees/fee_schedule.html)
