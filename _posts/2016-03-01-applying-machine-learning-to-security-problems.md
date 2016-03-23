@@ -15,7 +15,7 @@ expensive and time-consuming part of the data science process. Data is usually m
 While there are many tools to experiment with different algorithms and
 their parameters, there are few tools to help one develop clean, comprehensive
 datasets. Often times this means asking practitioners with deep domain expertise
-to help label existing datasets. Structured data and ground truth be hard to come by
+to help label existing datasets. But ground truth be hard to come by
 in the security context, and may go stale very quickly.
 
 On top of that, bias in training data can hamper the effectiveness of a model
