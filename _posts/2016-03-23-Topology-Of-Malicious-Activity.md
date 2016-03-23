@@ -82,9 +82,10 @@ This research represents an example of how Internet-scale data science can provi
 
 [^1]:[Sonar intro](https://sonar.labs.rapid7.com/)
 [^2]:[Heisenberg intro](https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots)
-[^3]:[Internet Bad Neighborhoods: The spam case](http://eprints.eemcs.utwente.nl/20379/01/cnsm2011.pdf)
-[^4]:[FIRE: FInding Rogue nEtworks](http://eprints.eemcs.utwente.nl/20379/01/cnsm2011.pdf)
-[^5]:[Abnormally Malicious Autonomous Systems and Their Internet Connectivity](http://eprints.eemcs.utwente.nl/20379/01/cnsm2011.pdf)
-[^6]:[Malicious Hubs: Detecting Abnormally Malicious Autonomous Systems](http://eprints.eemcs.utwente.nl/20379/01/cnsm2011.pdf)
+[^3]:[ G. C. M. Moura, R. Sadre and A. Pras, _Internet Bad Neighborhoods: The spam case,“_ Network
+and Service Management (CNSM), 2011 7th International Conference on, Paris, 2011, pp. 1­8](http://eprints.eemcs.utwente.nl/20379/01/cnsm2011.pdf)
+[^4]:[FIRE: FInding Rogue nEtworks](https://www.cs.ucsb.edu/~chris/research/doc/acsac09_fire.pdf)
+[^5]:[Abnormally Malicious Autonomous Systems and Their Internet Connectivity](http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=5783493&url=http%3A%2F%2Fieeexplore.ieee.org%2Fiel5%2F90%2F6151256%2F05783493.pdf%3Farnumber%3D5783493)
+[^6]:[Malicious Hubs: Detecting Abnormally Malicious Autonomous Systems](http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=5462220&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D5462220)
 [^7]:[Cleanmx archive](http://cleanmx.org)
 [^8]:[ARIN fee schedules](https://www.arin.net/fees/fee_schedule.html)
