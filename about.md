@@ -11,3 +11,5 @@ material and practice writing, and for readers to learn something new.
 Topics will be all over the place: machine learning to security, programming to books.
 
 Thanks for reading!
+
+Connect with me [@ssgrn](http://www.twitter.com/ssgrn)
