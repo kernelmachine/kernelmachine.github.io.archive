@@ -28,6 +28,17 @@
 
   <!-- RSS -->
   <link rel="alternate" type="application/atom+xml" title="suchin" href="/atom.xml">
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-75615851-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
 </head>
 
 
@@ -46,103 +57,21 @@
   
   <article class="post">
     <h1 class="post-title">
-      <a href="/2016/02/18/Type-Safe-Matrix-Computations/">
-        Making Compile-Time Guarantees for Matrix Computations
+      <a href="/2016/02/12/hello-world/">
+        Hello, World!
       </a>
     </h1>
 
-    <time datetime="2016-02-18T00:00:00-05:00" class="post-date">18 Feb 2016</time>
+    <time datetime="2016-02-12T00:00:00-05:00" class="post-date">12 Feb 2016</time>
 
-    <p>Numpy is a great library, a core library of scientific computing in Python. However,
-without compile-time guarantees matrix computations, it’s easy to push out code ridden
-with errors.</p>
+    <p>I’m Suchin. I’m a data scientist at Rapid7, a security company in Cambridge, MA.</p>
 
-<p>In fact, any limited wrapper around BLAS or LAPACK is constrained by deep stack tracebacks
-that are impossible to retrace.</p>
+<p>This blog will condense and communicate things I’m working on and reading about. It’s a way for me to understand
+material and practice writing, and for readers to learn something new.</p>
 
-<p>For example, take the dot product:</p>
+<p>Topics will be all over the place: machine learning to security, programming to books.</p>
 
-<p>info &gt; 1</p>
-
-<p>info &lt; 1</p>
-
-<p>Statically-typed languages like Rust have a the great advantage of providing compile-time
-guarantees for code execution.</p>
-
-<figure class="highlight"><pre><code class="language-rust" data-lang="rust"><span class="err">#</span><span class="p">[</span><span class="nf">derive</span><span class="p">(</span><span class="n">Debug</span><span class="p">)]</span>
-<span class="k">pub</span> <span class="k">enum</span> <span class="n">MatrixError</span><span class="p">{</span>
-    <span class="n">MismatchedDimensions</span><span class="p">,</span>
-    <span class="n">NonSquareMatrix</span><span class="p">,</span>
-    <span class="n">MalformedMatrix</span><span class="p">,</span>
-    <span class="n">SingularMatrix</span><span class="p">,</span>
-    <span class="n">LapackComputationError</span><span class="p">,</span>
-    <span class="n">LapackInputError</span><span class="p">,</span>
-    <span class="n">UnknownError</span><span class="p">,</span>
-    <span class="n">IndexError</span>
-<span class="p">}</span></code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-rust" data-lang="rust"><span class="k">impl</span> <span class="nn">fmt</span><span class="p">::</span><span class="n">Display</span> <span class="k">for</span> <span class="n">MatrixError</span><span class="p">{</span>
-
-    <span class="k">fn</span> <span class="nf">fmt</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">f</span> <span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="nn">fmt</span><span class="p">::</span><span class="n">Formatter</span> <span class="p">)</span> <span class="k">-&gt;</span> <span class="nn">fmt</span><span class="p">::</span><span class="n">Result</span><span class="p">{</span>
-
-        <span class="k">match</span> <span class="o">*</span><span class="k">self</span><span class="p">{</span>
-            <span class="nn">MatrixError</span><span class="p">::</span><span class="n">MismatchedDimensions</span><span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Operation cannot be performed.
-                      Mismatched dimensions."</span><span class="p">),</span>
-            <span class="nn">MatrixError</span><span class="p">::</span><span class="n">NonSquareMatrix</span><span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Operation cannot be performed.
-                      Matrix is not square."</span><span class="p">),</span>
-            <span class="nn">MatrixError</span><span class="p">::</span><span class="n">MalformedMatrix</span> <span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Matrix is malformed."</span><span class="p">),</span>
-            <span class="nn">MatrixError</span><span class="p">::</span><span class="n">SingularMatrix</span> <span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Operation cannot be performed.
-                      Matrix has zero determinant."</span><span class="p">),</span>
-            <span class="nn">MatrixError</span><span class="p">::</span><span class="n">LapackComputationError</span> <span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Failure in the course of computation."</span><span class="p">),</span>
-            <span class="nn">MatrixError</span><span class="p">::</span><span class="n">LapackInputError</span> <span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Illegal argument detected."</span><span class="p">),</span>
-            <span class="nn">MatrixError</span><span class="p">::</span><span class="n">IndexError</span> <span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"Indexed outside of matrix bounds."</span><span class="p">),</span>
-            <span class="nn">MatrixError</span><span class="p">::</span><span class="n">UnknownError</span> <span class="k">=&gt;</span>
-                <span class="nd">write!</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="s">"Unknown error, please submit bug."</span><span class="p">)</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span></code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-rust" data-lang="rust"><span class="k">trait</span> <span class="n">RectMat</span> <span class="p">:</span> <span class="nb">Num</span> <span class="o">+</span> <span class="n">Rand</span> <span class="o">+</span> <span class="n">Clone</span><span class="p">{</span>
-    <span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">e</span> <span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">r_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">c_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">Self</span><span class="p">,</span> <span class="n">MatrixError</span><span class="o">&gt;</span><span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">random</span><span class="p">(</span><span class="n">r_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">c_size</span><span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span> <span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">get_element</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">row</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">col</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span><span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">zeros</span> <span class="p">(</span><span class="n">r_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">c_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">transpose</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">diagonal</span> <span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">;</span>
-    <span class="err">.</span>
-    <span class="err">.</span>
-    <span class="err">.</span>  
-<span class="p">}</span></code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-rust" data-lang="rust"><span class="k">trait</span> <span class="n">SqMat</span><span class="p">:</span> <span class="n">RectMat</span><span class="p">{</span>
-    <span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">e</span> <span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">r_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">,</span> <span class="n">c_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span>   <span class="n">Self</span><span class="p">,</span> <span class="n">MatrixError</span><span class="o">&gt;</span><span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">diag_mat</span> <span class="p">(</span><span class="n">a</span> <span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">identity</span><span class="p">(</span><span class="n">row_size</span> <span class="p">:</span> <span class="n">usize</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Self</span><span class="p">;</span>
-    <span class="k">fn</span> <span class="nf">pseudoinverse</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Self</span><span class="p">)</span> <span class="k">-&gt;</span><span class="n">Result</span><span class="o">&lt;</span><span class="n">Self</span><span class="p">,</span><span class="n">MatrixError</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="p">}</span></code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-rust" data-lang="rust"><span class="k">trait</span> <span class="n">NonSingularMat</span> <span class="p">:</span> <span class="n">SqMat</span><span class="p">{</span>
-    <span class="k">fn</span> <span class="nf">inverse</span><span class="p">(</span><span class="n">a</span> <span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">Self</span> <span class="p">)</span> <span class="k">-&gt;</span><span class="n">Result</span><span class="o">&lt;</span><span class="n">Self</span><span class="p">,</span><span class="n">MatrixError</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="p">}</span></code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-rust" data-lang="rust"><span class="k">pub</span> <span class="k">fn</span> <span class="n">is_normal</span><span class="o">&lt;</span><span class="n">T</span><span class="p">:</span> <span class="n">SqMat</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span> <span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">T</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="nb">bool</span><span class="p">,</span> <span class="n">MatrixError</span><span class="o">&gt;</span> <span class="p">{</span>
-
-    <span class="k">let</span> <span class="k">mut</span> <span class="n">at</span> <span class="o">=</span> <span class="n">a</span><span class="nf">.transpose</span><span class="p">();</span>
-
-    <span class="k">let</span> <span class="n">inner</span> <span class="o">=</span> <span class="nd">try!</span><span class="p">(</span><span class="nf">dot</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">at</span><span class="p">));</span>
-    <span class="k">let</span> <span class="n">outer</span> <span class="o">=</span> <span class="nd">try!</span><span class="p">(</span><span class="nf">dot</span> <span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="n">at</span><span class="p">,</span> <span class="n">a</span><span class="p">));</span>
-
-    <span class="nd">matrix_equal!</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span><span class="n">outer</span><span class="p">)</span>
-
-<span class="p">}</span></code></pre></figure>
-
+<p>Thanks for reading!</p>
 
   </article>
   
@@ -150,18 +79,20 @@ guarantees for code execution.</p>
 
 <div class="pagination">
   
-    <a class="pagination-item older" href="/page4">Older</a>
+    <span class="pagination-item older">Older</span>
   
   
     <a class="pagination-item newer" href="/page2">Newer</a>
   
 </div>
 
+        
+
       </main>
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-03-04T09:37:34-05:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-03-25T16:28:34-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>
