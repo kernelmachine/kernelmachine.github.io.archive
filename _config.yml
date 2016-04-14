@@ -6,7 +6,7 @@ permalink:           pretty
 # Setup
 title:               suchin
 tagline:             writings
-url:                 http://suchin.co
+url:                 https://suchin.co
 paginate:            1
 baseurl:             ""
 about:               "about"
