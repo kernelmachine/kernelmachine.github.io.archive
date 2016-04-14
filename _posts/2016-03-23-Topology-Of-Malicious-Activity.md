@@ -11,7 +11,7 @@ We have recently focused our research on how these tools can work together to pr
 ### IPv4 Topology
 First, a quick primer on IPv4, the fourth version of the Internet Protocol. The topology of IPv4 is characterized by three levels of hierarchy, from smallest to largest: IP addresses, subnets, and autonomous systems (ASes). IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses, and ASes are blocks of subnets managed by public institutions and private enterprises. IPv4 is divided into about 65,000 ASes, at least 30M subnets, and $$2^{32}$$ IP addresses.
 
-![Phishing Activity](http://pegasos1.github.io/public/20160215/fig1.png)
+![Phishing Activity](https://pegasos1.github.io/public/20160215/fig1.png)
 
 
 ### Malicious ASes
@@ -22,7 +22,7 @@ amount of malicious activity*. In particular, 200 ASes hosted 70% of phishing ac
 (data: cleanmx archives[^7]). We wanted to understand what makes some autonomous systems more
 likely to host malicious activity.
 
-![IPv4 fragmentation](http://pegasos1.github.io/public/20160215/fig2.png)
+![IPv4 fragmentation](https://pegasos1.github.io/public/20160215/fig2.png)
 
 
 
@@ -31,7 +31,7 @@ likely to host malicious activity.
 
 We gathered historical mappings between IP addresses and ASes from 2007 to 2015 to understand the history of IPv4. The data clearly suggested that IPv4 has been fragmenting. The total number of ASes has grown about 60% in the past decade, and during the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that the IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.
 
-![AS fragmentation](http://pegasos1.github.io/public/20160215/fig3.png)
+![AS fragmentation](https://pegasos1.github.io/public/20160215/fig3.png)
 
 
 
@@ -48,7 +48,7 @@ Finally, to compute fragmentation, subnets observed in ASes overtime were organi
 These results suggest that malicious ASes are large and deeply fragmented into small subnets. ARIN fee schedules showed that smaller subnets are significantly less expensive to purchase.[^8] Cheap, small subnets may allow malicious registrars to purchase many IP blocks for traffic redirection or proxy servers, so they can better float under the radar.
 
 
-![topologies](http://pegasos1.github.io/public/20160215/fig5.png)
+![topologies](https://pegasos1.github.io/public/20160215/fig5.png)
 
 
 
@@ -70,7 +70,7 @@ We'd also like to understand the network and system features that convince attac
 
 As seen below, it's also possible to analyze SSL certificates to uncover the distribution of devices hosted in ASes across IPv4.
 
-![malicious infrastructure](http://pegasos1.github.io/public/20160215/fig4.png)
+![malicious infrastructure](https://pegasos1.github.io/public/20160215/fig4.png)
 
 Each square above shows the probability distribution of device counts of a particular type. Most ASes host fewer than 100 devices across a majority of categories. Are there skews in the types of devices used to propagate phishing attacks from these malicious ASes?
 
