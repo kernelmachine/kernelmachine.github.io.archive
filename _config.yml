@@ -8,7 +8,7 @@ title:               suchin
 tagline:             writings
 url:                 https://suchin.co
 paginate:            1
-baseurl:             "https//www.suchin.co/"
+baseurl:             ""
 about:               "about"
 
 # Gems
