@@ -249,7 +249,7 @@ I was interested in how Rayon matrix multiplication performance depended on `BLO
 
 As you can see, with smaller blocksizes, Rayon does consistently worse than single-threaded multiplication.
 
-<img src="http://127.0.0.1:4000/public/20160424/fig1.png" width="700">
+<img src="http://pegasos1.github.io/public/20160424/fig1.png" width="700">
 
 
 ## Fun experiment on EC2
