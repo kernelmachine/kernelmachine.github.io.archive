@@ -3,22 +3,30 @@ layout: default
 title: Home
 ---
 
+
+<h5> Welcome.</h5>
+
+</p> My name's Suchin. I'm a <a href ="http://www.linkedin.com/in/ssgrn"> data scientist </a> at <a href= "http://rapid7.com/"> Rapid7</a>, a security firm in Cambridge, MA.</p>
+
+</p> This blog will condense and communicate things I'm working on and reading about. </p>
+
+</p> Topics of current interest include <a href ="http://rust-lang.org/">Rust</a> and <a href= " https://sonar.labs.rapid7.com/"> Internet-scale</a> data science. </p>
+
+<p> Check out some of my posts below. Thanks for reading.</p>
+
+<br>
 <div class="posts">
-  {% for post in paginator.posts %}
-  <article class="post">
-    <h1 class="post-title">
-      <a href="{{ site.baseurl }}{{ post.url }}">
+  {% for post in site.posts %}
+    <h4 class="post-title">
+      <a href="{{ site.baseurl }}{{ post.url }}" style="text-decoration : none;">
         {{ post.title }}
       </a>
-    </h1>
-
+    </h4>
     <time datetime="{{ post.date | date_to_xmlschema }}" class="post-date">{{ post.date | date_to_string }}</time>
 
-    {{ post.content }}
-  </article>
   {% endfor %}
 </div>
-
+<!--
 <div class="pagination">
   {% if paginator.next_page %}
     <a class="pagination-item older" href="{{ paginator.next_page_path | prepend: site.baseurl }}">Older</a>
@@ -29,5 +37,4 @@ title: Home
     <a class="pagination-item newer" href="{{ paginator.previous_page_path | prepend: site.baseurl }}">Newer</a>
   {% else %}
     <span class="pagination-item newer">Newer</span>
-  {% endif %}
-</div>
+  {% endif %} -->

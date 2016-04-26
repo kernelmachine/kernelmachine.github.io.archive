@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>suchin</title>
- <link href="http://suchin.co/atom.xml" rel="self"/>
- <link href="http://suchin.co/"/>
- <updated>2016-03-25T16:28:34-04:00</updated>
- <id>http://suchin.co</id>
+ <link href="https://suchin.co/atom.xml" rel="self"/>
+ <link href="https://suchin.co/"/>
+ <updated>2016-04-25T20:10:17-04:00</updated>
+ <id>https://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
    <email></email>
@@ -13,10 +13,320 @@
 
  
  <entry>
+   <title>Matrix Multiplication in Rust (Part 1)</title>
+   <link href="https://suchin.co/2016/04/21/Parallelized-Matrix-Multiplication/"/>
+   <updated>2016-04-21T00:00:00-04:00</updated>
+   <id>https://suchin.co/2016/04/21/Parallelized-Matrix-Multiplication</id>
+   <content type="html">&lt;p&gt;&lt;em&gt;Thanks to staticassert for feedback. Source code can be found &lt;a href=&quot;http://github.com/pegasos1/rsmat&quot;&gt;here&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;This post is the first of a series.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Basic Linear Algebra Subprograms (BLAS) are the routines that underpin most high-level computational libraries today. Written in C and FORTRAN, they are acutely optimized for speed, and take advantage of special hardware features to achieve unparalleled performance in matrix computations.&lt;/p&gt;
+
+&lt;p&gt;It’s an early time for Rust, but we’re already seeing strides (pun intended) in the numeric computing space.&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;sup id=&quot;fnref:2&quot;&gt;&lt;a href=&quot;#fn:2&quot; class=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt; I was recently inspired to investigate how to make fast matrix computations in Rust, using ndarray-rblas compiled with OpenBLAS&lt;sup id=&quot;fnref:3&quot;&gt;&lt;a href=&quot;#fn:3&quot; class=&quot;footnote&quot;&gt;3&lt;/a&gt;&lt;/sup&gt; as the target benchmark. This blog series is a documentation of those explorations.&lt;/p&gt;
+
+&lt;p&gt;In this post, I’ll detail the process of making fast matrix computations through code changes.&lt;/p&gt;
+
+&lt;p&gt;The analyses in this post will involve the use of rust-ndarray&lt;sup id=&quot;fnref:1:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt; for matrix computations. All the crate-specific methods I use are documented &lt;a href=&quot;http://bluss.github.io/rust-ndarray/master/ndarray/index.html&quot;&gt;here&lt;/a&gt;. I’m on a basic Linux laptop: 4-core, i5 CPU with 8 GB RAM.&lt;/p&gt;
+
+&lt;h2 id=&quot;naive-dot-product&quot;&gt;Naive dot product&lt;/h2&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;A fundamental operation in numeric computing is the dot product between matrices &lt;script type=&quot;math/tex&quot;&gt;A = [a_1 ,..., a_n]&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;B = [b_1,...,b_n]&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;dot(A,B) = a_1b_1 + a_2b_2 + ... + a_nb_n&lt;/script&gt;
+
+&lt;p&gt;It’s a simple operation and a great way to dig into performance optimization. So let’s start here!&lt;/p&gt;
+
+&lt;p&gt;We’ll use the following type aliases:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub type VectorView&amp;lt;&#39;a, A&amp;gt; = ArrayView&amp;lt;&#39;a, A, Ix&amp;gt;;
+pub type MatView&amp;lt;&#39;a, A&amp;gt; = ArrayView&amp;lt;&#39;a, A, (Ix, Ix)&amp;gt;;
+pub type MatViewMut&amp;lt;&#39;a, A&amp;gt; = ArrayViewMut&amp;lt;&#39;a, A, (Ix, Ix)&amp;gt;;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;ArrayView(Mut)s are (mutable) references to a matrix, or part of it. They’re good objects to use if you want to  work with modular subviews of a matrix.&lt;/p&gt;
+
+&lt;p&gt;We begin with a naive implementation of the dot product, in which we fold a multiplicative sum of values in vectors &lt;code class=&quot;highlighter-rouge&quot;&gt;a&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;b&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub fn vector_dot(a : VectorView&amp;lt;f64&amp;gt;,b:  VectorView&amp;lt;f64&amp;gt;) -&amp;gt; f64 {
+        (0..a.len()).fold(0.0, |x, y| x + a.get(y).unwrap() * b.get(y).unwrap() )
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;We then define a matrix dot product like so:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub fn matrix_dot( a : &amp;amp;MatView&amp;lt;f64&amp;gt;, b: &amp;amp;MatView&amp;lt;f64&amp;gt;, c : &amp;amp;mut MatViewMut&amp;lt;f64&amp;gt;){
+    let ((m,k1),(k2,n)) = (a.dim(),b.dim());
+    assert_eq!(k1,k2);
+    for ix in 0..m{
+        for jx in 0..n{
+            let a_row = a.row(ix);
+            let b_col = b.column(jx);
+            let mut value = c.get((ix,jx)).unwrap();
+            *value += vector_dot(a_row, b_col);
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In the code above, we first check whether the inner and outer dimensions of &lt;code class=&quot;highlighter-rouge&quot;&gt;a&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;b&lt;/code&gt; (respectively) are the same. Then we loop through the matrices’ rows and columns, applying our &lt;code class=&quot;highlighter-rouge&quot;&gt;vector_dot&lt;/code&gt; function and updating a separate matrix &lt;code class=&quot;highlighter-rouge&quot;&gt;c&lt;/code&gt; with the corresponding output.&lt;/p&gt;
+
+&lt;p&gt;Here are the benchmarks, compared to OpenBLAS, on multiplying &lt;script type=&quot;math/tex&quot;&gt;128 \times 100&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;100 \times 128&lt;/script&gt; matrices:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;test bench_dot_dumb        ... bench:   2,843,823 ns/iter (+/- 110,881)
+
+test bench_dot_openblas    ... bench:   201,170 ns/iter (+/- 18,666)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Wow, that sucks. We’re at least 10x slower than OpenBLAS. But the above implementation is called naive for a reason; we can do a lot better.&lt;/p&gt;
+
+&lt;h2 id=&quot;unsafe-indexing&quot;&gt;Unsafe indexing&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;get()&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;get_mut()&lt;/code&gt;  checks matrix dimensions before returning the indexed value. This makes for safe code, since ndarray will throw an error if the supplied index falls outside of the matrix dimensions (hence the &lt;code class=&quot;highlighter-rouge&quot;&gt;unwrap&lt;/code&gt;). However, index checking wastes time, and we’re trying to make things as fast as possible.&lt;/p&gt;
+
+&lt;p&gt;The first thing we could do is index the matrix &lt;code class=&quot;highlighter-rouge&quot;&gt;c&lt;/code&gt; with unsafe methods &lt;code class=&quot;highlighter-rouge&quot;&gt;uget()&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;uget_mut()&lt;/code&gt;. These don’t check the bounds of the matrix when indexing, and will save us time.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub fn vector_dot_unsafe(a : VectorView&amp;lt;f64&amp;gt;,b:  VectorView&amp;lt;f64&amp;gt;) -&amp;gt; f64 {
+    unsafe{
+        (0..a.len()).fold(0.0, |x, y| x + a.uget(y) * b.uget(y))
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub fn matrix_dot_unsafe( a : &amp;amp;MatView&amp;lt;f64&amp;gt;, b: &amp;amp;MatView&amp;lt;f64&amp;gt;,
+                        c : &amp;amp;mut MatViewMut&amp;lt;f64&amp;gt;){
+    let ((m,k1),(k2,n)) = (a.dim(),b.dim());
+    assert_eq!(k1,k2);
+    for ix in 0..m{
+        for jx in 0..n{
+            let a_row = a.row(ix);
+            let b_col = b.column(jx);
+            unsafe{
+                let mut value = c.uget_mut((ix,jx));
+                *value += vector_dot_unsafe( a_row, b_col);
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;We achieve about a 2x speedup with this change.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;test bench_dot_dumb        ... bench:   1,518,253 ns/iter (+/- 24,523)
+
+test bench_dot_openblas    ... bench:   201,170 ns/iter (+/- 18,666)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;improve-matrix-multiplication&quot;&gt;Improve matrix multiplication&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;p&gt;The second thing we can do is employ some black magic to improve our matrix multiplication.&lt;/p&gt;
+
+&lt;p&gt;The matrixmultiply crate&lt;sup id=&quot;fnref:4&quot;&gt;&lt;a href=&quot;#fn:4&quot; class=&quot;footnote&quot;&gt;4&lt;/a&gt;&lt;/sup&gt; computes the dot product by decomposing the full computation into a layered set of mini subproblems that can be efficiently packed into the cache. For an in-depth review of the algorithm and its implementation, I’ll refer you to another post on the subject &lt;sup id=&quot;fnref:5&quot;&gt;&lt;a href=&quot;#fn:5&quot; class=&quot;footnote&quot;&gt;5&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+
+&lt;p&gt;By replacing the naive dot product with this smarter version, natively supported in ndarray via the method &lt;code class=&quot;highlighter-rouge&quot;&gt;dot&lt;/code&gt;, we achieve significant speed up:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub fn matrix_dot( left : &amp;amp;MatView&amp;lt;f64&amp;gt;, right: &amp;amp;MatView&amp;lt;f64&amp;gt;,
+                  init : &amp;amp;mut MatViewMut&amp;lt;f64&amp;gt;){
+    let dot_prod = left.dot(right);
+    for ix in 0..m{
+        for jx in 0..n{
+            unsafe{
+            let mut value = init.uget_mut((ix,jx));
+            let res = dot_prod.uget_mut((ix,jx));
+            *value += res;
+          }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;test bench_dot_matrixmultiply      ... bench:     370,281 ns/iter (+/- 14,179)
+
+test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Nice! We’ve increased the speed almost 4x. Now let’s try to get our algorithm even closer to OpenBLAS performance.&lt;/p&gt;
+
+&lt;h2 id=&quot;avoid-explicit-bounds-checking&quot;&gt;Avoid explicit bounds checking&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;p&gt;Let’s revisit the indexing issue in the loop. We gained some significant speedups by making our code unsafe, but this isn’t ideal. Let’s see if we can get speed &lt;em&gt;and&lt;/em&gt; safety.&lt;/p&gt;
+
+&lt;p&gt;The trick here is that matrix elements in ndarray implement &lt;code class=&quot;highlighter-rouge&quot;&gt;Iterator&lt;/code&gt;, and &lt;em&gt;iteration naturally lends itself to bounds checking elimination optimization&lt;/em&gt;. It’s implicitly safe to iterate over the matrix. We can assign the values of our dot product to &lt;code class=&quot;highlighter-rouge&quot;&gt;c&lt;/code&gt; safely without having to make sure we’re within the matrix dimensions.&lt;/p&gt;
+
+&lt;p&gt;With this in mind, we can simplify the loop to a one-liner that involves the iterator method &lt;code class=&quot;highlighter-rouge&quot;&gt;zip&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;c.zip_mut_with(&amp;amp;dot_prod, |x, y| *x = *y)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This results in a smarter, faster matrix multiplication below:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub fn matrix_dot_safe(a: &amp;amp;MatView&amp;lt;f64&amp;gt;, b: &amp;amp;MatView&amp;lt;f64&amp;gt;,
+  c: &amp;amp;mut MatViewMut&amp;lt;f64&amp;gt;) {
+    let ((_,k1),(k2,_)) = (a.dim(),b.dim());
+    assert_eq!(k1,k2);
+    let dot_prod = a.dot(b);
+    c.zip_mut_with(&amp;amp;dot_prod, |x, y| *x = *y)
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Because ndarray matrices implement &lt;code class=&quot;highlighter-rouge&quot;&gt;Iterator&lt;/code&gt;, we can use array methods to achieve safety without sacrificing speed. And we get simplicity for free.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;test &lt;/span&gt;bench_dot_safe            ... bench:     346,677 ns/iter &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;+/- 13,246&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;test &lt;/span&gt;bench_dot_openblas        ... bench:   201,170 ns/iter &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;+/- 18,666&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Why are we still assigning the dot product of  &lt;code class=&quot;highlighter-rouge&quot;&gt;a&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;b&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;c&lt;/code&gt;? Well, we’re just thinking one step ahead - towards parallelization.&lt;/p&gt;
+
+&lt;h2 id=&quot;parallelization&quot;&gt;Parallelization&lt;/h2&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;Another optimization we can make involves multi-threading. Rust is great for writing concurrent programs because its memory management and type system free the developer from dealing with data races.&lt;sup id=&quot;fnref:6&quot;&gt;&lt;a href=&quot;#fn:6&quot; class=&quot;footnote&quot;&gt;6&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+
+&lt;p&gt;There are quite a few crates that assist the developer in making multi-threaded applications, but the one I’ll focus on here is Rayon&lt;sup id=&quot;fnref:7&quot;&gt;&lt;a href=&quot;#fn:7&quot; class=&quot;footnote&quot;&gt;7&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+
+&lt;p&gt;The core of Rayon’s API is a work-stealing thread pool. Worker threads pop tasks from a queue, and additional threads are spawned as needed to “steal” future work from busy threads. The really interesting thing about Rayon is that parallelism is not &lt;em&gt;guaranteed&lt;/em&gt;; instead, it’s dependent on whether idle cores are available. It’s great to release the developer from thinking about when to use concurrency, and let the API handle it. For an explanation on how this works, I’ll refer you to a series of posts here&lt;sup id=&quot;fnref:8&quot;&gt;&lt;a href=&quot;#fn:8&quot; class=&quot;footnote&quot;&gt;8&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+
+&lt;p&gt;Rayon works best with divide-and-conquer algorithms, which happens to be an optimal technique for matrix multiplication.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://www.catonmat.net/blog/wp-content/uploads/2009/12/matrix-multiplication-blocks.gif&quot; width=&quot;700&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We call &lt;code class=&quot;highlighter-rouge&quot;&gt;join&lt;/code&gt; on recursively divided matrices, spawning threads to perform multiplication on blocks when we reach some minimum dimension, called &lt;code class=&quot;highlighter-rouge&quot;&gt;BLOCKSIZE&lt;/code&gt;. The next section will detail the effects of the &lt;code class=&quot;highlighter-rouge&quot;&gt;BLOCKSIZE&lt;/code&gt; parameter on performance, but for now we arbitrarily set it to 64.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub const BLOCKSIZE: usize = 64;
+
+pub fn matrix_dot_rayon(a: &amp;amp;MatView&amp;lt;f64&amp;gt;, b: &amp;amp;MatView&amp;lt;f64&amp;gt;,
+                        c: &amp;amp;mut MatViewMut&amp;lt;f64&amp;gt;) {
+
+    let (m, k1) = a.dim();
+    let (k2, n) = b.dim();
+    assert_eq!(k1, k2);
+
+    if m &amp;lt;= BLOCKSIZE &amp;amp;&amp;amp; n &amp;lt;= BLOCKSIZE {
+        matrix_dot_safe(a, b, c);
+        return;
+    } else if m &amp;gt; BLOCKSIZE {
+        let mid = m / 2;
+        let (a_0, a_1) = a.split_at(Axis(0), mid);
+        let (mut c_0,
+            mut c_1) = c.view_mut().split_at(Axis(0), mid);
+        rayon::join(|| matrix_dot_rayon(&amp;amp;a_0, b, &amp;amp;mut c_0),
+                    || matrix_dot_rayon(&amp;amp;a_1, b, &amp;amp;mut c_1));
+
+    } else if n &amp;gt; BLOCKSIZE {
+        let mid = n / 2;
+        let (b_0, b_1) = b.split_at(Axis(1), mid);
+        let (mut c_0,
+            mut c_1) = c.view_mut().split_at(Axis(1), mid);
+        rayon::join(|| matrix_dot_rayon(a, &amp;amp;b_0, &amp;amp;mut c_0),
+                    || matrix_dot_rayon(a, &amp;amp;b_1, &amp;amp;mut c_1));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;As before, we first make sure dimensions of &lt;code class=&quot;highlighter-rouge&quot;&gt;a&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;b&lt;/code&gt; are consistent. Then we enter into the rayon loop. The program recursively divides &lt;code class=&quot;highlighter-rouge&quot;&gt;a&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;b&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;c&lt;/code&gt; until it reaches the minimum threshold for blocksize, at which point the spawned thread(s) begin multiplication on the blocks of &lt;code class=&quot;highlighter-rouge&quot;&gt;a&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;b&lt;/code&gt; and update the corresponding blocks of &lt;code class=&quot;highlighter-rouge&quot;&gt;c&lt;/code&gt; accordingly.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;test bench_dot_rayon           ... bench:     224,570 ns/iter (+/- 45,483)
+test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It now looks like we’re competitive with OpenBLAS on my machine.&lt;/p&gt;
+
+&lt;h2 id=&quot;rayon-performance-graph&quot;&gt;Rayon Performance Graph&lt;/h2&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;I was interested in how Rayon matrix multiplication performance depended on &lt;code class=&quot;highlighter-rouge&quot;&gt;BLOCKSIZE&lt;/code&gt; and the overall dimensions of &lt;code class=&quot;highlighter-rouge&quot;&gt;a&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;b&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;First,  I looked at two &lt;script type=&quot;math/tex&quot;&gt;128 \times 100&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;100 \times 128&lt;/script&gt; matrices. I varied the inner dimension of both matrices in lockstep, and computed benchmarks with/without rayon.&lt;/p&gt;
+
+&lt;p&gt;As you can see, with smaller blocksizes, Rayon does consistently worse than single-threaded multiplication.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://127.0.0.1:4000/public/20160424/fig1.png&quot; width=&quot;700&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;fun-experiment-on-ec2&quot;&gt;Fun experiment on EC2&lt;/h2&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;I was also interested in how the performance of this matrix multiplication program scaled with compute power. I ran the program on Amazon Web Services EC2 – a compute optimized c4.2xlarge instance.&lt;/p&gt;
+
+&lt;p&gt;A c4.2xlarge  instance has 8 cores of “high frequency Intel Xeon E5-2666 v3 (Haswell) processors optimized specifically for EC2”, and 15 GB of RAM.&lt;sup id=&quot;fnref:9&quot;&gt;&lt;a href=&quot;#fn:9&quot; class=&quot;footnote&quot;&gt;9&lt;/a&gt;&lt;/sup&gt; With high compute power and low extraneous CPU activity, I expected to see far better performance.&lt;/p&gt;
+
+&lt;p&gt;Here are the results of multiplying &lt;script type=&quot;math/tex&quot;&gt;128 \times 100&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;100 \times 128&lt;/script&gt; matrices on that machine.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;test bench_dot ... bench: 323,867 ns/iter (+/- 4,005)
+test bench_dot_rayon ... bench: 195,585 ns/iter (+/- 15,530)
+test bench_dot_openblas ... bench: 91,242 ns/iter (+/- 686)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Rayon’s performance improved quite a bit! But, it gets blown out of the water by OpenBLAS. No competition here.&lt;/p&gt;
+
+&lt;p&gt;We’ll dig deeper into these types of tests on various EC2 instances in the last post of this series.&lt;/p&gt;
+
+&lt;h2 id=&quot;things-to-consider&quot;&gt;Things to consider&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;p&gt;It’s hard to interpret/generalize the results of concurrent programs because, as I showed above, they’re highly dependent on a variety of parameters, like the size of the data, the number of threads, the power of the CPU, and the cache size. On top of that, Rayon’s &lt;em&gt;potential parallelism&lt;/em&gt; concept, while really useful for development, makes the overall program a  bit of a black box. For example, why exactly does rayon performance degrade with a smaller &lt;code class=&quot;highlighter-rouge&quot;&gt;BLOCKSIZE&lt;/code&gt;? Maybe each computation was so ephemeral on a smaller &lt;code class=&quot;highlighter-rouge&quot;&gt;BLOCKSIZE&lt;/code&gt; that rayon didn’t spawn enough threads. Or perhaps I had a random background process that suddenly limited the amount of threads I could allocate. Or perhaps cache lines are the primary determinant of which &lt;code class=&quot;highlighter-rouge&quot;&gt;BLOCKSIZE&lt;/code&gt; is optimal.&lt;/p&gt;
+
+&lt;p&gt;In the next post of this series, we’ll go under the hood by investigating the CPU and cache to understand &lt;em&gt;why&lt;/em&gt; our code improvements resulted in faster performance, hopefully answering some of these questions and controlling for the many factors that can affect the algorithm’s speed.&lt;/p&gt;
+
+&lt;p&gt;For now, see these results as a showcase of Rayon, as well as an example of how matrix multiplication in Rust can be &lt;em&gt;really&lt;/em&gt; fast and easy to optimize.&lt;/p&gt;
+
+&lt;p&gt;Numeric computing in Rust is exciting. Hope to see more work in this space!&lt;/p&gt;
+
+&lt;div class=&quot;footnotes&quot;&gt;
+  &lt;ol&gt;
+    &lt;li id=&quot;fn:1&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;https://github.com/bluss/rust-ndarray&quot;&gt;rust-ndarray&lt;/a&gt; &lt;a href=&quot;#fnref:1&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt; &lt;a href=&quot;#fnref:1:1&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;sup&gt;2&lt;/sup&gt;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:2&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;https://github.com/autumnai/leaf&quot;&gt;leaf&lt;/a&gt; &lt;a href=&quot;#fnref:2&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:3&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;https://github.com/bluss/rust-ndarray/tree/master/ndarray-rblas&quot;&gt;ndarray-rblas&lt;/a&gt; &lt;a href=&quot;#fnref:3&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:4&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;https://crates.io/crates/matrixmultiply&quot;&gt;matrixmultiply&lt;/a&gt; &lt;a href=&quot;#fnref:4&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:5&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;http://bluss.github.io/rust/2016/03/28/a-gemmed-rabbit-hole/#fn:2&quot;&gt;matrixmultiply explanation&lt;/a&gt; &lt;a href=&quot;#fnref:5&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:6&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;https://doc.rust-lang.org/nomicon/send-and-sync.html&quot;&gt;send and sync&lt;/a&gt; &lt;a href=&quot;#fnref:6&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:7&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;http://crates.io/crates/rayon&quot;&gt;rayon&lt;/a&gt; &lt;a href=&quot;#fnref:7&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:8&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;http://smallcultfollowing.com/babysteps/blog/2015/12/18/rayon-data-parallelism-in-rust/&quot;&gt;rayon explanation&lt;/a&gt; &lt;a href=&quot;#fnref:8&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:9&quot;&gt;
+      &lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/ec2/instance-types/&quot;&gt;instance types&lt;/a&gt; &lt;a href=&quot;#fnref:9&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;
+</content>
+ </entry>
+ 
+ <entry>
    <title>The Topology of Malicious Activity on IPv4</title>
-   <link href="http://suchin.co/2016/03/23/Topology-Of-Malicious-Activity/"/>
+   <link href="https://suchin.co/2016/03/23/Topology-Of-Malicious-Activity/"/>
    <updated>2016-03-23T00:00:00-04:00</updated>
-   <id>http://suchin.co/2016/03/23/Topology-Of-Malicious-Activity</id>
+   <id>https://suchin.co/2016/03/23/Topology-Of-Malicious-Activity</id>
    <content type="html">&lt;p&gt;At Rapid7, we’re building tools that help us investigate the threat landscape across the Internet. Projects Sonar&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt; and Heisenberg&lt;sup id=&quot;fnref:2&quot;&gt;&lt;a href=&quot;#fn:2&quot; class=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt; give us global exposure to common vulnerabilities and patterns in offensive attacks. Our machine learning projects can detect and characterize phishing URLs and SSL certificates. Our threat intelligence repository is growing with datasets that resolve malicious activity to address blocks and autonomous systems.&lt;/p&gt;
 
 &lt;p&gt;We have recently focused our research on how these tools can work together to provide unique insights on the state of the Internet. In this post, we’ll present the beginning of our explorations to identify stable, macro-level attacks trends invisible on the scale of IP addresses.&lt;/p&gt;
@@ -27,11 +337,11 @@
 &lt;p&gt;&lt;img src=&quot;http://pegasos1.github.io/public/20160215/fig1.png&quot; alt=&quot;Phishing Activity&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;malicious-ases&quot;&gt;Malicious ASes&lt;/h3&gt;
-&lt;p&gt;There has been a great deal of academic and industry focus on identifying malicious activity across
-autonomous systems, and for good reasons.&lt;sup id=&quot;fnref:3&quot;&gt;&lt;a href=&quot;#fn:3&quot; class=&quot;footnote&quot;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;sup id=&quot;fnref:4&quot;&gt;&lt;a href=&quot;#fn:4&quot; class=&quot;footnote&quot;&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;sup id=&quot;fnref:5&quot;&gt;&lt;a href=&quot;#fn:5&quot; class=&quot;footnote&quot;&gt;5&lt;/a&gt;&lt;/sup&gt;&lt;sup id=&quot;fnref:6&quot;&gt;&lt;a href=&quot;#fn:6&quot; class=&quot;footnote&quot;&gt;6&lt;/a&gt;&lt;/sup&gt; Over 50% of “good” Internet traffic comes
-from large, ocean-like ASes pushing content from companies like Netflix, Google, Facebook, Apple and Amazon.  However, despite this centralized content, the vastness of the Internet enables those with malicious intent to stake their claim in less friendly waters. In fact, our longitudinal data on phishing activity across IPv4 presented an interesting trend: &lt;em&gt;a small subset of autonomous systems have regularly hosted a disproportionate
-amount of malicious activity&lt;/em&gt;. In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015
-(data: cleanmx archives&lt;sup id=&quot;fnref:7&quot;&gt;&lt;a href=&quot;#fn:7&quot; class=&quot;footnote&quot;&gt;7&lt;/a&gt;&lt;/sup&gt;). We wanted to understand what makes some autonomous systems more
+&lt;p&gt;There has been a great deal of academic and industry focus on identifying malicious activity across&lt;br /&gt;
+autonomous systems, and for good reasons.&lt;sup id=&quot;fnref:3&quot;&gt;&lt;a href=&quot;#fn:3&quot; class=&quot;footnote&quot;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;sup id=&quot;fnref:4&quot;&gt;&lt;a href=&quot;#fn:4&quot; class=&quot;footnote&quot;&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;sup id=&quot;fnref:5&quot;&gt;&lt;a href=&quot;#fn:5&quot; class=&quot;footnote&quot;&gt;5&lt;/a&gt;&lt;/sup&gt;&lt;sup id=&quot;fnref:6&quot;&gt;&lt;a href=&quot;#fn:6&quot; class=&quot;footnote&quot;&gt;6&lt;/a&gt;&lt;/sup&gt; Over 50% of “good” Internet traffic comes&lt;br /&gt;
+from large, ocean-like ASes pushing content from companies like Netflix, Google, Facebook, Apple and Amazon.  However, despite this centralized content, the vastness of the Internet enables those with malicious intent to stake their claim in less friendly waters. In fact, our longitudinal data on phishing activity across IPv4 presented an interesting trend: &lt;em&gt;a small subset of autonomous systems have regularly hosted a disproportionate&lt;br /&gt;
+amount of malicious activity&lt;/em&gt;. In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015&lt;br /&gt;
+(data: cleanmx archives&lt;sup id=&quot;fnref:7&quot;&gt;&lt;a href=&quot;#fn:7&quot; class=&quot;footnote&quot;&gt;7&lt;/a&gt;&lt;/sup&gt;). We wanted to understand what makes some autonomous systems more&lt;br /&gt;
 likely to host malicious activity.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://pegasos1.github.io/public/20160215/fig2.png&quot; alt=&quot;IPv4 fragmentation&quot; /&gt;&lt;/p&gt;
@@ -113,66 +423,41 @@ likely to host malicious activity.&lt;/p&gt;
  
  <entry>
    <title>Applying Machine Learning to Security Problems</title>
-   <link href="http://suchin.co/2016/03/01/applying-machine-learning-to-security-problems/"/>
+   <link href="https://suchin.co/2016/03/01/applying-machine-learning-to-security-problems/"/>
    <updated>2016-03-01T00:00:00-05:00</updated>
-   <id>http://suchin.co/2016/03/01/applying-machine-learning-to-security-problems</id>
-   <content type="html">&lt;p&gt;Anomaly detection is a hard process ridden with false alarms. The security community
-has been increasingly interested in the potential for data-driven tools to filter out
-noise and automatically detect malicious activity in large networks. However, while capable
-of overcoming the limitations of static, rule-based techniques, machine learning
-is not a silver bullet solution to detecting and responding to attacks.&lt;/p&gt;
+   <id>https://suchin.co/2016/03/01/applying-machine-learning-to-security-problems</id>
+   <content type="html">&lt;p&gt;Anomaly detection is a hard process ridden with false alarms. The security community has been increasingly interested in the potential for data-driven tools to filter out noise and automatically detect malicious activity in large networks. However, while capable of overcoming the limitations of static, rule-based techniques, machine learning is not a silver bullet solution to detecting and responding to attacks.&lt;/p&gt;
 
-&lt;p&gt;Adaptable models require a continuous flow of labeled data to train with. Unfortunately, the creation of such labeled data is the most
-expensive and time-consuming part of the data science process. Data is usually messy, incomplete, and inconsistent.
-While there are many tools to experiment with different algorithms and
-their parameters, there are few tools to help one develop clean, comprehensive
-datasets. Often times this means asking practitioners with deep domain expertise
-to help label existing datasets. But ground truth be hard to come by
-in the security context, and may go stale very quickly.&lt;/p&gt;
+&lt;p&gt;Adaptable models require a continuous flow of labeled data to train with. Unfortunately, the creation of such labeled data is the most expensive and time-consuming part of the data science process. Data is usually messy, incomplete, and inconsistent. While there are many tools to experiment with different algorithms and their parameters, there are few tools to help one develop clean, comprehensive datasets. Often times this means asking practitioners with deep domain expertise to help label existing datasets. But ground truth be hard to come by in the security context, and may go stale very quickly.&lt;/p&gt;
 
-&lt;p&gt;On top of that, bias in training data can hamper the effectiveness of a model
-to discern between output classes. In the security context, data bias can be
-interpreted in two ways.&lt;/p&gt;
+&lt;p&gt;On top of that, bias in training data can hamper the effectiveness of a model to discern between output classes. In the security context, data bias can be interpreted in two ways.&lt;/p&gt;
 
-&lt;p&gt;First, attack methodologies are becoming more dynamic than ever before. If a predictive model is trained on
-known patterns and vulnerabilities (e.g. using features from malware that is file-system resident),
-it may not necessarily detect an unprecedented attack that does not conform
- to those trends (e.g. misses features from malware that is only memory resident).&lt;/p&gt;
+&lt;p&gt;First, attack methodologies are becoming more dynamic than ever before. If a predictive model is trained on known patterns and vulnerabilities (e.g. using features from malware that is file-system resident), it may not necessarily detect an unprecedented attack that does not conform to those trends (e.g. misses features from malware that is only memory resident).&lt;/p&gt;
 
-&lt;p&gt;Second, data bias also comes in the form of &lt;em&gt;class representation&lt;/em&gt;&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;. To understand
-class representation bias, one can look to a core foundation of statistics: Bayes
-theorem.&lt;/p&gt;
+&lt;p&gt;Second, data bias also comes in the form of &lt;em&gt;class representation&lt;/em&gt;&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;. To understand class representation bias, one can look to a core foundation of statistics: Bayes theorem.&lt;/p&gt;
 
 &lt;p&gt;Bayes theorem describes the probability of event A given event B:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;P(A | B) = \frac { P (A) P(B | A)}{P(B)}&lt;/script&gt;
 
-&lt;p&gt;Expanding the probability P (B) for the set of two mutually exclusive outcomes,
-we arrive at the following equation:&lt;/p&gt;
+&lt;p&gt;Expanding the probability P (B) for the set of two mutually exclusive outcomes, we arrive at the following equation:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;P (B) = (A_1 )P (B|A_1 ) + (\neg A_2 )P (B|\neg A_2 )&lt;/script&gt;
 
-&lt;p&gt;Combining the above equations, we arrive at the following alternative statement
-of Bayes’ theorem:&lt;/p&gt;
+&lt;p&gt;Combining the above equations, we arrive at the following alternative statement of Bayes’ theorem:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;P (A|B) = \frac{P (A)P (B|A)} {P (A_1 )P (B|A_1 ) + P (\neg A_2 )P (B|\neg A_2 )}&lt;/script&gt;
 
-&lt;p&gt;Let’s apply this theorem to a concrete security problem to show the emergent
-issues of training predictive models on biased data.&lt;/p&gt;
+&lt;p&gt;Let’s apply this theorem to a concrete security problem to show the emergent issues of training predictive models on biased data.&lt;/p&gt;
 
-&lt;p&gt;Suppose company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; has &lt;script type=&quot;math/tex&quot;&gt;1000&lt;/script&gt; employees, and a security vendor has deployed an
-intrusion detection system (IDS) alerting the company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; when it detects a malicious
-URL sent to an employee’s inbox. Suppose there are &lt;script type=&quot;math/tex&quot;&gt;10&lt;/script&gt; malicious URLs
-sent to employees of company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; per day. Finally, suppose the IDS analyzes
-&lt;script type=&quot;math/tex&quot;&gt;10000&lt;/script&gt; incoming URLs to company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; per day.&lt;/p&gt;
+&lt;p&gt;Suppose company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; has &lt;script type=&quot;math/tex&quot;&gt;1000&lt;/script&gt; employees, and a security vendor has deployed an intrusion detection system (IDS) alerting the company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; when it detects a malicious URL sent to an employee’s inbox. Suppose there are &lt;script type=&quot;math/tex&quot;&gt;10&lt;/script&gt; malicious URLs sent to employees of company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; per day. Finally, suppose the IDS analyzes &lt;script type=&quot;math/tex&quot;&gt;10000&lt;/script&gt; incoming URLs to company &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; per day.&lt;/p&gt;
 
-&lt;p&gt;Let &lt;script type=&quot;math/tex&quot;&gt;I&lt;/script&gt; denote an incident (an incoming malicious URL) and &lt;script type=&quot;math/tex&quot;&gt;\neg I&lt;/script&gt; denote a non-incident (an incoming benign URL).
-Similarly, let &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; denote an alarm (the IDS classifies incoming URL as malicious) and &lt;script type=&quot;math/tex&quot;&gt;\neg A&lt;/script&gt; denote a non-alarm (the
+&lt;p&gt;Let &lt;script type=&quot;math/tex&quot;&gt;I&lt;/script&gt; denote an incident (an incoming malicious URL) and &lt;script type=&quot;math/tex&quot;&gt;\neg I&lt;/script&gt; denote a non-incident (an incoming benign URL).&lt;br /&gt;
+Similarly, let &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; denote an alarm (the IDS classifies incoming URL as malicious) and &lt;script type=&quot;math/tex&quot;&gt;\neg A&lt;/script&gt; denote a non-alarm (the&lt;br /&gt;
 IDS classifies URL as benign). That means &lt;script type=&quot;math/tex&quot;&gt;P (A|I) = P (\text{hit})&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;P (A| \neg I) =
 P (\text{false alarm})&lt;/script&gt;.&lt;/p&gt;
 
-&lt;p&gt;What’s the probability that an alarm is associated with a real incident? In other
-words, &lt;em&gt;how much can we trust the IDS under these conditions?&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;What’s the probability that an alarm is associated with a real incident? In other words, &lt;em&gt;how much can we trust the IDS under these conditions?&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;Using Bayes’ Theorem from above, we know:&lt;/p&gt;
 
@@ -182,34 +467,20 @@ words, &lt;em&gt;how much can we trust the IDS under these conditions?&lt;/em&gt
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;P (\text{IDS is accurate}) = \frac{P (\text{incident})P (\text{hit})}{P (\text{incident})P (\text{hit}) + P (\text{non-incident})P (\text{false alarm})}&lt;/script&gt;
 
-&lt;p&gt;Now let’s calculate &lt;script type=&quot;math/tex&quot;&gt;P(\text{incident})&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;P(\text{non-incident})&lt;/script&gt;, given the parameters of
-the IDS problem we defined above:&lt;/p&gt;
+&lt;p&gt;Now let’s calculate &lt;script type=&quot;math/tex&quot;&gt;P(\text{incident})&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;P(\text{non-incident})&lt;/script&gt;, given the parameters of the IDS problem we defined above:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;P(\text{incident}) =\frac{\text{10 incidents per day}}{\text{10000 audits per day}} = 0.001&lt;/script&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;P (\text{non-incident}) = 1 − P (\text{incident}) = 0.999&lt;/script&gt;
 
-&lt;p&gt;These probabilities emphasize the bias present in the distribution of analyzed
-URLs. The IDS has little sense of what incidents entail, as it is trained on very
-few examples of it. Plugging the probabilities into the equation above, we find
-that:&lt;/p&gt;
+&lt;p&gt;These probabilities emphasize the bias present in the distribution of analyzed URLs. The IDS has little sense of what incidents entail, as it is trained on very few examples of it. Plugging the probabilities into the equation above, we find that:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;P (\text{IDS is accurate}) = \frac{0.001 * P (\text{hit})}{0.001 * P (\text{hit}) + 0.999 * P (\text{false alarm})}&lt;/script&gt;
 
-&lt;p&gt;Thus, to have reasonable confidence in an IDS under these biased conditions,
-we must have not only unrealistically high hit rate, but also unrealistically low
-false positive rate. For example, for an IDS to be &lt;script type=&quot;math/tex&quot;&gt;80&lt;/script&gt; percent accurate, even with
-a best case scenario of a 100 percent hit rate, the IDS’ false alarm rate must be
-&lt;script type=&quot;math/tex&quot;&gt;4 \times 10^{−4}&lt;/script&gt; . In other words, only &lt;script type=&quot;math/tex&quot;&gt;4&lt;/script&gt; out of &lt;script type=&quot;math/tex&quot;&gt;10000&lt;/script&gt; alarms can be false
+&lt;p&gt;Thus, to have reasonable confidence in an IDS under these biased conditions, we must have not only unrealistically high hit rate, but also unrealistically low false positive rate. For example, for an IDS to be &lt;script type=&quot;math/tex&quot;&gt;80&lt;/script&gt; percent accurate, even with a best case scenario of a 100 percent hit rate, the IDS’ false alarm rate must be &lt;script type=&quot;math/tex&quot;&gt;4 \times 10^{−4}&lt;/script&gt; . In other words, only &lt;script type=&quot;math/tex&quot;&gt;4&lt;/script&gt; out of &lt;script type=&quot;math/tex&quot;&gt;10000&lt;/script&gt; alarms can be false&lt;br /&gt;
 positives to achieve this accuracy.&lt;/p&gt;
 
-&lt;p&gt;In the real world, detection hit rates are much lower and false alarm rates are
-much higher. Thus, class representation bias in the security context can make
-machine learning algorithms inaccurate and untrustworthy. When models are
-trained on only a few examples of one class but many examples of another, the
-bar for reasonable accuracy is extremely high, and in some cases unachievable.
-Predictive algorithms run the risk of being ”the boy who cried wolf” – annoying
-and prone to desensitizing security professionals to incident alerts.&lt;/p&gt;
+&lt;p&gt;In the real world, detection hit rates are much lower and false alarm rates are much higher. Thus, class representation bias in the security context can make machine learning algorithms inaccurate and untrustworthy. When models are trained on only a few examples of one class but many examples of another, the bar for reasonable accuracy is extremely high, and in some cases unachievable. Predictive algorithms run the risk of being ”the boy who cried wolf” – annoying and prone to desensitizing security professionals to incident alerts.&lt;/p&gt;
 
 &lt;p&gt;Security data scientists can avoid these obstacles with a few measures:&lt;/p&gt;
 
@@ -225,16 +496,11 @@ and prone to desensitizing security professionals to incident alerts.&lt;/p&gt;
 
 &lt;p&gt;7) &lt;strong&gt;Encourage data gathering expeditions.&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;8) &lt;strong&gt;Encourage security expertise on the team.&lt;/strong&gt; Security expertise can help you think of viable solutions to problems when
-data is insufficient.&lt;/p&gt;
+&lt;p&gt;8) &lt;strong&gt;Encourage security expertise on the team.&lt;/strong&gt; Security expertise can help you think of viable solutions to problems when data is insufficient.&lt;/p&gt;
 
-&lt;p&gt;9) &lt;strong&gt;Weigh the trade-off between accuracy vs. coverage.&lt;/strong&gt; The effects of false positives are particularly
-detrimental in the security space, meaning that for some applications it may be more useful to sacrifice
-the volume of accurate classifications for higher confidence.&lt;/p&gt;
+&lt;p&gt;9) &lt;strong&gt;Weigh the trade-off between accuracy vs. coverage.&lt;/strong&gt; The effects of false positives are particularly detrimental in the security space, meaning that for some applications it may be more useful to sacrifice the volume of accurate classifications for higher confidence.&lt;/p&gt;
 
-&lt;p&gt;Machine learning has the potential to change how we detect and respond to malicious activity in our networks by weeding out signal from noise. It can help
-security professionals discover patterns in network activity never seen before. However, when applying these
-algorithms to security we have to be aware of caveats of the approach so we can address them.&lt;/p&gt;
+&lt;p&gt;Machine learning has the potential to change how we detect and respond to malicious activity in our networks by weeding out signal from noise. It can help security professionals discover patterns in network activity never seen before. However, when applying these algorithms to security we have to be aware of caveats of the approach so we can address them.&lt;/p&gt;
 
 &lt;div class=&quot;footnotes&quot;&gt;
   &lt;ol&gt;
@@ -254,12 +520,12 @@ algorithms to security we have to be aware of caveats of the approach so we can 
  
  <entry>
    <title>Hello, World!</title>
-   <link href="http://suchin.co/2016/02/12/hello-world/"/>
+   <link href="https://suchin.co/2016/02/12/hello-world/"/>
    <updated>2016-02-12T00:00:00-05:00</updated>
-   <id>http://suchin.co/2016/02/12/hello-world</id>
+   <id>https://suchin.co/2016/02/12/hello-world</id>
    <content type="html">&lt;p&gt;I’m Suchin. I’m a data scientist at Rapid7, a security company in Cambridge, MA.&lt;/p&gt;
 
-&lt;p&gt;This blog will condense and communicate things I’m working on and reading about. It’s a way for me to understand
+&lt;p&gt;This blog will condense and communicate things I’m working on and reading about. It’s a way for me to understand&lt;br /&gt;
 material and practice writing, and for readers to learn something new.&lt;/p&gt;
 
 &lt;p&gt;Topics will be all over the place: machine learning to security, programming to books.&lt;/p&gt;

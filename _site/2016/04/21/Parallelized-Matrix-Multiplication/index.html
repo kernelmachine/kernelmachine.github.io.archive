@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>
+    
+      Matrix Multiplication in Rust (Part 1) &middot; suchin
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/styles.css">
+  <!-- <link rel="stylesheet" href="/googlecode.css"> -->
+
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/public/square-outline.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/atom+xml" title="suchin" href="/atom.xml">
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-75615851-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+</head>
+
+
+  <body>
+
+    <div class="container content">
+      <header class="masthead">
+        <h3 class="masthead-title">
+          <a href="/" title="Home" style="text-decoration: none;">suchin</a>
+          <small><a href="/about" style="text-decoration: none; color: #C0C0C0">writings</a></small>
+          <div class="links">
+          <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
+          <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
+          <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
+
+        </div>
+        </h3>
+      </header>
+
+      <main>
+        <article class="post">
+  <h1 class="post-title">Matrix Multiplication in Rust (Part 1)</h1>
+  <time datetime="2016-04-21T00:00:00-04:00" class="post-date">21 Apr 2016</time>
+  <p><em>Thanks to staticassert for feedback. Source code can be found <a href="http://github.com/pegasos1/rsmat">here</a>.</em></p>
+
+<p><em>This post is the first of a series.</em></p>
+
+<p>Basic Linear Algebra Subprograms (BLAS) are the routines that underpin most high-level computational libraries today. Written in C and FORTRAN, they are acutely optimized for speed, and take advantage of special hardware features to achieve unparalleled performance in matrix computations.</p>
+
+<p>It’s an early time for Rust, but we’re already seeing strides (pun intended) in the numeric computing space.<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup><sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup> I was recently inspired to investigate how to make fast matrix computations in Rust, using ndarray-rblas compiled with OpenBLAS<sup id="fnref:3"><a href="#fn:3" class="footnote">3</a></sup> as the target benchmark. This blog series is a documentation of those explorations.</p>
+
+<p>In this post, I’ll detail the process of making fast matrix computations through code changes.</p>
+
+<p>The analyses in this post will involve the use of rust-ndarray<sup id="fnref:1:1"><a href="#fn:1" class="footnote">1</a></sup> for matrix computations. All the crate-specific methods I use are documented <a href="http://bluss.github.io/rust-ndarray/master/ndarray/index.html">here</a>. I’m on a basic Linux laptop: 4-core, i5 CPU with 8 GB RAM.</p>
+
+<h2 id="naive-dot-product">Naive dot product</h2>
+<hr />
+
+<p>A fundamental operation in numeric computing is the dot product between matrices <script type="math/tex">A = [a_1 ,..., a_n]</script> and <script type="math/tex">B = [b_1,...,b_n]</script>:</p>
+
+<script type="math/tex; mode=display">dot(A,B) = a_1b_1 + a_2b_2 + ... + a_nb_n</script>
+
+<p>It’s a simple operation and a great way to dig into performance optimization. So let’s start here!</p>
+
+<p>We’ll use the following type aliases:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>pub type VectorView&lt;'a, A&gt; = ArrayView&lt;'a, A, Ix&gt;;
+pub type MatView&lt;'a, A&gt; = ArrayView&lt;'a, A, (Ix, Ix)&gt;;
+pub type MatViewMut&lt;'a, A&gt; = ArrayViewMut&lt;'a, A, (Ix, Ix)&gt;;
+</code></pre>
+</div>
+
+<p>ArrayView(Mut)s are (mutable) references to a matrix, or part of it. They’re good objects to use if you want to  work with modular subviews of a matrix.</p>
+
+<p>We begin with a naive implementation of the dot product, in which we fold a multiplicative sum of values in vectors <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code>.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>pub fn vector_dot(a : VectorView&lt;f64&gt;,b:  VectorView&lt;f64&gt;) -&gt; f64 {
+        (0..a.len()).fold(0.0, |x, y| x + a.get(y).unwrap() * b.get(y).unwrap() )
+}
+</code></pre>
+</div>
+
+<p>We then define a matrix dot product like so:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>pub fn matrix_dot( a : &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;, c : &amp;mut MatViewMut&lt;f64&gt;){
+    let ((m,k1),(k2,n)) = (a.dim(),b.dim());
+    assert_eq!(k1,k2);
+    for ix in 0..m{
+        for jx in 0..n{
+            let a_row = a.row(ix);
+            let b_col = b.column(jx);
+            let mut value = c.get((ix,jx)).unwrap();
+            *value += vector_dot(a_row, b_col);
+        }
+    }
+}
+</code></pre>
+</div>
+
+<p>In the code above, we first check whether the inner and outer dimensions of <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> (respectively) are the same. Then we loop through the matrices’ rows and columns, applying our <code class="highlighter-rouge">vector_dot</code> function and updating a separate matrix <code class="highlighter-rouge">c</code> with the corresponding output.</p>
+
+<p>Here are the benchmarks, compared to OpenBLAS, on multiplying <script type="math/tex">128 \times 100</script> and <script type="math/tex">100 \times 128</script> matrices:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>test bench_dot_dumb        ... bench:   2,843,823 ns/iter (+/- 110,881)
+
+test bench_dot_openblas    ... bench:   201,170 ns/iter (+/- 18,666)
+</code></pre>
+</div>
+
+<p>Wow, that sucks. We’re at least 10x slower than OpenBLAS. But the above implementation is called naive for a reason; we can do a lot better.</p>
+
+<h2 id="unsafe-indexing">Unsafe indexing</h2>
+<hr />
+<p><code class="highlighter-rouge">get()</code> and <code class="highlighter-rouge">get_mut()</code>  checks matrix dimensions before returning the indexed value. This makes for safe code, since ndarray will throw an error if the supplied index falls outside of the matrix dimensions (hence the <code class="highlighter-rouge">unwrap</code>). However, index checking wastes time, and we’re trying to make things as fast as possible.</p>
+
+<p>The first thing we could do is index the matrix <code class="highlighter-rouge">c</code> with unsafe methods <code class="highlighter-rouge">uget()</code> and <code class="highlighter-rouge">uget_mut()</code>. These don’t check the bounds of the matrix when indexing, and will save us time.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>pub fn vector_dot_unsafe(a : VectorView&lt;f64&gt;,b:  VectorView&lt;f64&gt;) -&gt; f64 {
+    unsafe{
+        (0..a.len()).fold(0.0, |x, y| x + a.uget(y) * b.uget(y))
+    }
+
+}
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>pub fn matrix_dot_unsafe( a : &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;,
+                        c : &amp;mut MatViewMut&lt;f64&gt;){
+    let ((m,k1),(k2,n)) = (a.dim(),b.dim());
+    assert_eq!(k1,k2);
+    for ix in 0..m{
+        for jx in 0..n{
+            let a_row = a.row(ix);
+            let b_col = b.column(jx);
+            unsafe{
+                let mut value = c.uget_mut((ix,jx));
+                *value += vector_dot_unsafe( a_row, b_col);
+            }
+        }
+    }
+}
+</code></pre>
+</div>
+
+<p>We achieve about a 2x speedup with this change.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>test bench_dot_dumb        ... bench:   1,518,253 ns/iter (+/- 24,523)
+
+test bench_dot_openblas    ... bench:   201,170 ns/iter (+/- 18,666)
+</code></pre>
+</div>
+
+<h2 id="improve-matrix-multiplication">Improve matrix multiplication</h2>
+<hr />
+<p>The second thing we can do is employ some black magic to improve our matrix multiplication.</p>
+
+<p>The matrixmultiply crate<sup id="fnref:4"><a href="#fn:4" class="footnote">4</a></sup> computes the dot product by decomposing the full computation into a layered set of mini subproblems that can be efficiently packed into the cache. For an in-depth review of the algorithm and its implementation, I’ll refer you to another post on the subject <sup id="fnref:5"><a href="#fn:5" class="footnote">5</a></sup>.</p>
+
+<p>By replacing the naive dot product with this smarter version, natively supported in ndarray via the method <code class="highlighter-rouge">dot</code>, we achieve significant speed up:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>pub fn matrix_dot( left : &amp;MatView&lt;f64&gt;, right: &amp;MatView&lt;f64&gt;,
+                  init : &amp;mut MatViewMut&lt;f64&gt;){
+    let dot_prod = left.dot(right);
+    for ix in 0..m{
+        for jx in 0..n{
+            unsafe{
+            let mut value = init.uget_mut((ix,jx));
+            let res = dot_prod.uget_mut((ix,jx));
+            *value += res;
+          }
+        }
+    }
+}
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>test bench_dot_matrixmultiply      ... bench:     370,281 ns/iter (+/- 14,179)
+
+test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
+</code></pre>
+</div>
+
+<p>Nice! We’ve increased the speed almost 4x. Now let’s try to get our algorithm even closer to OpenBLAS performance.</p>
+
+<h2 id="avoid-explicit-bounds-checking">Avoid explicit bounds checking</h2>
+<hr />
+<p>Let’s revisit the indexing issue in the loop. We gained some significant speedups by making our code unsafe, but this isn’t ideal. Let’s see if we can get speed <em>and</em> safety.</p>
+
+<p>The trick here is that matrix elements in ndarray implement <code class="highlighter-rouge">Iterator</code>, and <em>iteration naturally lends itself to bounds checking elimination optimization</em>. It’s implicitly safe to iterate over the matrix. We can assign the values of our dot product to <code class="highlighter-rouge">c</code> safely without having to make sure we’re within the matrix dimensions.</p>
+
+<p>With this in mind, we can simplify the loop to a one-liner that involves the iterator method <code class="highlighter-rouge">zip</code>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>c.zip_mut_with(&amp;dot_prod, |x, y| *x = *y)
+</code></pre>
+</div>
+
+<p>This results in a smarter, faster matrix multiplication below:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>pub fn matrix_dot_safe(a: &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;,
+  c: &amp;mut MatViewMut&lt;f64&gt;) {
+    let ((_,k1),(k2,_)) = (a.dim(),b.dim());
+    assert_eq!(k1,k2);
+    let dot_prod = a.dot(b);
+    c.zip_mut_with(&amp;dot_prod, |x, y| *x = *y)
+}
+</code></pre>
+</div>
+
+<p>Because ndarray matrices implement <code class="highlighter-rouge">Iterator</code>, we can use array methods to achieve safety without sacrificing speed. And we get simplicity for free.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test </span>bench_dot_safe            ... bench:     346,677 ns/iter <span class="o">(</span>+/- 13,246<span class="o">)</span>
+
+<span class="nb">test </span>bench_dot_openblas        ... bench:   201,170 ns/iter <span class="o">(</span>+/- 18,666<span class="o">)</span>
+</code></pre>
+</div>
+
+<p>Why are we still assigning the dot product of  <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> to <code class="highlighter-rouge">c</code>? Well, we’re just thinking one step ahead - towards parallelization.</p>
+
+<h2 id="parallelization">Parallelization</h2>
+<hr />
+
+<p>Another optimization we can make involves multi-threading. Rust is great for writing concurrent programs because its memory management and type system free the developer from dealing with data races.<sup id="fnref:6"><a href="#fn:6" class="footnote">6</a></sup></p>
+
+<p>There are quite a few crates that assist the developer in making multi-threaded applications, but the one I’ll focus on here is Rayon<sup id="fnref:7"><a href="#fn:7" class="footnote">7</a></sup>.</p>
+
+<p>The core of Rayon’s API is a work-stealing thread pool. Worker threads pop tasks from a queue, and additional threads are spawned as needed to “steal” future work from busy threads. The really interesting thing about Rayon is that parallelism is not <em>guaranteed</em>; instead, it’s dependent on whether idle cores are available. It’s great to release the developer from thinking about when to use concurrency, and let the API handle it. For an explanation on how this works, I’ll refer you to a series of posts here<sup id="fnref:8"><a href="#fn:8" class="footnote">8</a></sup>.</p>
+
+<p>Rayon works best with divide-and-conquer algorithms, which happens to be an optimal technique for matrix multiplication.</p>
+
+<p><img src="http://www.catonmat.net/blog/wp-content/uploads/2009/12/matrix-multiplication-blocks.gif" width="700" /></p>
+
+<p>We call <code class="highlighter-rouge">join</code> on recursively divided matrices, spawning threads to perform multiplication on blocks when we reach some minimum dimension, called <code class="highlighter-rouge">BLOCKSIZE</code>. The next section will detail the effects of the <code class="highlighter-rouge">BLOCKSIZE</code> parameter on performance, but for now we arbitrarily set it to 64.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>pub const BLOCKSIZE: usize = 64;
+
+pub fn matrix_dot_rayon(a: &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;,
+                        c: &amp;mut MatViewMut&lt;f64&gt;) {
+
+    let (m, k1) = a.dim();
+    let (k2, n) = b.dim();
+    assert_eq!(k1, k2);
+
+    if m &lt;= BLOCKSIZE &amp;&amp; n &lt;= BLOCKSIZE {
+        matrix_dot_safe(a, b, c);
+        return;
+    } else if m &gt; BLOCKSIZE {
+        let mid = m / 2;
+        let (a_0, a_1) = a.split_at(Axis(0), mid);
+        let (mut c_0,
+            mut c_1) = c.view_mut().split_at(Axis(0), mid);
+        rayon::join(|| matrix_dot_rayon(&amp;a_0, b, &amp;mut c_0),
+                    || matrix_dot_rayon(&amp;a_1, b, &amp;mut c_1));
+
+    } else if n &gt; BLOCKSIZE {
+        let mid = n / 2;
+        let (b_0, b_1) = b.split_at(Axis(1), mid);
+        let (mut c_0,
+            mut c_1) = c.view_mut().split_at(Axis(1), mid);
+        rayon::join(|| matrix_dot_rayon(a, &amp;b_0, &amp;mut c_0),
+                    || matrix_dot_rayon(a, &amp;b_1, &amp;mut c_1));
+    }
+}
+</code></pre>
+</div>
+
+<p>As before, we first make sure dimensions of <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> are consistent. Then we enter into the rayon loop. The program recursively divides <code class="highlighter-rouge">a</code>, <code class="highlighter-rouge">b</code> and <code class="highlighter-rouge">c</code> until it reaches the minimum threshold for blocksize, at which point the spawned thread(s) begin multiplication on the blocks of <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> and update the corresponding blocks of <code class="highlighter-rouge">c</code> accordingly.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>test bench_dot_rayon           ... bench:     224,570 ns/iter (+/- 45,483)
+test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
+</code></pre>
+</div>
+
+<p>It now looks like we’re competitive with OpenBLAS on my machine.</p>
+
+<h2 id="rayon-performance-graph">Rayon Performance Graph</h2>
+<hr />
+
+<p>I was interested in how Rayon matrix multiplication performance depended on <code class="highlighter-rouge">BLOCKSIZE</code> and the overall dimensions of <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code>.</p>
+
+<p>First,  I looked at two <script type="math/tex">128 \times 100</script> and <script type="math/tex">100 \times 128</script> matrices. I varied the inner dimension of both matrices in lockstep, and computed benchmarks with/without rayon.</p>
+
+<p>As you can see, with smaller blocksizes, Rayon does consistently worse than single-threaded multiplication.</p>
+
+<p><img src="http://127.0.0.1:4000/public/20160424/fig1.png" width="700" /></p>
+
+<h2 id="fun-experiment-on-ec2">Fun experiment on EC2</h2>
+<hr />
+
+<p>I was also interested in how the performance of this matrix multiplication program scaled with compute power. I ran the program on Amazon Web Services EC2 – a compute optimized c4.2xlarge instance.</p>
+
+<p>A c4.2xlarge  instance has 8 cores of “high frequency Intel Xeon E5-2666 v3 (Haswell) processors optimized specifically for EC2”, and 15 GB of RAM.<sup id="fnref:9"><a href="#fn:9" class="footnote">9</a></sup> With high compute power and low extraneous CPU activity, I expected to see far better performance.</p>
+
+<p>Here are the results of multiplying <script type="math/tex">128 \times 100</script> and <script type="math/tex">100 \times 128</script> matrices on that machine.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>test bench_dot ... bench: 323,867 ns/iter (+/- 4,005)
+test bench_dot_rayon ... bench: 195,585 ns/iter (+/- 15,530)
+test bench_dot_openblas ... bench: 91,242 ns/iter (+/- 686)
+</code></pre>
+</div>
+
+<p>Rayon’s performance improved quite a bit! But, it gets blown out of the water by OpenBLAS. No competition here.</p>
+
+<p>We’ll dig deeper into these types of tests on various EC2 instances in the last post of this series.</p>
+
+<h2 id="things-to-consider">Things to consider</h2>
+<hr />
+<p>It’s hard to interpret/generalize the results of concurrent programs because, as I showed above, they’re highly dependent on a variety of parameters, like the size of the data, the number of threads, the power of the CPU, and the cache size. On top of that, Rayon’s <em>potential parallelism</em> concept, while really useful for development, makes the overall program a  bit of a black box. For example, why exactly does rayon performance degrade with a smaller <code class="highlighter-rouge">BLOCKSIZE</code>? Maybe each computation was so ephemeral on a smaller <code class="highlighter-rouge">BLOCKSIZE</code> that rayon didn’t spawn enough threads. Or perhaps I had a random background process that suddenly limited the amount of threads I could allocate. Or perhaps cache lines are the primary determinant of which <code class="highlighter-rouge">BLOCKSIZE</code> is optimal.</p>
+
+<p>In the next post of this series, we’ll go under the hood by investigating the CPU and cache to understand <em>why</em> our code improvements resulted in faster performance, hopefully answering some of these questions and controlling for the many factors that can affect the algorithm’s speed.</p>
+
+<p>For now, see these results as a showcase of Rayon, as well as an example of how matrix multiplication in Rust can be <em>really</em> fast and easy to optimize.</p>
+
+<p>Numeric computing in Rust is exciting. Hope to see more work in this space!</p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p><a href="https://github.com/bluss/rust-ndarray">rust-ndarray</a> <a href="#fnref:1" class="reversefootnote">&#8617;</a> <a href="#fnref:1:1" class="reversefootnote">&#8617;<sup>2</sup></a></p>
+    </li>
+    <li id="fn:2">
+      <p><a href="https://github.com/autumnai/leaf">leaf</a> <a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:3">
+      <p><a href="https://github.com/bluss/rust-ndarray/tree/master/ndarray-rblas">ndarray-rblas</a> <a href="#fnref:3" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:4">
+      <p><a href="https://crates.io/crates/matrixmultiply">matrixmultiply</a> <a href="#fnref:4" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:5">
+      <p><a href="http://bluss.github.io/rust/2016/03/28/a-gemmed-rabbit-hole/#fn:2">matrixmultiply explanation</a> <a href="#fnref:5" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:6">
+      <p><a href="https://doc.rust-lang.org/nomicon/send-and-sync.html">send and sync</a> <a href="#fnref:6" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:7">
+      <p><a href="http://crates.io/crates/rayon">rayon</a> <a href="#fnref:7" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:8">
+      <p><a href="http://smallcultfollowing.com/babysteps/blog/2015/12/18/rayon-data-parallelism-in-rust/">rayon explanation</a> <a href="#fnref:8" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:9">
+      <p><a href="https://aws.amazon.com/ec2/instance-types/">instance types</a> <a href="#fnref:9" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+</article>
+<!--
+<aside class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/03/23/Topology-Of-Malicious-Activity/">
+            The Topology of Malicious Activity on IPv4
+            <small><time datetime="2016-03-23T00:00:00-04:00">23 Mar 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/03/01/applying-machine-learning-to-security-problems/">
+            Applying Machine Learning to Security Problems
+            <small><time datetime="2016-03-01T00:00:00-05:00">01 Mar 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/02/12/hello-world/">
+            Hello, World!
+            <small><time datetime="2016-02-12T00:00:00-05:00">12 Feb 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</aside> -->
+
+      </main>
+
+      <footer class="footer">
+        <small>
+          &copy; <time datetime="2016-04-25T20:10:17-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+        </small>
+      </footer>
+    </div>
+
+  </body>
+</html>

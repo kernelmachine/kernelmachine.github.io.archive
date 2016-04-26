@@ -7,7 +7,7 @@ permalink:           pretty
 title:               suchin
 tagline:             writings
 url:                 https://suchin.co
-paginate:            1
+paginate:            3
 baseurl:             ""
 about:               "about"
 
@@ -34,3 +34,6 @@ github:
   repo:              https://github.com/pegasos1/pegasos1.github.io
 
 markdown: kramdown
+kramdown:
+  input: GFM # Enable GitHub Flavored Markdown (fenced code blocks)
+  hard_wrap: false

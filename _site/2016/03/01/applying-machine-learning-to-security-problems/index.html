@@ -16,11 +16,9 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="/styles.css">
-  <script src="/highlight.pack.js"></script>
   <!-- <link rel="stylesheet" href="/googlecode.css"> -->
 
-  <script>hljs.initHighlightingOnLoad();</script>
-  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
 
   <!-- Icons -->
   <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
@@ -49,6 +47,12 @@
         <h3 class="masthead-title">
           <a href="/" title="Home" style="text-decoration: none;">suchin</a>
           <small><a href="/about" style="text-decoration: none; color: #C0C0C0">writings</a></small>
+          <div class="links">
+          <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
+          <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
+          <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
+
+        </div>
         </h3>
       </header>
 
@@ -56,63 +60,38 @@
         <article class="post">
   <h1 class="post-title">Applying Machine Learning to Security Problems</h1>
   <time datetime="2016-03-01T00:00:00-05:00" class="post-date">01 Mar 2016</time>
-  <p>Anomaly detection is a hard process ridden with false alarms. The security community
-has been increasingly interested in the potential for data-driven tools to filter out
-noise and automatically detect malicious activity in large networks. However, while capable
-of overcoming the limitations of static, rule-based techniques, machine learning
-is not a silver bullet solution to detecting and responding to attacks.</p>
+  <p>Anomaly detection is a hard process ridden with false alarms. The security community has been increasingly interested in the potential for data-driven tools to filter out noise and automatically detect malicious activity in large networks. However, while capable of overcoming the limitations of static, rule-based techniques, machine learning is not a silver bullet solution to detecting and responding to attacks.</p>
 
-<p>Adaptable models require a continuous flow of labeled data to train with. Unfortunately, the creation of such labeled data is the most
-expensive and time-consuming part of the data science process. Data is usually messy, incomplete, and inconsistent.
-While there are many tools to experiment with different algorithms and
-their parameters, there are few tools to help one develop clean, comprehensive
-datasets. Often times this means asking practitioners with deep domain expertise
-to help label existing datasets. But ground truth be hard to come by
-in the security context, and may go stale very quickly.</p>
+<p>Adaptable models require a continuous flow of labeled data to train with. Unfortunately, the creation of such labeled data is the most expensive and time-consuming part of the data science process. Data is usually messy, incomplete, and inconsistent. While there are many tools to experiment with different algorithms and their parameters, there are few tools to help one develop clean, comprehensive datasets. Often times this means asking practitioners with deep domain expertise to help label existing datasets. But ground truth be hard to come by in the security context, and may go stale very quickly.</p>
 
-<p>On top of that, bias in training data can hamper the effectiveness of a model
-to discern between output classes. In the security context, data bias can be
-interpreted in two ways.</p>
+<p>On top of that, bias in training data can hamper the effectiveness of a model to discern between output classes. In the security context, data bias can be interpreted in two ways.</p>
 
-<p>First, attack methodologies are becoming more dynamic than ever before. If a predictive model is trained on
-known patterns and vulnerabilities (e.g. using features from malware that is file-system resident),
-it may not necessarily detect an unprecedented attack that does not conform
- to those trends (e.g. misses features from malware that is only memory resident).</p>
+<p>First, attack methodologies are becoming more dynamic than ever before. If a predictive model is trained on known patterns and vulnerabilities (e.g. using features from malware that is file-system resident), it may not necessarily detect an unprecedented attack that does not conform to those trends (e.g. misses features from malware that is only memory resident).</p>
 
-<p>Second, data bias also comes in the form of <em>class representation</em><sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>. To understand
-class representation bias, one can look to a core foundation of statistics: Bayes
-theorem.</p>
+<p>Second, data bias also comes in the form of <em>class representation</em><sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup>. To understand class representation bias, one can look to a core foundation of statistics: Bayes theorem.</p>
 
 <p>Bayes theorem describes the probability of event A given event B:</p>
 
 <script type="math/tex; mode=display">P(A | B) = \frac { P (A) P(B | A)}{P(B)}</script>
 
-<p>Expanding the probability P (B) for the set of two mutually exclusive outcomes,
-we arrive at the following equation:</p>
+<p>Expanding the probability P (B) for the set of two mutually exclusive outcomes, we arrive at the following equation:</p>
 
 <script type="math/tex; mode=display">P (B) = (A_1 )P (B|A_1 ) + (\neg A_2 )P (B|\neg A_2 )</script>
 
-<p>Combining the above equations, we arrive at the following alternative statement
-of Bayes’ theorem:</p>
+<p>Combining the above equations, we arrive at the following alternative statement of Bayes’ theorem:</p>
 
 <script type="math/tex; mode=display">P (A|B) = \frac{P (A)P (B|A)} {P (A_1 )P (B|A_1 ) + P (\neg A_2 )P (B|\neg A_2 )}</script>
 
-<p>Let’s apply this theorem to a concrete security problem to show the emergent
-issues of training predictive models on biased data.</p>
+<p>Let’s apply this theorem to a concrete security problem to show the emergent issues of training predictive models on biased data.</p>
 
-<p>Suppose company <script type="math/tex">X</script> has <script type="math/tex">1000</script> employees, and a security vendor has deployed an
-intrusion detection system (IDS) alerting the company <script type="math/tex">X</script> when it detects a malicious
-URL sent to an employee’s inbox. Suppose there are <script type="math/tex">10</script> malicious URLs
-sent to employees of company <script type="math/tex">X</script> per day. Finally, suppose the IDS analyzes
-<script type="math/tex">10000</script> incoming URLs to company <script type="math/tex">X</script> per day.</p>
+<p>Suppose company <script type="math/tex">X</script> has <script type="math/tex">1000</script> employees, and a security vendor has deployed an intrusion detection system (IDS) alerting the company <script type="math/tex">X</script> when it detects a malicious URL sent to an employee’s inbox. Suppose there are <script type="math/tex">10</script> malicious URLs sent to employees of company <script type="math/tex">X</script> per day. Finally, suppose the IDS analyzes <script type="math/tex">10000</script> incoming URLs to company <script type="math/tex">X</script> per day.</p>
 
-<p>Let <script type="math/tex">I</script> denote an incident (an incoming malicious URL) and <script type="math/tex">\neg I</script> denote a non-incident (an incoming benign URL).
-Similarly, let <script type="math/tex">A</script> denote an alarm (the IDS classifies incoming URL as malicious) and <script type="math/tex">\neg A</script> denote a non-alarm (the
+<p>Let <script type="math/tex">I</script> denote an incident (an incoming malicious URL) and <script type="math/tex">\neg I</script> denote a non-incident (an incoming benign URL).<br />
+Similarly, let <script type="math/tex">A</script> denote an alarm (the IDS classifies incoming URL as malicious) and <script type="math/tex">\neg A</script> denote a non-alarm (the<br />
 IDS classifies URL as benign). That means <script type="math/tex">P (A|I) = P (\text{hit})</script> and <script type="math/tex">P (A| \neg I) =
 P (\text{false alarm})</script>.</p>
 
-<p>What’s the probability that an alarm is associated with a real incident? In other
-words, <em>how much can we trust the IDS under these conditions?</em></p>
+<p>What’s the probability that an alarm is associated with a real incident? In other words, <em>how much can we trust the IDS under these conditions?</em></p>
 
 <p>Using Bayes’ Theorem from above, we know:</p>
 
@@ -122,34 +101,20 @@ words, <em>how much can we trust the IDS under these conditions?</em></p>
 
 <script type="math/tex; mode=display">P (\text{IDS is accurate}) = \frac{P (\text{incident})P (\text{hit})}{P (\text{incident})P (\text{hit}) + P (\text{non-incident})P (\text{false alarm})}</script>
 
-<p>Now let’s calculate <script type="math/tex">P(\text{incident})</script> and <script type="math/tex">P(\text{non-incident})</script>, given the parameters of
-the IDS problem we defined above:</p>
+<p>Now let’s calculate <script type="math/tex">P(\text{incident})</script> and <script type="math/tex">P(\text{non-incident})</script>, given the parameters of the IDS problem we defined above:</p>
 
 <script type="math/tex; mode=display">P(\text{incident}) =\frac{\text{10 incidents per day}}{\text{10000 audits per day}} = 0.001</script>
 
 <script type="math/tex; mode=display">P (\text{non-incident}) = 1 − P (\text{incident}) = 0.999</script>
 
-<p>These probabilities emphasize the bias present in the distribution of analyzed
-URLs. The IDS has little sense of what incidents entail, as it is trained on very
-few examples of it. Plugging the probabilities into the equation above, we find
-that:</p>
+<p>These probabilities emphasize the bias present in the distribution of analyzed URLs. The IDS has little sense of what incidents entail, as it is trained on very few examples of it. Plugging the probabilities into the equation above, we find that:</p>
 
 <script type="math/tex; mode=display">P (\text{IDS is accurate}) = \frac{0.001 * P (\text{hit})}{0.001 * P (\text{hit}) + 0.999 * P (\text{false alarm})}</script>
 
-<p>Thus, to have reasonable confidence in an IDS under these biased conditions,
-we must have not only unrealistically high hit rate, but also unrealistically low
-false positive rate. For example, for an IDS to be <script type="math/tex">80</script> percent accurate, even with
-a best case scenario of a 100 percent hit rate, the IDS’ false alarm rate must be
-<script type="math/tex">4 \times 10^{−4}</script> . In other words, only <script type="math/tex">4</script> out of <script type="math/tex">10000</script> alarms can be false
+<p>Thus, to have reasonable confidence in an IDS under these biased conditions, we must have not only unrealistically high hit rate, but also unrealistically low false positive rate. For example, for an IDS to be <script type="math/tex">80</script> percent accurate, even with a best case scenario of a 100 percent hit rate, the IDS’ false alarm rate must be <script type="math/tex">4 \times 10^{−4}</script> . In other words, only <script type="math/tex">4</script> out of <script type="math/tex">10000</script> alarms can be false<br />
 positives to achieve this accuracy.</p>
 
-<p>In the real world, detection hit rates are much lower and false alarm rates are
-much higher. Thus, class representation bias in the security context can make
-machine learning algorithms inaccurate and untrustworthy. When models are
-trained on only a few examples of one class but many examples of another, the
-bar for reasonable accuracy is extremely high, and in some cases unachievable.
-Predictive algorithms run the risk of being ”the boy who cried wolf” – annoying
-and prone to desensitizing security professionals to incident alerts.</p>
+<p>In the real world, detection hit rates are much lower and false alarm rates are much higher. Thus, class representation bias in the security context can make machine learning algorithms inaccurate and untrustworthy. When models are trained on only a few examples of one class but many examples of another, the bar for reasonable accuracy is extremely high, and in some cases unachievable. Predictive algorithms run the risk of being ”the boy who cried wolf” – annoying and prone to desensitizing security professionals to incident alerts.</p>
 
 <p>Security data scientists can avoid these obstacles with a few measures:</p>
 
@@ -165,16 +130,11 @@ and prone to desensitizing security professionals to incident alerts.</p>
 
 <p>7) <strong>Encourage data gathering expeditions.</strong></p>
 
-<p>8) <strong>Encourage security expertise on the team.</strong> Security expertise can help you think of viable solutions to problems when
-data is insufficient.</p>
+<p>8) <strong>Encourage security expertise on the team.</strong> Security expertise can help you think of viable solutions to problems when data is insufficient.</p>
 
-<p>9) <strong>Weigh the trade-off between accuracy vs. coverage.</strong> The effects of false positives are particularly
-detrimental in the security space, meaning that for some applications it may be more useful to sacrifice
-the volume of accurate classifications for higher confidence.</p>
+<p>9) <strong>Weigh the trade-off between accuracy vs. coverage.</strong> The effects of false positives are particularly detrimental in the security space, meaning that for some applications it may be more useful to sacrifice the volume of accurate classifications for higher confidence.</p>
 
-<p>Machine learning has the potential to change how we detect and respond to malicious activity in our networks by weeding out signal from noise. It can help
-security professionals discover patterns in network activity never seen before. However, when applying these
-algorithms to security we have to be aware of caveats of the approach so we can address them.</p>
+<p>Machine learning has the potential to change how we detect and respond to malicious activity in our networks by weeding out signal from noise. It can help security professionals discover patterns in network activity never seen before. However, when applying these algorithms to security we have to be aware of caveats of the approach so we can address them.</p>
 
 <div class="footnotes">
   <ol>
@@ -191,11 +151,19 @@ algorithms to security we have to be aware of caveats of the approach so we can 
 </div>
 
 </article>
-
-<!-- 
+<!--
 <aside class="related">
   <h2>Related Posts</h2>
   <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/04/21/Parallelized-Matrix-Multiplication/">
+            Matrix Multiplication in Rust (Part 1)
+            <small><time datetime="2016-04-21T00:00:00-04:00">21 Apr 2016</time></small>
+          </a>
+        </h3>
+      </li>
     
       <li>
         <h3>
@@ -216,41 +184,13 @@ algorithms to security we have to be aware of caveats of the approach so we can 
       </li>
     
   </ul>
-</aside>
- -->
-
-        
-
-<div id="disqus_thread"></div>
-<script>
-/**
-* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
-*/
-/*
-var disqus_config = function () {
-this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
-this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-};
-*/
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-
-s.src = '//pegasos1.disqus.com/embed.js';
-
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
-
-
+</aside> -->
 
       </main>
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-03-25T16:28:34-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-04-25T20:10:17-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>

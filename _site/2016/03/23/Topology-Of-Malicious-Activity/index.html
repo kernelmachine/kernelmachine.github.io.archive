@@ -16,11 +16,9 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="/styles.css">
-  <script src="/highlight.pack.js"></script>
   <!-- <link rel="stylesheet" href="/googlecode.css"> -->
 
-  <script>hljs.initHighlightingOnLoad();</script>
-  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
 
   <!-- Icons -->
   <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
@@ -49,6 +47,12 @@
         <h3 class="masthead-title">
           <a href="/" title="Home" style="text-decoration: none;">suchin</a>
           <small><a href="/about" style="text-decoration: none; color: #C0C0C0">writings</a></small>
+          <div class="links">
+          <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
+          <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
+          <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
+
+        </div>
         </h3>
       </header>
 
@@ -66,11 +70,11 @@
 <p><img src="http://pegasos1.github.io/public/20160215/fig1.png" alt="Phishing Activity" /></p>
 
 <h3 id="malicious-ases">Malicious ASes</h3>
-<p>There has been a great deal of academic and industry focus on identifying malicious activity across
-autonomous systems, and for good reasons.<sup id="fnref:3"><a href="#fn:3" class="footnote">3</a></sup><sup id="fnref:4"><a href="#fn:4" class="footnote">4</a></sup><sup id="fnref:5"><a href="#fn:5" class="footnote">5</a></sup><sup id="fnref:6"><a href="#fn:6" class="footnote">6</a></sup> Over 50% of “good” Internet traffic comes
-from large, ocean-like ASes pushing content from companies like Netflix, Google, Facebook, Apple and Amazon.  However, despite this centralized content, the vastness of the Internet enables those with malicious intent to stake their claim in less friendly waters. In fact, our longitudinal data on phishing activity across IPv4 presented an interesting trend: <em>a small subset of autonomous systems have regularly hosted a disproportionate
-amount of malicious activity</em>. In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015
-(data: cleanmx archives<sup id="fnref:7"><a href="#fn:7" class="footnote">7</a></sup>). We wanted to understand what makes some autonomous systems more
+<p>There has been a great deal of academic and industry focus on identifying malicious activity across<br />
+autonomous systems, and for good reasons.<sup id="fnref:3"><a href="#fn:3" class="footnote">3</a></sup><sup id="fnref:4"><a href="#fn:4" class="footnote">4</a></sup><sup id="fnref:5"><a href="#fn:5" class="footnote">5</a></sup><sup id="fnref:6"><a href="#fn:6" class="footnote">6</a></sup> Over 50% of “good” Internet traffic comes<br />
+from large, ocean-like ASes pushing content from companies like Netflix, Google, Facebook, Apple and Amazon.  However, despite this centralized content, the vastness of the Internet enables those with malicious intent to stake their claim in less friendly waters. In fact, our longitudinal data on phishing activity across IPv4 presented an interesting trend: <em>a small subset of autonomous systems have regularly hosted a disproportionate<br />
+amount of malicious activity</em>. In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015<br />
+(data: cleanmx archives<sup id="fnref:7"><a href="#fn:7" class="footnote">7</a></sup>). We wanted to understand what makes some autonomous systems more<br />
 likely to host malicious activity.</p>
 
 <p><img src="http://pegasos1.github.io/public/20160215/fig2.png" alt="IPv4 fragmentation" /></p>
@@ -149,11 +153,19 @@ likely to host malicious activity.</p>
 </div>
 
 </article>
-
-<!-- 
+<!--
 <aside class="related">
   <h2>Related Posts</h2>
   <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/04/21/Parallelized-Matrix-Multiplication/">
+            Matrix Multiplication in Rust (Part 1)
+            <small><time datetime="2016-04-21T00:00:00-04:00">21 Apr 2016</time></small>
+          </a>
+        </h3>
+      </li>
     
       <li>
         <h3>
@@ -174,41 +186,13 @@ likely to host malicious activity.</p>
       </li>
     
   </ul>
-</aside>
- -->
-
-        
-
-<div id="disqus_thread"></div>
-<script>
-/**
-* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
-*/
-/*
-var disqus_config = function () {
-this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
-this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-};
-*/
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-
-s.src = '//pegasos1.disqus.com/embed.js';
-
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
-
-
+</aside> -->
 
       </main>
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-03-25T16:28:34-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-04-25T20:10:17-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>

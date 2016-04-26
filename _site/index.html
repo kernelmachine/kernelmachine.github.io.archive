@@ -16,11 +16,9 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="/styles.css">
-  <script src="/highlight.pack.js"></script>
   <!-- <link rel="stylesheet" href="/googlecode.css"> -->
 
-  <script>hljs.initHighlightingOnLoad();</script>
-  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
 
   <!-- Icons -->
   <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
@@ -49,133 +47,76 @@
         <h3 class="masthead-title">
           <a href="/" title="Home" style="text-decoration: none;">suchin</a>
           <small><a href="/about" style="text-decoration: none; color: #C0C0C0">writings</a></small>
+          <div class="links">
+          <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
+          <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
+          <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
+
+        </div>
         </h3>
       </header>
 
       <main>
-        <div class="posts">
+        <h5> Welcome.</h5>
+
+</p> My name's Suchin. I'm a <a href ="http://www.linkedin.com/in/ssgrn"> data scientist </a> at <a href= "http://rapid7.com/"> Rapid7</a>, a security firm in Cambridge, MA.</p>
+
+</p> This blog will condense and communicate things I'm working on and reading about. </p>
+
+</p> Topics of current interest include <a href ="http://rust-lang.org/">Rust</a> and <a href= " https://sonar.labs.rapid7.com/"> Internet-scale</a> data science. </p>
+
+<p> Check out some of my posts below. Thanks for reading.</p>
+
+<br>
+<div class="posts">
   
-  <article class="post">
-    <h1 class="post-title">
-      <a href="/2016/03/23/Topology-Of-Malicious-Activity/">
+    <h4 class="post-title">
+      <a href="/2016/04/21/Parallelized-Matrix-Multiplication/" style="text-decoration : none;">
+        Matrix Multiplication in Rust (Part 1)
+      </a>
+    </h4>
+    <time datetime="2016-04-21T00:00:00-04:00" class="post-date">21 Apr 2016</time>
+
+  
+    <h4 class="post-title">
+      <a href="/2016/03/23/Topology-Of-Malicious-Activity/" style="text-decoration : none;">
         The Topology of Malicious Activity on IPv4
       </a>
-    </h1>
-
+    </h4>
     <time datetime="2016-03-23T00:00:00-04:00" class="post-date">23 Mar 2016</time>
 
-    <p>At Rapid7, we’re building tools that help us investigate the threat landscape across the Internet. Projects Sonar<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> and Heisenberg<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup> give us global exposure to common vulnerabilities and patterns in offensive attacks. Our machine learning projects can detect and characterize phishing URLs and SSL certificates. Our threat intelligence repository is growing with datasets that resolve malicious activity to address blocks and autonomous systems.</p>
+  
+    <h4 class="post-title">
+      <a href="/2016/03/01/applying-machine-learning-to-security-problems/" style="text-decoration : none;">
+        Applying Machine Learning to Security Problems
+      </a>
+    </h4>
+    <time datetime="2016-03-01T00:00:00-05:00" class="post-date">01 Mar 2016</time>
 
-<p>We have recently focused our research on how these tools can work together to provide unique insights on the state of the Internet. In this post, we’ll present the beginning of our explorations to identify stable, macro-level attacks trends invisible on the scale of IP addresses.</p>
+  
+    <h4 class="post-title">
+      <a href="/2016/02/12/hello-world/" style="text-decoration : none;">
+        Hello, World!
+      </a>
+    </h4>
+    <time datetime="2016-02-12T00:00:00-05:00" class="post-date">12 Feb 2016</time>
 
-<h3 id="ipv4-topology">IPv4 Topology</h3>
-<p>First, a quick primer on IPv4, the fourth version of the Internet Protocol. The topology of IPv4 is characterized by three levels of hierarchy, from smallest to largest: IP addresses, subnets, and autonomous systems (ASes). IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses, and ASes are blocks of subnets managed by public institutions and private enterprises. IPv4 is divided into about 65,000 ASes, at least 30M subnets, and <script type="math/tex">2^{32}</script> IP addresses.</p>
-
-<p><img src="http://pegasos1.github.io/public/20160215/fig1.png" alt="Phishing Activity" /></p>
-
-<h3 id="malicious-ases">Malicious ASes</h3>
-<p>There has been a great deal of academic and industry focus on identifying malicious activity across
-autonomous systems, and for good reasons.<sup id="fnref:3"><a href="#fn:3" class="footnote">3</a></sup><sup id="fnref:4"><a href="#fn:4" class="footnote">4</a></sup><sup id="fnref:5"><a href="#fn:5" class="footnote">5</a></sup><sup id="fnref:6"><a href="#fn:6" class="footnote">6</a></sup> Over 50% of “good” Internet traffic comes
-from large, ocean-like ASes pushing content from companies like Netflix, Google, Facebook, Apple and Amazon.  However, despite this centralized content, the vastness of the Internet enables those with malicious intent to stake their claim in less friendly waters. In fact, our longitudinal data on phishing activity across IPv4 presented an interesting trend: <em>a small subset of autonomous systems have regularly hosted a disproportionate
-amount of malicious activity</em>. In particular, 200 ASes hosted 70% of phishing activity from 2007 to 2015
-(data: cleanmx archives<sup id="fnref:7"><a href="#fn:7" class="footnote">7</a></sup>). We wanted to understand what makes some autonomous systems more
-likely to host malicious activity.</p>
-
-<p><img src="http://pegasos1.github.io/public/20160215/fig2.png" alt="IPv4 fragmentation" /></p>
-
-<h3 id="ipv4-fragmentation">IPv4 Fragmentation</h3>
-
-<p>We gathered historical mappings between IP addresses and ASes from 2007 to 2015 to understand the history of IPv4. The data clearly suggested that IPv4 has been fragmenting. The total number of ASes has grown about 60% in the past decade, and during the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that the IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.</p>
-
-<p><img src="http://pegasos1.github.io/public/20160215/fig3.png" alt="AS fragmentation" /></p>
-
-<h3 id="as-fragmentation">AS Fragmentation</h3>
-
-<p>Digging deeper into the Internet’s topological hierarchy, we analyzed the composition, size, and fragmentation of malicious ASes.</p>
-
-<p>ARIN, one of the primary registrars of ASes, categorizes subnets based on the number of IP addresses they contain.<sup id="fnref:8"><a href="#fn:8" class="footnote">8</a></sup> We found that the smallest subnets available made up on average 56 <script type="math/tex">\pm</script> 3.0 percent of a malicious AS.</p>
-
-<p>Furthermore, we inferred the the size of an AS by calculating its maximum amount of addressable space. Malicious ASes were in the 80-90th percentile in size across IPv4.</p>
-
-<p>Finally, to compute fragmentation, subnets observed in ASes overtime were organized into trees based on parent-child relationships (Figure 3). We then calculated the ratio of the number of root subnets, which have no parents, to the number of child subnets across the lifetime of the AS. We found that malicious ASes were 10-20% more fragmented than other ASes in IPv4.</p>
-
-<p>These results suggest that malicious ASes are large and deeply fragmented into small subnets. ARIN fee schedules showed that smaller subnets are significantly less expensive to purchase.<sup id="fnref:8:1"><a href="#fn:8" class="footnote">8</a></sup> Cheap, small subnets may allow malicious registrars to purchase many IP blocks for traffic redirection or proxy servers, so they can better float under the radar.</p>
-
-<p><img src="http://pegasos1.github.io/public/20160215/fig5.png" alt="topologies" /></p>
-
-<h3 id="conclusion">Conclusion</h3>
-
-<p>Our research presents the following results:</p>
-
-<p>1) A small subset of ASes host a disproportionate amount of malicious activity.</p>
-
-<p>2) Smaller subnets and ASes are becoming more ubiquitous in IPv4.</p>
-
-<p>3) Malicious ASes are likely large and deeply fragmented</p>
-
-<p>Further work is required to characterize the exact cost structure of buying subnets, registering IP blocks, and setting up infrastructure in malicious ASes.</p>
-
-<p>We’d also like to understand the network and system features that convince attackers to co-opt a specific AS over another. For example, we used Sonar’s historical forward­DNS service and our phishing detection algorithms to characterize the domains that have mapped to these ASes in the past two years. Domains hosted in malicious ASes had features that suggested deliberate use of specific infrastructure. For example, ‘wordpress’ sites were over-represented in some malicious ASes (like <a href="https://www.google.com/transparencyreport/safebrowsing/malware/?hl=en#region=ALL&amp;period=90&amp;size=LARGEST&amp;compromised&amp;attack&amp;asn=4808&amp;page=1">AS4808</a>), and GoDaddy was by far the most popular registrar for malicious sites across the board. Are these features core to the design and sustenance of phishing attacks?</p>
-
-<p>As seen below, it’s also possible to analyze SSL certificates to uncover the distribution of devices hosted in ASes across IPv4.</p>
-
-<p><img src="http://pegasos1.github.io/public/20160215/fig4.png" alt="malicious infrastructure" /></p>
-
-<p>Each square above shows the probability distribution of device counts of a particular type. Most ASes host fewer than 100 devices across a majority of categories. Are there skews in the types of devices used to propagate phishing attacks from these malicious ASes?</p>
-
-<p>This research represents an example of how Internet-scale data science can provide valuable insight on the threat landscape. We hope similar macro level research is inspired by these explorations.</p>
-
-<p><em>Thanks to Bob Rudis (<a href="http://twitter.com/hrbrmstr">@hrbrmstr</a>) for help with this post.</em></p>
-
-<div class="footnotes">
-  <ol>
-    <li id="fn:1">
-      <p><a href="https://sonar.labs.rapid7.com/">Sonar intro</a> <a href="#fnref:1" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:2">
-      <p><a href="https://community.rapid7.com/community/infosec/blog/2016/01/05/12-days-of-haxmas-beginner-threat-intelligence-with-honeypots">Heisenberg intro</a> <a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:3">
-      <p><a href="http://eprints.eemcs.utwente.nl/20379/01/cnsm2011.pdf">Internet Bad Neighborhoods: The spam case</a> <a href="#fnref:3" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:4">
-      <p><a href="https://www.cs.ucsb.edu/~chris/research/doc/acsac09_fire.pdf">FIRE: FInding Rogue nEtworks</a> <a href="#fnref:4" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:5">
-      <p><a href="http://ieeexplore.ieee.org/xpl/login.jsp?tp=&amp;arnumber=5783493&amp;url=http%3A%2F%2Fieeexplore.ieee.org%2Fiel5%2F90%2F6151256%2F05783493.pdf%3Farnumber%3D5783493">Abnormally Malicious Autonomous Systems and Their Internet Connectivity</a> <a href="#fnref:5" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:6">
-      <p><a href="http://ieeexplore.ieee.org/xpl/login.jsp?tp=&amp;arnumber=5462220&amp;url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D5462220">Malicious Hubs: Detecting Abnormally Malicious Autonomous Systems</a> <a href="#fnref:6" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:7">
-      <p><a href="http://cleanmx.org">Cleanmx archive</a> <a href="#fnref:7" class="reversefootnote">&#8617;</a></p>
-    </li>
-    <li id="fn:8">
-      <p><a href="https://www.arin.net/fees/fee_schedule.html">ARIN fee schedules</a> <a href="#fnref:8" class="reversefootnote">&#8617;</a> <a href="#fnref:8:1" class="reversefootnote">&#8617;<sup>2</sup></a></p>
-    </li>
-  </ol>
-</div>
-
-  </article>
   
 </div>
-
+<!--
 <div class="pagination">
   
     <a class="pagination-item older" href="/page2">Older</a>
   
   
     <span class="pagination-item newer">Newer</span>
-  
-</div>
-
-        
+   -->
 
       </main>
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-03-25T16:28:34-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-04-25T20:10:17-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>

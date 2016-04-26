@@ -1,0 +1,132 @@
+<p>The fundamental operation in computational science is the dot product between arbitrary matrices <script type="math/tex">A</script> and <script type="math/tex">B</script>:</p>
+
+<script type="math/tex; mode=display">dot(A,B) = A_1B_1 + A_2B_2 + ... + A_nB_n</script>
+
+<p>It’s a simple operation, and a great use case to understand cache efficiency and multi-threading. This blog post will detail those explorations.</p>
+
+<h2 id="matrix-computations-in-rust">Matrix computations in Rust</h2>
+<hr />
+<p>It’s an early time for Rust, but we’re already seeing wins in the scientific computing space.<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup><sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup> Rust’s type system and error-handling for effective data structures for high-performance computing. This analysis will be centered around the use of rust-ndarray<sup id="fnref:1:1"><a href="#fn:1" class="footnote">1</a></sup> for matrix computations.</p>
+
+<h2 id="naive-dot-product">Naive dot product</h2>
+<hr />
+
+<p>In the following, note that we’ll use the following type aliases:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>
+<span class="k">pub</span> <span class="k">type</span> <span class="n">MatView</span><span class="o">&lt;</span><span class="err">'</span><span class="n">a</span><span class="p">,</span> <span class="n">A</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">ArrayView</span><span class="o">&lt;</span><span class="err">'</span><span class="n">a</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="p">(</span><span class="n">Ix</span><span class="p">,</span> <span class="n">Ix</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="k">pub</span> <span class="k">type</span> <span class="n">MatViewMut</span><span class="o">&lt;</span><span class="err">'</span><span class="n">a</span><span class="p">,</span> <span class="n">A</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">ArrayViewMut</span><span class="o">&lt;</span><span class="err">'</span><span class="n">a</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="p">(</span><span class="n">Ix</span><span class="p">,</span> <span class="n">Ix</span><span class="p">)</span><span class="o">&gt;</span><span class="p">;</span>
+
+
+</code></pre>
+</div>
+
+<p>ArrayViews are references to a matrix or part of it. Variants of arrayviews include array slices and subviews.</p>
+
+<p>Let’s start out with a naive implementation of the dot product, and understand where we might make some improvements.</p>
+
+<p>The naive implementation includes mapping the multiplicative sum of two vectors over the rows and columns of two matrices:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">pub</span> <span class="k">fn</span> <span class="nf">matrix_dot</span><span class="p">(</span> <span class="n">a</span> <span class="p">:</span> <span class="o">&amp;</span><span class="n">MatView</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">MatView</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">init</span> <span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">MatViewMut</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">){</span>
+    <span class="k">let</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">k1</span><span class="p">)</span><span class="o">=</span> <span class="n">left</span><span class="nf">.dim</span><span class="p">();</span>
+    <span class="k">let</span> <span class="p">(</span><span class="n">k2</span><span class="p">,</span><span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="n">right</span><span class="nf">.dim</span><span class="p">();</span>
+    <span class="nd">assert_eq!</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">);</span>
+    <span class="k">for</span> <span class="n">ix</span> <span class="n">in</span> <span class="mi">0</span><span class="err">.</span><span class="py">.m</span><span class="p">{</span>
+        <span class="k">for</span> <span class="n">jx</span> <span class="n">in</span> <span class="mi">0</span><span class="err">.</span><span class="py">.n</span><span class="p">{</span>
+            <span class="k">let</span> <span class="n">left_row</span> <span class="o">=</span> <span class="n">left</span><span class="nf">.row</span><span class="p">(</span><span class="n">ix</span><span class="p">);</span>
+            <span class="k">let</span> <span class="n">right_col</span> <span class="o">=</span> <span class="n">right</span><span class="nf">.column</span><span class="p">(</span><span class="n">jx</span><span class="p">);</span>
+            <span class="k">let</span> <span class="k">mut</span> <span class="n">value</span> <span class="o">=</span> <span class="n">init</span><span class="nf">.get_mut</span><span class="p">((</span><span class="n">ix</span><span class="p">,</span><span class="n">jx</span><span class="p">));</span>
+            <span class="k">let</span> <span class="n">dot_prod</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="err">.</span><span class="py">.a</span><span class="nf">.len</span><span class="p">())</span><span class="nf">.fold</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">|</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">|</span> <span class="n">x</span> <span class="o">+</span> <span class="o">*</span><span class="n">a</span><span class="nf">.get</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="o">*</span><span class="n">b</span><span class="nf">.get</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="p">)</span>
+            <span class="o">*</span><span class="n">value</span> <span class="o">+=</span> <span class="n">dot_prod</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>You’ll quickly realize that this is an extremely inefficient way of going about things. This blog post will deal with how to optimize this code with three approaches, to make it competitive with BLAS.</p>
+
+<p>1) Improve matrix dot product computation</p>
+
+<p>2) Avoid explicit bounds checking</p>
+
+<p>2) Improve cache efficiency</p>
+
+<p>3) Implement multi-threading</p>
+
+<h2 id="improve-matrix-multiplication">Improve matrix multiplication</h2>
+
+<h2 id="avoid-safety-checking">Avoid Safety Checking</h2>
+<hr />
+<p><code class="highlighter-rouge">get()</code> and <code class="highlighter-rouge">get_mut()</code> are are tied to bounds checking. While this makes for safe code, we’re trying to make things as fast as possible.</p>
+
+<p>There are two options we have here. One is to write <code class="highlighter-rouge">unsafe</code> code to index the matrix. Instead of indexing the matrices and making sure that we’re within bounds, we can use <code class="highlighter-rouge">uget()</code> and <code class="highlighter-rouge">uget_mut()</code> to index these matrices unsafely. This is okay to do because we can be sure that our for loop iteration is in bounds, as we assert indices before hand.</p>
+
+<p>Alternatively, we can scrap this code all together.</p>
+
+<p>Remember that <em>iteration has implicit bounds checking</em>. This means that if we can reduce this code to a function that implements iteration, then we achieve speed while still being safe.</p>
+
+<p>Fortunately, that functionality exists through <code class="highlighter-rouge">zip</code>. Specifically, we can simplify the above code to a simple  one liner:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>
+<span class="n">init</span><span class="nf">.zip_mut_with</span><span class="p">(</span><span class="o">&amp;</span><span class="n">res</span><span class="p">,</span> <span class="p">|</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">|</span> <span class="o">*</span><span class="n">x</span> <span class="o">=</span> <span class="o">*</span><span class="n">y</span><span class="p">)</span>
+
+</code></pre>
+</div>
+
+<p>All in all, we can reduce the above (unelegant) code to a simple two-liner:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="k">pub</span> <span class="k">fn</span> <span class="nf">matrix_dot_safe</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">MatView</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">MatView</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">MatViewMut</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="n">res</span> <span class="o">=</span> <span class="n">left</span><span class="nf">.dot</span><span class="p">(</span><span class="n">right</span><span class="p">);</span>
+    <span class="n">init</span><span class="nf">.zip_mut_with</span><span class="p">(</span><span class="o">&amp;</span><span class="n">res</span><span class="p">,</span> <span class="p">|</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">|</span> <span class="o">*</span><span class="n">x</span> <span class="o">=</span> <span class="o">*</span><span class="n">y</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h2 id="cache-efficiency">Cache Efficiency</h2>
+<hr />
+
+<p>Let’s look at how this new matrix dot product performs in terms of cache efficiency.</p>
+
+<p>Writing cache friendly code requires clever refactoring of code, and data-oriented design. The primary focus should be to understand how code fits into lower-level caches.</p>
+
+<p>Here’s the valgrind output for this particular code.</p>
+
+<h3 id="parallelization">Parallelization</h3>
+<hr />
+<p>There’s another optimization that we can make, and that’s make the operations multi-threaded. There are quite a few crates that assist the developer in making easily parallelizable code, but the two I’ll focus on here are <em>rayon</em> and <em>simple_parallel</em>. These two libraries attempt to make writing zero-cost multi-threaded applications.</p>
+
+<h4 id="simple-parallel">Simple Parallel</h4>
+<hr />
+
+<h4 id="rayon">Rayon</h4>
+<hr />
+<p>Rayon, on the other hand, focus on <em>potential parallelism</em> instead of <em>guaranteed concurrency</em>. The core of its operation centers around <em>work-stealing</em>.</p>
+
+<h2 id="other-optimizations">Other Optimizations</h2>
+<hr />
+
+<p>Avx/cpu=native</p>
+
+<h2 id="fun-experiments">Fun experiments</h2>
+<hr />
+
+<p>c4.2xlarge!!</p>
+
+<h2 id="a-look-to-the-future">A look to the future</h2>
+<hr />
+
+<p>Ndaray + Rayon</p>
+
+<p><em>Thanks to @staticassert and @bluss for help with this post.</em></p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:1">
+      <p><a href="http://github.com/bluss/rust-ndarray">rust-ndarray</a> <a href="#fnref:1" class="reversefootnote">&#8617;</a> <a href="#fnref:1:1" class="reversefootnote">&#8617;<sup>2</sup></a></p>
+    </li>
+    <li id="fn:2">
+      <p><a href="http://github.com/autumnai/leaf">leaf</a> <a href="#fnref:2" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
