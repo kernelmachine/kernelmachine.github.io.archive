@@ -46,12 +46,12 @@
       <header class="masthead">
         <h3 class="masthead-title">
           <a href="/" title="Home" style="text-decoration: none;">suchin</a>
-          <small><a href="/about" style="text-decoration: none; color: #C0C0C0">writings</a></small>
+          <small><a href="/" style="text-decoration: none; color: #C0C0C0">writings</a></small>
           <div class="links">
           <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
           <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
           <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
-
+          <a  href="http://twitter.com/ssgrn" > <img style="display: inline; margin-left: 15px;" src="https://upload.wikimedia.org/wikipedia/de/thumb/9/9f/Twitter_bird_logo_2012.svg/1000px-Twitter_bird_logo_2012.svg.png"   height="50px" width="50px"></img></a>
         </div>
         </h3>
       </header>
@@ -86,8 +86,8 @@
 
 <p>Suppose company <script type="math/tex">X</script> has <script type="math/tex">1000</script> employees, and a security vendor has deployed an intrusion detection system (IDS) alerting the company <script type="math/tex">X</script> when it detects a malicious URL sent to an employee’s inbox. Suppose there are <script type="math/tex">10</script> malicious URLs sent to employees of company <script type="math/tex">X</script> per day. Finally, suppose the IDS analyzes <script type="math/tex">10000</script> incoming URLs to company <script type="math/tex">X</script> per day.</p>
 
-<p>Let <script type="math/tex">I</script> denote an incident (an incoming malicious URL) and <script type="math/tex">\neg I</script> denote a non-incident (an incoming benign URL).<br />
-Similarly, let <script type="math/tex">A</script> denote an alarm (the IDS classifies incoming URL as malicious) and <script type="math/tex">\neg A</script> denote a non-alarm (the<br />
+<p>Let <script type="math/tex">I</script> denote an incident (an incoming malicious URL) and <script type="math/tex">\neg I</script> denote a non-incident (an incoming benign URL).
+Similarly, let <script type="math/tex">A</script> denote an alarm (the IDS classifies incoming URL as malicious) and <script type="math/tex">\neg A</script> denote a non-alarm (the
 IDS classifies URL as benign). That means <script type="math/tex">P (A|I) = P (\text{hit})</script> and <script type="math/tex">P (A| \neg I) =
 P (\text{false alarm})</script>.</p>
 
@@ -111,7 +111,7 @@ P (\text{false alarm})</script>.</p>
 
 <script type="math/tex; mode=display">P (\text{IDS is accurate}) = \frac{0.001 * P (\text{hit})}{0.001 * P (\text{hit}) + 0.999 * P (\text{false alarm})}</script>
 
-<p>Thus, to have reasonable confidence in an IDS under these biased conditions, we must have not only unrealistically high hit rate, but also unrealistically low false positive rate. For example, for an IDS to be <script type="math/tex">80</script> percent accurate, even with a best case scenario of a 100 percent hit rate, the IDS’ false alarm rate must be <script type="math/tex">4 \times 10^{−4}</script> . In other words, only <script type="math/tex">4</script> out of <script type="math/tex">10000</script> alarms can be false<br />
+<p>Thus, to have reasonable confidence in an IDS under these biased conditions, we must have not only unrealistically high hit rate, but also unrealistically low false positive rate. For example, for an IDS to be <script type="math/tex">80</script> percent accurate, even with a best case scenario of a 100 percent hit rate, the IDS’ false alarm rate must be <script type="math/tex">4 \times 10^{−4}</script> . In other words, only <script type="math/tex">4</script> out of <script type="math/tex">10000</script> alarms can be false
 positives to achieve this accuracy.</p>
 
 <p>In the real world, detection hit rates are much lower and false alarm rates are much higher. Thus, class representation bias in the security context can make machine learning algorithms inaccurate and untrustworthy. When models are trained on only a few examples of one class but many examples of another, the bar for reasonable accuracy is extremely high, and in some cases unachievable. Predictive algorithms run the risk of being ”the boy who cried wolf” – annoying and prone to desensitizing security professionals to incident alerts.</p>
@@ -158,9 +158,9 @@ positives to achieve this accuracy.</p>
     
       <li>
         <h3>
-          <a href="/2016/04/21/Parallelized-Matrix-Multiplication/">
+          <a href="/2016/04/25/Matrix-Multiplication-In-Rust-Pt-1/">
             Matrix Multiplication in Rust (Part 1)
-            <small><time datetime="2016-04-21T00:00:00-04:00">21 Apr 2016</time></small>
+            <small><time datetime="2016-04-25T00:00:00-04:00">25 Apr 2016</time></small>
           </a>
         </h3>
       </li>
@@ -190,7 +190,7 @@ positives to achieve this accuracy.</p>
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-04-25T20:10:17-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-04-26T10:39:27-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>
