@@ -3,6 +3,4 @@ layout: post
 title: Hello, World!
 ---
 
-I'm Suchin.
-
-Thanks for reading!
+Just testing out my blog.
