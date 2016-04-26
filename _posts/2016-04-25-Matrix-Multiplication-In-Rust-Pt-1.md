@@ -12,7 +12,7 @@ Basic Linear Algebra Subprograms (BLAS) are the routines that underpin most high
 
 It's an early time for Rust, but we're already seeing strides (pun intended) in the numeric computing space.[^1][^2] I was recently inspired to investigate how to make fast matrix computations in Rust, using ndarray-rblas compiled with OpenBLAS[^3] as the target benchmark. This blog series is a documentation of those explorations.
 
-In this post, I'll detail the process of making fast matrix computations through code changes.
+In this post, I'll detail, on a high-level, the process of making fast matrix computations.
 
 The analyses in this post will involve the use of rust-ndarray[^1] for matrix computations. All the crate-specific methods I use are documented [here](http://bluss.github.io/rust-ndarray/master/ndarray/index.html). I'm on a basic Linux laptop: 4-core, i5 CPU with 8 GB RAM.
 
