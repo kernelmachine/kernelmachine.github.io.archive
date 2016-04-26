@@ -4,7 +4,7 @@ title: Matrix Multiplication in Rust (Part 1)
 comments: true
 ---
 
-*Thanks to staticassert for feedback. Source code can be found [here](http://github.com/pegasos1/rsmat).*
+*Thanks to staticassert for feedback, and bluss for conversations. Source code can be found [here](http://github.com/pegasos1/rsmat).*
 
 *This post is the first of a series.*
 
