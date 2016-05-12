@@ -34,6 +34,6 @@ This project is in its infancy, and here are some current ideas on the roadmap:
  * Building support for more profiling tools
  * Creating alternate consumptions of profiling data (e.g. visualizations)
 
-Now, cargo-profiler is a simple and lightweight app that merely serves as an interface to existing tools. There's a whole world beyond this project that involves totally new and native Rust profiling workflows. These workflows could be really powerful and address some caveats to profiling Rust programs today. For example, compiler optimizations like inlining  render some functions at the code-level mangled or lost to valgrind. Perhaps native profiling at the MIR or LLVM level may solve this issue.
+Now, cargo-profiler is a simple and lightweight app that merely serves as an interface to existing tools. There's a whole world beyond this project that involves totally new and native Rust profiling workflows. These workflows could be really powerful and address some caveats to profiling Rust programs today. For example, compiler optimizations like inlining  render some functions at the code-level mangled or lost to valgrind. Perhaps native profiling at the MIR or LLVM level can solve this issue.
 
 Native Rust profiling would definitely require major work, so in the meantime, leveraging existing tools seems like a good first step! I hope this tool is useful to you developers.
