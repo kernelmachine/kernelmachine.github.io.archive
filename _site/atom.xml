@@ -4,13 +4,58 @@
  <title>suchin</title>
  <link href="https://suchin.co/atom.xml" rel="self"/>
  <link href="https://suchin.co/"/>
- <updated>2016-04-26T10:44:21-04:00</updated>
+ <updated>2016-05-11T23:33:23-04:00</updated>
  <id>https://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>Introducing Cargo Profiler</title>
+   <link href="https://suchin.co/2016/05/11/Introducing-Cargo-Profiler/"/>
+   <updated>2016-05-11T00:00:00-04:00</updated>
+   <id>https://suchin.co/2016/05/11/Introducing-Cargo-Profiler</id>
+   <content type="html">&lt;p&gt;Profiling tools can help you write fast and efficient code. However, whether you use perf, oprofile, or valgrind, you have to exit the Rust ecosystem to profile your applications. This has always been a little cumbersome to me, so I built a cargo subcommand to perform the job: &lt;a href=&quot;https://github.com/pegasos1/cargo-profiler&quot;&gt;cargo-profiler&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Cargo-profiler interfaces with Linux-based profiling tools to:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Profile your applications&lt;/li&gt;
+  &lt;li&gt;Parse profiler output into structs for further analysis&lt;/li&gt;
+  &lt;li&gt;Display information to you in the most user-friendly way possible.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For example, instead of this gross cachegrind output:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;valgrind --tool=cachegrind $BINARY &amp;amp;&amp;amp; cg_annotate $OUT_FILE&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://127.0.0.1:4000/public/20160511/cachegrind_pic.png&quot; width=&quot;900&quot; height=&quot;400&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You get this prettier cachegrind output:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;cargo profiler cachegrind --bin=$BINARY -n 10&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://127.0.0.1:4000/public/20160511/cargoprofiler.png&quot; alt=&quot;Cargo profiler&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Since cargo-profiler parses performance statistics into machine-readable, structured objects, we can do a lot more with the data, even in a programmatic way.&lt;/p&gt;
+
+&lt;p&gt;Here are some current ideas on the roadmap of this project:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Comparisons between profiling runs&lt;/li&gt;
+  &lt;li&gt;Creating macros that conditionally compile a binary with functions you want to profile&lt;/li&gt;
+  &lt;li&gt;Getting better context around expensive functions in your library (location, types, etc.)&lt;/li&gt;
+  &lt;li&gt;Building support for more profiling tools&lt;/li&gt;
+  &lt;li&gt;Creating alternate consumptions of profiling data (e.g. visualizations)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Now, cargo-profiler is a simple and lightweight app that merely serves as an interface to existing tools. There’s a whole world beyond this project that involves totally new and native Rust profiling workflows. These workflows could be really powerful and address some caveats to profiling Rust programs today. For example, compiler optimizations like inlining  render some functions at the code-level mangled or lost to valgrind. Perhaps native profiling at the MIR or LLVM level may solve this issue.&lt;/p&gt;
+
+&lt;p&gt;Native Rust profiling would definitely require major work, so in the meantime, leveraging existing tools seems like a good first step! I hope this tool is useful to you developers.&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Matrix Multiplication in Rust (Part 1)</title>

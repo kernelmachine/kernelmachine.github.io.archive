@@ -10,7 +10,7 @@
 
   <title>
     
-      Hello, World! &middot; suchin
+      Introducing Cargo Profiler &middot; suchin
     
   </title>
 
@@ -58,24 +58,51 @@
 
       <main>
         <article class="post">
-  <h1 class="post-title">Hello, World!</h1>
-  <time datetime="2016-02-12T00:00:00-05:00" class="post-date">12 Feb 2016</time>
-  <p>Just testing out my blog.</p>
+  <h1 class="post-title">Introducing Cargo Profiler</h1>
+  <time datetime="2016-05-11T00:00:00-04:00" class="post-date">11 May 2016</time>
+  <p>Profiling tools can help you write fast and efficient code. However, whether you use perf, oprofile, or valgrind, you have to exit the Rust ecosystem to profile your applications. This has always been a little cumbersome to me, so I built a cargo subcommand to perform the job: <a href="https://github.com/pegasos1/cargo-profiler">cargo-profiler</a>.</p>
+
+<p>Cargo-profiler interfaces with Linux-based profiling tools to:</p>
+
+<ul>
+  <li>Profile your applications</li>
+  <li>Parse profiler output into structs for further analysis</li>
+  <li>Display information to you in the most user-friendly way possible.</li>
+</ul>
+
+<p>For example, instead of this gross cachegrind output:</p>
+
+<p><code class="highlighter-rouge">valgrind --tool=cachegrind $BINARY &amp;&amp; cg_annotate $OUT_FILE</code></p>
+
+<p><img src="http://127.0.0.1:4000/public/20160511/cachegrind_pic.png" width="900" height="400" /></p>
+
+<p>You get this prettier cachegrind output:</p>
+
+<p><code class="highlighter-rouge">cargo profiler cachegrind --bin=$BINARY -n 10</code></p>
+
+<p><img src="http://127.0.0.1:4000/public/20160511/cargoprofiler.png" alt="Cargo profiler" /></p>
+
+<p>Since cargo-profiler parses performance statistics into machine-readable, structured objects, we can do a lot more with the data, even in a programmatic way.</p>
+
+<p>Here are some current ideas on the roadmap of this project:</p>
+
+<ul>
+  <li>Comparisons between profiling runs</li>
+  <li>Creating macros that conditionally compile a binary with functions you want to profile</li>
+  <li>Getting better context around expensive functions in your library (location, types, etc.)</li>
+  <li>Building support for more profiling tools</li>
+  <li>Creating alternate consumptions of profiling data (e.g. visualizations)</li>
+</ul>
+
+<p>Now, cargo-profiler is a simple and lightweight app that merely serves as an interface to existing tools. There’s a whole world beyond this project that involves totally new and native Rust profiling workflows. These workflows could be really powerful and address some caveats to profiling Rust programs today. For example, compiler optimizations like inlining  render some functions at the code-level mangled or lost to valgrind. Perhaps native profiling at the MIR or LLVM level may solve this issue.</p>
+
+<p>Native Rust profiling would definitely require major work, so in the meantime, leveraging existing tools seems like a good first step! I hope this tool is useful to you developers.</p>
 
 </article>
 <!--
 <aside class="related">
   <h2>Related Posts</h2>
   <ul class="related-posts">
-    
-      <li>
-        <h3>
-          <a href="/2016/05/11/Introducing-Cargo-Profiler/">
-            Introducing Cargo Profiler
-            <small><time datetime="2016-05-11T00:00:00-04:00">11 May 2016</time></small>
-          </a>
-        </h3>
-      </li>
     
       <li>
         <h3>
@@ -95,6 +122,15 @@
         </h3>
       </li>
     
+      <li>
+        <h3>
+          <a href="/2016/03/01/applying-machine-learning-to-security-problems/">
+            Applying Machine Learning to Security Problems
+            <small><time datetime="2016-03-01T00:00:00-05:00">01 Mar 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
   </ul>
 </aside> -->
 
@@ -102,7 +138,7 @@
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-05-11T23:33:23-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-05-11T23:31:50-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>
