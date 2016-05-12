@@ -26,7 +26,7 @@ You get this prettier cachegrind output:
 
 Since cargo-profiler parses performance statistics into machine-readable, structured objects, we can do a lot more with the data, even in a programmatic way.
 
-Here are some current ideas on the roadmap of this project:
+This project is in its infancy, and here are some current ideas on the roadmap:
 
  * Comparisons between profiling runs
  * Creating macros that conditionally compile a binary with functions you want to profile
