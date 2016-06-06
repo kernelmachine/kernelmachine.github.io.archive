@@ -19,6 +19,7 @@ With this library you can access a number of HIBP services from Python, includin
 Each service request object contains a response attribute that holds the raw data in JSON format. To perform a query, just setup a service request object, and then execute it:
 
 ```python
+>> from hibp import HIBP
 >> req = HIBP.get_account_breaches("pegasos1")
 >> req.execute()
 >> req.response
@@ -59,6 +60,7 @@ Cool, huh? We can see when the breach occurred, the various types of data that w
 If you want to query on multiple accounts or domains at once, you can use the `AsyncHIBP` object, which can perform queries concurrently via [gevent](http://www.gevent.org/).
 
 ```python
+>> from hibp import AsyncHIBP
 >> names = ['adobe','ashleymadison', 'myspace']
 >> breaches = [HIBP.get_breach(x) for x in names]
 >> async_reqs = AsyncHIBP().map(breaches)
@@ -68,14 +70,14 @@ If you want to query on multiple accounts or domains at once, you can use the `A
 You can also perform lazy evaluations on multiple accounts or domains with the `imap` method. This will return a generator on request objects, which could be more memory efficient if you're working with a larger list of queries.
 
 ```python
->> names = ['adobe','ashleymadison', 'myspace']
->> breaches = [HIBP.get_breach(x) for x in names]
+>> domains = ['twitter.com','facebook.com', 'myspace.com']
+>> breaches = [HIBP.get_domain_breaches(x) for x in domains]
 >> async_reqs = AsyncHIBP().imap(breaches)
 >> for req in async_reqs:
    ... print req
 ```
 
-Concurrent queries is much faster than serial ones:
+Concurrent queries are much faster than serial ones:
 
 ```python
 ### SERIAL
