@@ -30,6 +30,7 @@ You can see a full example script of how to use the API [here](https://github.co
 Here's some example data we get back when we query for data breaches on `adobe.com`:
 
 ```python
+>> import json
 >> req = HIBP.get_domain_breaches("adobe.com")
 >> req.execute()
 >> print(json.dumps(req.response, indent=4, sort_keys=True))
