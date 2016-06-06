@@ -81,7 +81,7 @@ You can also perform lazy evaluations on multiple accounts or domains with the `
 Concurrent queries are much faster than serial ones:
 
 ```python
-# random set of query paramaters
+# random set of query parameters
 names = ['adobe','ashleymadison', 'linkedin', 'myspace']*20
 accounts = ["ssgrn", "pegasos1","barackobama"]*20
 domains = ['twitter.com', 'facebook.com','github.com','adobe.com']*20
