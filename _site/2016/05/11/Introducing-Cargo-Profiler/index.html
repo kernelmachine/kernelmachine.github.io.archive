@@ -74,17 +74,17 @@
 
 <p><code class="highlighter-rouge">valgrind --tool=cachegrind $BINARY &amp;&amp; cg_annotate $OUT_FILE</code></p>
 
-<p><img src="http://127.0.0.1:4000/public/20160511/cachegrind_pic.png" width="900" height="400" /></p>
+<p><img src="http://pegasos1.github.io/public/20160511/cachegrind_pic.png" width="900" height="400" /></p>
 
 <p>You get this prettier cachegrind output:</p>
 
 <p><code class="highlighter-rouge">cargo profiler cachegrind --bin=$BINARY -n 10</code></p>
 
-<p><img src="http://127.0.0.1:4000/public/20160511/cargoprofiler.png" alt="Cargo profiler" /></p>
+<p><img src="http://pegasos1.github.io/public/20160511/cargoprofiler.png" alt="Cargo profiler" /></p>
 
 <p>Since cargo-profiler parses performance statistics into machine-readable, structured objects, we can do a lot more with the data, even in a programmatic way.</p>
 
-<p>Here are some current ideas on the roadmap of this project:</p>
+<p>This project is in its infancy, and here are some current ideas on the roadmap:</p>
 
 <ul>
   <li>Comparisons between profiling runs</li>
@@ -94,7 +94,7 @@
   <li>Creating alternate consumptions of profiling data (e.g. visualizations)</li>
 </ul>
 
-<p>Now, cargo-profiler is a simple and lightweight app that merely serves as an interface to existing tools. There’s a whole world beyond this project that involves totally new and native Rust profiling workflows. These workflows could be really powerful and address some caveats to profiling Rust programs today. For example, compiler optimizations like inlining  render some functions at the code-level mangled or lost to valgrind. Perhaps native profiling at the MIR or LLVM level may solve this issue.</p>
+<p>Now, cargo-profiler is a simple and lightweight app that merely serves as an interface to existing tools. There’s a whole world beyond this project that involves totally new and native Rust profiling workflows. These workflows could be really powerful and address some caveats to profiling Rust programs today. For example, compiler optimizations like inlining  render some functions at the code-level mangled or lost to valgrind. Perhaps native profiling at the MIR or LLVM level can solve this issue.</p>
 
 <p>Native Rust profiling would definitely require major work, so in the meantime, leveraging existing tools seems like a good first step! I hope this tool is useful to you developers.</p>
 
@@ -103,6 +103,15 @@
 <aside class="related">
   <h2>Related Posts</h2>
   <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/06/05/Introducing-The-Have-I-Been-Pwned-Python-API/">
+            Have I Been Pwned? with Python
+            <small><time datetime="2016-06-05T00:00:00-04:00">05 Jun 2016</time></small>
+          </a>
+        </h3>
+      </li>
     
       <li>
         <h3>
@@ -122,15 +131,6 @@
         </h3>
       </li>
     
-      <li>
-        <h3>
-          <a href="/2016/03/01/applying-machine-learning-to-security-problems/">
-            Applying Machine Learning to Security Problems
-            <small><time datetime="2016-03-01T00:00:00-05:00">01 Mar 2016</time></small>
-          </a>
-        </h3>
-      </li>
-    
   </ul>
 </aside> -->
 
@@ -138,7 +138,7 @@
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-05-11T23:33:23-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-06-05T21:44:25-04:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>
