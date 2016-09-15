@@ -5,7 +5,7 @@ comments: true
 ---
 
 
-*For those who weren't able to attend [RustConf 2016](http://rustconf.com/), I thought I'd summarize my and /u/staticassert's talk in written form. I've only focused on a subset of talking points below; for the full talk, check out the upcoming video when it's posted.*
+*For those who weren't able to attend [RustConf 2016](http://rustconf.com/), I thought I'd provide a synopsis of my and /u/staticassert's talk. I've only focused on a subset of talking points below; for the full talk, check out the upcoming video when it's posted.*
 
 ## Technical Debt in Data Science
 
