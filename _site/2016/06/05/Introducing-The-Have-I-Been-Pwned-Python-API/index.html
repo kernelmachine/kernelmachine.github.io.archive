@@ -76,7 +76,7 @@
 
 <p>Each service request object contains a response attribute that holds the raw data in JSON format. To perform a query, just setup a service request object, and then execute it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">hibp</span> <span class="kn">import</span> <span class="n">HIBP</span>
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">hibp</span> <span class="kn">import</span> <span class="n">HIBP</span>
 <span class="o">&gt;&gt;</span> <span class="n">req</span> <span class="o">=</span> <span class="n">HIBP</span><span class="o">.</span><span class="n">get_account_breaches</span><span class="p">(</span><span class="s">"pegasos1"</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">req</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 <span class="o">&gt;&gt;</span> <span class="n">req</span><span class="o">.</span><span class="n">response</span>
@@ -87,7 +87,7 @@
 
 <p>Here’s some example data we get back when we query for data breaches on <code class="highlighter-rouge">adobe.com</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="kn">import</span> <span class="nn">json</span>
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="kn">import</span> <span class="nn">json</span>
 <span class="o">&gt;&gt;</span> <span class="n">req</span> <span class="o">=</span> <span class="n">HIBP</span><span class="o">.</span><span class="n">get_domain_breaches</span><span class="p">(</span><span class="s">"adobe.com"</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">req</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 <span class="o">&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">response</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
@@ -118,7 +118,7 @@
 
 <p>If you want to query on multiple accounts or domains at once, you can use the <code class="highlighter-rouge">AsyncHIBP</code> object, which can perform queries concurrently via <a href="http://www.gevent.org/">gevent</a>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">hibp</span> <span class="kn">import</span> <span class="n">AsyncHIBP</span>
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">hibp</span> <span class="kn">import</span> <span class="n">AsyncHIBP</span>
 <span class="o">&gt;&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'adobe'</span><span class="p">,</span><span class="s">'ashleymadison'</span><span class="p">,</span> <span class="s">'myspace'</span><span class="p">]</span>
 <span class="o">&gt;&gt;</span> <span class="n">breaches</span> <span class="o">=</span> <span class="p">[</span><span class="n">HIBP</span><span class="o">.</span><span class="n">get_breach</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
 <span class="o">&gt;&gt;</span> <span class="n">async_reqs</span> <span class="o">=</span> <span class="n">AsyncHIBP</span><span class="p">()</span><span class="o">.</span><span class="nb">map</span><span class="p">(</span><span class="n">breaches</span><span class="p">)</span>
@@ -128,7 +128,7 @@
 
 <p>You can also perform lazy evaluations on multiple accounts or domains with the <code class="highlighter-rouge">imap</code> method. This will return a generator on request objects, which could be more memory efficient if you’re working with a larger list of queries.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">domains</span> <span class="o">=</span> <span class="p">[</span><span class="s">'twitter.com'</span><span class="p">,</span><span class="s">'facebook.com'</span><span class="p">,</span> <span class="s">'myspace.com'</span><span class="p">]</span>
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="o">&gt;&gt;</span> <span class="n">domains</span> <span class="o">=</span> <span class="p">[</span><span class="s">'twitter.com'</span><span class="p">,</span><span class="s">'facebook.com'</span><span class="p">,</span> <span class="s">'myspace.com'</span><span class="p">]</span>
 <span class="o">&gt;&gt;</span> <span class="n">breaches</span> <span class="o">=</span> <span class="p">[</span><span class="n">HIBP</span><span class="o">.</span><span class="n">get_domain_breaches</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">domains</span><span class="p">]</span>
 <span class="o">&gt;&gt;</span> <span class="n">async_reqs</span> <span class="o">=</span> <span class="n">AsyncHIBP</span><span class="p">()</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">breaches</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">async_reqs</span><span class="p">:</span>
@@ -138,7 +138,7 @@
 
 <p>Concurrent queries are much faster than serial ones:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c"># random set of query parameters</span>
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># random set of query parameters</span>
 <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'adobe'</span><span class="p">,</span><span class="s">'ashleymadison'</span><span class="p">,</span> <span class="s">'linkedin'</span><span class="p">,</span> <span class="s">'myspace'</span><span class="p">]</span><span class="o">*</span><span class="mi">20</span>
 <span class="n">accounts</span> <span class="o">=</span> <span class="p">[</span><span class="s">"ssgrn"</span><span class="p">,</span> <span class="s">"pegasos1"</span><span class="p">,</span><span class="s">"barackobama"</span><span class="p">]</span><span class="o">*</span><span class="mi">20</span>
 <span class="n">domains</span> <span class="o">=</span> <span class="p">[</span><span class="s">'twitter.com'</span><span class="p">,</span> <span class="s">'facebook.com'</span><span class="p">,</span><span class="s">'github.com'</span><span class="p">,</span><span class="s">'adobe.com'</span><span class="p">]</span><span class="o">*</span><span class="mi">20</span>
@@ -182,9 +182,9 @@
     
       <li>
         <h3>
-          <a href="/2016/09/11/The-PlayRust-Classifier/">
-            RustConf Reflections
-            <small><time datetime="2016-09-11T00:00:00-07:00">11 Sep 2016</time></small>
+          <a href="/2016/09/13/The-PlayRust-Classifier/">
+            The PlayRust Classifier
+            <small><time datetime="2016-09-13T00:00:00-07:00">13 Sep 2016</time></small>
           </a>
         </h3>
       </li>
@@ -214,7 +214,7 @@
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-09-11T15:14:41-07:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2016-09-14T23:13:05-07:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>

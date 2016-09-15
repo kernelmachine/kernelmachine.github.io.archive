@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="https://suchin.co/atom.xml" rel="self"/>
  <link href="https://suchin.co/"/>
- <updated>2016-09-11T15:14:41-07:00</updated>
+ <updated>2016-09-14T23:13:05-07:00</updated>
  <id>https://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -13,48 +13,230 @@
 
  
  <entry>
-   <title>RustConf Reflections</title>
-   <link href="https://suchin.co/2016/09/11/The-PlayRust-Classifier/"/>
-   <updated>2016-09-11T00:00:00-07:00</updated>
-   <id>https://suchin.co/2016/09/11/The-PlayRust-Classifier</id>
-   <content type="html">&lt;p&gt;It’s been a while since my last post – a product of an insane summer. I got a new job, moved across the country, and gave a talk at RustConf yesterday, which required a lot of preparation. To inaugurate things (hopefully) settling down for the next few months, I wanted to start blogging again! Here’s a little essay around my experience at RustConf, as well as a little dive into the talk that &lt;em&gt;staticassert&lt;/em&gt; and I gave around Rust machine learning.&lt;/p&gt;
+   <title>The PlayRust Classifier</title>
+   <link href="https://suchin.co/2016/09/13/The-PlayRust-Classifier/"/>
+   <updated>2016-09-13T00:00:00-07:00</updated>
+   <id>https://suchin.co/2016/09/13/The-PlayRust-Classifier</id>
+   <content type="html">&lt;p&gt;&lt;em&gt;For those who weren’t able to attend &lt;a href=&quot;http://rustconf.com/&quot;&gt;RustConf 2016&lt;/a&gt;, I thought I’d summarize my and /u/staticassert’s talk in written form. I’ve only focused on the most important points below; for the full talk, check out the upcoming video when it’s posted.&lt;/em&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;data-science-technical-debt&quot;&gt;Data Science Technical Debt&lt;/h3&gt;
+&lt;h2 id=&quot;technical-debt-in-data-science&quot;&gt;Technical Debt in Data Science&lt;/h2&gt;
 
-&lt;p&gt;When Colin and I worked at Rapid7 together,  that (in a nutshell) tried&lt;/p&gt;
+&lt;p&gt;Our RustConf talk, entitled &lt;em&gt;&lt;a href=&quot;https://slides.com/suchingururangan/playrustclassifier&quot;&gt;The PlayRust Classifier&lt;/a&gt;&lt;/em&gt;, was essentially about how to reduce technical debt. It’s something that most software engineers experience regularly – the lack of documentation, unhandled errors, costly scaling, etc. However, technical debt in  machine learning compounds quickly due to unique challenges in the space.&lt;/p&gt;
 
-&lt;p&gt;Our talk at RustConf dealt with technical debt that we’ve experienced as developers in data science. A crucial motivator for us was a paper from Google that came out in 2014 called &lt;strong&gt;Machine Learning: The High Interest Credit Card of Technical Debt&lt;/strong&gt;, which describes the unique difficulties of creating production-level machine learning systems that tend to get neglected under the hype of AI.&lt;/p&gt;
+&lt;p&gt;Most data science teams face the basic problem of moving between research and production-level machine learning. These two types of data science have very different motivations and goals. Research data science is usually one-off and includes a lot of proof-of-concept work, while production-level machine learning may run in the cloud or on a low-memory device, and has the same engineering constraints as any other software product. Most technical debt is accrued in the transition between these phases, especially during feature engineering.&lt;/p&gt;
 
-&lt;p&gt;People tend to believe that machine learning &lt;em&gt;models&lt;/em&gt; are the real bottleneck to reliable AI. And this may be true in domains like vision and natural language, in which data is abundant and relatively clean. However, applications of data science in virtually any other domain requires significant data wrangling, which is best summarized by the following:&lt;/p&gt;
+&lt;div style=&quot;margin-left:175px&quot;&gt;
+  &lt;img src=&quot;http://pegasos1.github.io/public/20160913/datapic.jpg&quot; width=&quot;400&quot; height=&quot;400&quot; /&gt;
+&lt;/div&gt;
 
-&lt;p&gt;Data almost always sucks in &lt;em&gt;some&lt;/em&gt; way. It’s either biased, missing, dirty, unexpected, short-lived – I could go on forever. This means that 99% of a data scientists time is spent doing &lt;em&gt;feature engineering&lt;/em&gt; rather than actual machine learning.&lt;/p&gt;
+&lt;p&gt;The unfortunate reality is that data often sucks in most applicable domains of machine learning.   This means that data scientists spent 99% of their time doing feature engineering – munging through data, building and cleaning features – and only a minority of their time working with machine learning algorithms.&lt;/p&gt;
 
-&lt;p&gt;Furthermore, movement from research to production involves an incredible amount of technical debt:&lt;/p&gt;
+&lt;p&gt;Tech debt during feature engineering comes in many flavors, as outlined by &lt;em&gt;&lt;a href=&quot;http://research.google.com/pubs/pub43146.html&quot;&gt;Machine Learning: The High Interest Credit Card of Technical Debt (2014)&lt;/a&gt;&lt;/em&gt;, a crucial motivator of our talk:&lt;/p&gt;
 
-&lt;p&gt;1) &lt;em&gt;Siloed teams&lt;/em&gt;
-2) &lt;em&gt;Pipeline Jungles&lt;/em&gt;
-3) &lt;em&gt;Unscalable Experiments&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;1) &lt;strong&gt;Siloed Teams&lt;/strong&gt;: Data scientists and software engineers are usually considered distinct teams. This means that POC research code may not be held up to common engineering standards, and that handoff to production may involve a lot of reimplementation. Furthermore, siloed teams can make ML models more esoteric to those who are tasked with making them production-ready.&lt;/p&gt;
 
-&lt;p&gt;This is on top of &lt;em&gt;all the other technical debt&lt;/em&gt; that any engineer is used to. Undocumented code, Invisible Errors, etc.&lt;/p&gt;
+&lt;p&gt;2) &lt;strong&gt;Pipeline Jungles&lt;/strong&gt;: Complex transformations of data to get it into an ML-friendly format means that the related code can be extremely hard to reason about, and thus difficult to move into production. Extraneous, messy supporting code can leak into your codebase, especially in dynamic languages that give you more freedom over the way you represent and manipulate data. Pipeline jungles can prevent errors from bubbling up, making it very difficult to trace where things are breaking.&lt;/p&gt;
 
-&lt;p&gt;There are many other sources of technical debt that we don’t outline in the talk. This includes:&lt;/p&gt;
+&lt;p&gt;3) &lt;strong&gt;Unscalable Experiments&lt;/strong&gt;: Code handed off to engineers may be not only monolithic and hard to reason about, but also difficult to scale. Writing code that is difficult to parallelize may lead to costly horizontal scaling in the cloud.&lt;/p&gt;
 
-&lt;p&gt;1) &lt;em&gt;Glue code&lt;/em&gt;
-2) &lt;em&gt;BLAH&lt;/em&gt;
-3) &lt;em&gt;BLAH&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The long story short is that machine learning services are not only dependent on the quality of machine learning models, but also the quality of feature engineering and data ingestion. This realization prompted us to look for tools that would help us become more confident that feature engineering pipelines are reliable and robust in a very non-deterministic domain.&lt;/p&gt;
 
-&lt;p&gt;In general an ML system might contain only a &lt;em&gt;minority&lt;/em&gt; amount of machine learning code, majority amount data wrangling.&lt;/p&gt;
+&lt;h2 id=&quot;the-rplayrust-classifier&quot;&gt;The /r/playrust classifier&lt;/h2&gt;
 
-&lt;p&gt;Long story short - building scalable machine learning systems from POC research is extremely difficult. ML services are not only dependent on the quality of models,  but also the quality of &lt;em&gt;feature engineering&lt;/em&gt; and &lt;em&gt;data ingestion&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;How can Rust help us pay off technical debt in machine learning during the feature engineering stage? To explore the strengths of Rust in this area, my co-speaker and I built a classifier to solve a well-known problem for the Rust reddit community.&lt;/p&gt;
 
-&lt;h3 id=&quot;the-playrust-classifier&quot;&gt;The PlayRust Classifier&lt;/h3&gt;
+&lt;p&gt;From time to time, someone mistakenly publishes a post in the &lt;em&gt;&lt;a href=&quot;http://reddit.com/r/rust&quot;&gt;/r/rust&lt;/a&gt;&lt;/em&gt; subreddit that was intended for the &lt;em&gt;&lt;a href=&quot;http://reddit.com/r/playrust&quot;&gt;/r/playrust&lt;/a&gt;&lt;/em&gt; subreddit, a community for a popular video game &lt;em&gt;Rust&lt;/em&gt;. We built a classifier to detect these mistakenly published posts.&lt;/p&gt;
 
-&lt;h3 id=&quot;rustconf-reflections&quot;&gt;RustConf Reflections&lt;/h3&gt;
+&lt;div style=&quot;text-align:center&quot;&gt;
+  &lt;img src=&quot;http://pegasos1.github.io/public/20160913/playrust.png&quot; width=&quot;780&quot; height=&quot;400&quot; /&gt;
+&lt;/div&gt;
 
-&lt;p&gt;The first annual RustConf was an incredible experience. It’s exciting to be a part of a community that values inclusiveness and empowerment above most everything else. It’s also humbling to be surround by brilliant people who are as interested in teaching others as they are pushing the bounds of programming.&lt;/p&gt;
+&lt;p&gt;This toy problem was an optimal medium to explore Rust data science, because we were gifted with naturally labeled training data: posts collected from both subreddits. This let us focus on the implementation details.&lt;/p&gt;
 
-&lt;p&gt;Colin (&lt;em&gt;staticassert&lt;/em&gt;) and my talk was around
-Rust in 2017 looks like it’s going to be really exciting, as Niko and Aaron mentioned in their keynote. Really glad to have met so many cool people! Keep in touch :)&lt;/p&gt;
+&lt;h3 id=&quot;the-model&quot;&gt;The Model&lt;/h3&gt;
+
+&lt;p&gt;Before digging into Rust-specific features of the pipeline we built, let’s look at the model and its accuracy.&lt;/p&gt;
+
+&lt;p&gt;We gathered thousands of reddit posts and looked at a number of features to describe their respective subreddits:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Author popularity&lt;/li&gt;
+  &lt;li&gt;Upvotes&lt;/li&gt;
+  &lt;li&gt;Downvotes&lt;/li&gt;
+  &lt;li&gt;Post length&lt;/li&gt;
+  &lt;li&gt;Word frequency&lt;/li&gt;
+  &lt;li&gt;Symbol frequency&lt;/li&gt;
+  &lt;li&gt;Regex matches on Rust code&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We then trained a Random Forest with the crate &lt;em&gt;rustlearn&lt;/em&gt; to perform the predictions.&lt;/p&gt;
+
+&lt;h3 id=&quot;results&quot;&gt;Results&lt;/h3&gt;
+
+&lt;p&gt;We achieved good accuracy in our model. The model had a &amp;gt;98% AUC in prediction, as seen below.&lt;/p&gt;
+
+&lt;div style=&quot;margin-left:100px&quot;&gt;
+  &lt;img src=&quot;http://pegasos1.github.io/public/20160913/roccurve.png&quot; width=&quot;550&quot; height=&quot;400&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The model was primarily driven by the frequencies of words related to the &lt;em&gt;/r/rust&lt;/em&gt; subreddit.&lt;/p&gt;
+
+&lt;div style=&quot;margin-left:100px&quot;&gt;
+  &lt;img src=&quot;http://pegasos1.github.io/public/20160913/featimps.png&quot; width=&quot;580&quot; height=&quot;400&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Some example outputs are below. Notice the third post, with the slightly confusing title, is also slightly confusing to the model.&lt;/p&gt;
+
+&lt;div style=&quot;margin-left:50px&quot;&gt;
+  &lt;img src=&quot;http://pegasos1.github.io/public/20160913/examples.png&quot; width=&quot;700&quot; height=&quot;400&quot; /&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;rust-advantages&quot;&gt;Rust advantages&lt;/h2&gt;
+
+&lt;p&gt;So what was our experience using Rust to build this model end-to-end? Did Rust showcase strengths in reducing technical debt?&lt;/p&gt;
+
+&lt;h3 id=&quot;upfront-error-handling&quot;&gt;Upfront error handling&lt;/h3&gt;
+
+&lt;p&gt;A powerful aspect of the Rust language is the idea that developers must handle potential errors up front.&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_reddit_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RawPostData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.client&lt;/span&gt;
+                     &lt;span class=&quot;nf&quot;&gt;.get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                     &lt;span class=&quot;nf&quot;&gt;.send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+                     &lt;span class=&quot;nf&quot;&gt;.unwrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+   &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;extract_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                  &lt;span class=&quot;nf&quot;&gt;.unwrap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In the above code, we send a &lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt; request to a url, and extract data from it. You can see that you &lt;em&gt;must&lt;/em&gt; handle the potential errors that could surface from each of these operations. For example, the network could go down, or data extraction may fail for some reason. We easily handle potential errors with an &lt;em&gt;unwrap()&lt;/em&gt; method, in which we assert that we are sure that this method won’t fail on us. This may be something you see in POC research code. We don’t really need anything fancy here.&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_reddit_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Result&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RawPostData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+     &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;try!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.client&lt;/span&gt;
+                            &lt;span class=&quot;nf&quot;&gt;.get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                            &lt;span class=&quot;nf&quot;&gt;.send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+                            &lt;span class=&quot;nf&quot;&gt;.chain_err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(||&lt;/span&gt;
+                                &lt;span class=&quot;nd&quot;&gt;format!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Failed to GET {}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)));&lt;/span&gt;
+
+
+     &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;try!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;extract_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                    &lt;span class=&quot;nf&quot;&gt;.chain_err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(||&lt;/span&gt;
+                          &lt;span class=&quot;nd&quot;&gt;format!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Failed to parse data {}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)));&lt;/span&gt;
+     &lt;span class=&quot;nf&quot;&gt;Ok&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;But in production, we definitely want to handle any potential errors in some meaningful way. We can do this with the &lt;code class=&quot;highlighter-rouge&quot;&gt;try!&lt;/code&gt; macro.&lt;/p&gt;
+
+&lt;p&gt;This approach to handling errors is different from the unchecked exceptions paradigm in languages like Python or Java. Unlike try/except, &lt;code class=&quot;highlighter-rouge&quot;&gt;try!&lt;/code&gt; is precise. In the former paradigm, you tend to wrap larger codeblocks with try/except, when in reality only parts of the code may fail.&lt;/p&gt;
+
+&lt;p&gt;Furthermore, potential errors are  baked into the output type of the function with the &lt;code class=&quot;highlighter-rouge&quot;&gt;Result&lt;/code&gt; type. This means that the caller knows &lt;em&gt;without knowledge of function implementation&lt;/em&gt; that the function may return an error. On the developer’s side, it’s easy to move from research code to production, just &lt;code class=&quot;highlighter-rouge&quot;&gt;Ctrl+F&lt;/code&gt; the &lt;code class=&quot;highlighter-rouge&quot;&gt;unwraps&lt;/code&gt;, and handle them with &lt;code class=&quot;highlighter-rouge&quot;&gt;try!&lt;/code&gt; macros.&lt;/p&gt;
+
+&lt;h3 id=&quot;typed-approach-to-dataframes&quot;&gt;Typed approach to Dataframes&lt;/h3&gt;
+
+&lt;p&gt;Dataframes are a tabular data format for many languages like Python, R, and Julia. Dataframes are ergonomic, but can lead to technical debt, by allowing things like mixed types per column. This could lead to bugs in which unexpected values crop up where they’re not supposed to – a big headache to trace in large datasets.&lt;/p&gt;
+
+&lt;p&gt;In static languages like Rust, we do care about types associated with our data. For the &lt;em&gt;/r/playrust&lt;/em&gt; classifier, we stored raw data collected about the subreddits in a struct called &lt;code class=&quot;highlighter-rouge&quot;&gt;RawPostData&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RawPostData&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;is_self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;author_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;downvotes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;u64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;upvotes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;u64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;u64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;edited&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;selftext&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;subreddit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;And extracted features were stored in a struct called &lt;code class=&quot;highlighter-rouge&quot;&gt;ProcessedPostFeatures&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ProcessedPostFeatures&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;is_self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;author_popularity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;downs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;ups&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;post_len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;word_freq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;f32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;symbol_freq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;f32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;regex_matches&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;f32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RawPostData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_raw_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.iter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;nf&quot;&gt;.map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.author&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;nf&quot;&gt;.map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;author&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;calculate_author_value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;author&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;nf&quot;&gt;.collect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Each field of the struct was equivalent to a dataframe column, and each index of the field was equivalent to a dataframe row. This typed approach gave us confidence that we did not populate unexpected values in our dataframe for a particular column. We could apply transformations in our data in the normal way we map over iterators.&lt;/p&gt;
+
+&lt;h3 id=&quot;parallelization&quot;&gt;Parallelization&lt;/h3&gt;
+
+&lt;p&gt;Furthermore, this structure to dataframes allowed us to easily parallelize operations with crates like &lt;em&gt;rayon&lt;/em&gt;. We just change &lt;code class=&quot;highlighter-rouge&quot;&gt;iter&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;par_iter&lt;/code&gt; in the code above, and we’re golden.&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;extern&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;crate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rayon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;rayon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nn&quot;&gt;prelude&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RawPostFeatures&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_raw_features&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;processed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;with_capacity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.par_iter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;nf&quot;&gt;.map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.author&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;nf&quot;&gt;.map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(|&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;author&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;calculate_author_value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;author&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;nf&quot;&gt;.collect_into&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;processed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;predictable-performance-during-scaling&quot;&gt;Predictable performance during scaling&lt;/h3&gt;
+
+&lt;p&gt;We did some comparative benchmarks on the &lt;em&gt;LabelEncoding&lt;/em&gt; procedure, a very common operation in data science, in which we convert vector of strings to a vector of integer values that the model can understand. In these benchmarks, we compared an out-of-the-box Python implementation of the algorithm from scikit-learn to a custom one we built in Rust.&lt;/p&gt;
+
+&lt;p&gt;Our Rust implementation was able to encode 100,000 strings 7x faster than the Python one. More surprising was the benchmark of encoding 1,000,000 strings. In this case, the Rust version was &lt;em&gt;2500x faster&lt;/em&gt; than the corresponding Python implementation! The predictability of our Rust code was incredibly useful in scaling our pipeline, as we were sure that we would be able to process larger datasets without unexpected overhead.&lt;/p&gt;
+
+&lt;h3 id=&quot;other-advantages&quot;&gt;Other advantages&lt;/h3&gt;
+
+&lt;p&gt;There are other very useful aspects of Rust for the data science pipeline:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Cargo testing, benchmarking, and documentation help dev follow good practices&lt;/li&gt;
+  &lt;li&gt;Major refactoring is really easy&lt;/li&gt;
+  &lt;li&gt;Trait composition/generics limit the need for messy glue code&lt;/li&gt;
+  &lt;li&gt;Many benchmarks (like those on this blog) support that Rust has strong performance in numerics&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;rust-disadvantages&quot;&gt;Rust disadvantages&lt;/h2&gt;
+
+&lt;p&gt;While using Rust was generally a pleasant experience for this project, there were some areas in which Rust fell short.&lt;/p&gt;
+
+&lt;h3 id=&quot;fragmented-ml-ecosystem&quot;&gt;Fragmented ML ecosystem&lt;/h3&gt;
+
+&lt;p&gt;The reality is that the current machine learning community is sparse. We found that while there are 60+ crates on crates.io associated with machine learning or linear algebra, many of these libraries provide similar functionality with different APIs. For example, most machine learning tools have custom matrix implementations. This limits the interoperability of crates that makes a language like Python, which builds most of its numeric libraries around the numpy array, very attractive for data science.&lt;/p&gt;
+
+&lt;h3 id=&quot;data-exploration-difficult-in-a-static-language&quot;&gt;Data exploration difficult in a static language&lt;/h3&gt;
+
+&lt;p&gt;Dynamic languages like Python and R dominate data investigation, and with good reason. A REPL/interpreter lends itself very well to exploration, because you have instant feedback to tweaks in your code – you don’t need to re-compile to see effects. Furthermore, during the data investigation stage, performance is not that important, so we can get away with ignoring language level details that may slow us down while exploring. Last, Python and R are laden with libraries around graphing and visualization, which is totally non-existent in Rust. Most mature machine learning systems are hybrids of languages and tools specialized for specific tasks, and we envision Python and R still dominating this space.&lt;/p&gt;
+
+&lt;h2 id=&quot;vision-for-rust-ml&quot;&gt;Vision for Rust ML&lt;/h2&gt;
+
+&lt;p&gt;We have shown that Rust language features help reduce many technical debt issues that arise in making production level data science systems. We hope that Rust is promoted to improve feature engineering systems. We also hope that implementations of data science tooling become standardized to facilitate interoperability. Finally, we believe that effective domain applications of a language are primarily driven by the community that forms around it. We should start sharing ideas and building a collective metric for success in Rust machine learning and numerics!&lt;/p&gt;
 </content>
  </entry>
  
@@ -79,7 +261,7 @@ Rust in 2017 looks like it’s going to be really exciting, as Niko and Aaron me
 
 &lt;p&gt;Each service request object contains a response attribute that holds the raw data in JSON format. To perform a query, just setup a service request object, and then execute it:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;hibp&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HIBP&lt;/span&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;hibp&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HIBP&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;req&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HIBP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_account_breaches&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;pegasos1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;
@@ -90,7 +272,7 @@ Rust in 2017 looks like it’s going to be really exciting, as Niko and Aaron me
 
 &lt;p&gt;Here’s some example data we get back when we query for data breaches on &lt;code class=&quot;highlighter-rouge&quot;&gt;adobe.com&lt;/code&gt;:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;json&lt;/span&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;json&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;req&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HIBP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_domain_breaches&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;adobe.com&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dumps&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;indent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sort_keys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
@@ -121,8 +303,8 @@ Rust in 2017 looks like it’s going to be really exciting, as Niko and Aaron me
 
 &lt;p&gt;If you want to query on multiple accounts or domains at once, you can use the &lt;code class=&quot;highlighter-rouge&quot;&gt;AsyncHIBP&lt;/code&gt; object, which can perform queries concurrently via &lt;a href=&quot;http://www.gevent.org/&quot;&gt;gevent&lt;/a&gt;.&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;hibp&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AsyncHIBP&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;names&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;adobe&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;ashleymadison&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;myspace&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;hibp&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AsyncHIBP&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;names&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'adobe'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ashleymadison'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'myspace'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;breaches&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HIBP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_breach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;async_reqs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AsyncHIBP&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;breaches&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;async_req&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;async_req&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;async_reqs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
@@ -131,7 +313,7 @@ Rust in 2017 looks like it’s going to be really exciting, as Niko and Aaron me
 
 &lt;p&gt;You can also perform lazy evaluations on multiple accounts or domains with the &lt;code class=&quot;highlighter-rouge&quot;&gt;imap&lt;/code&gt; method. This will return a generator on request objects, which could be more memory efficient if you’re working with a larger list of queries.&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;domains&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;twitter.com&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;facebook.com&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;myspace.com&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;domains&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'twitter.com'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'facebook.com'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'myspace.com'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;breaches&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HIBP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_domain_breaches&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;domains&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;async_reqs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AsyncHIBP&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;imap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;breaches&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;req&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;async_reqs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
@@ -141,10 +323,10 @@ Rust in 2017 looks like it’s going to be really exciting, as Niko and Aaron me
 
 &lt;p&gt;Concurrent queries are much faster than serial ones:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# random set of query parameters&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;names&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;adobe&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;ashleymadison&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;linkedin&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;myspace&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# random set of query parameters&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;names&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'adobe'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ashleymadison'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'linkedin'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'myspace'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;accounts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ssgrn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;pegasos1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;barackobama&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;domains&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;twitter.com&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;facebook.com&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;github.com&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;adobe.com&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;domains&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'twitter.com'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'facebook.com'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'github.com'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'adobe.com'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# setup HIBP objects for request executions&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;reqs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HIBP&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_breach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; \
@@ -252,9 +434,9 @@ Rust in 2017 looks like it’s going to be really exciting, as Niko and Aaron me
 
 &lt;p&gt;We’ll use the following type aliases:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub type VectorView&amp;lt;&#39;a, A&amp;gt; = ArrayView&amp;lt;&#39;a, A, Ix&amp;gt;;
-pub type MatView&amp;lt;&#39;a, A&amp;gt; = ArrayView&amp;lt;&#39;a, A, (Ix, Ix)&amp;gt;;
-pub type MatViewMut&amp;lt;&#39;a, A&amp;gt; = ArrayViewMut&amp;lt;&#39;a, A, (Ix, Ix)&amp;gt;;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub type VectorView&amp;lt;'a, A&amp;gt; = ArrayView&amp;lt;'a, A, Ix&amp;gt;;
+pub type MatView&amp;lt;'a, A&amp;gt; = ArrayView&amp;lt;'a, A, (Ix, Ix)&amp;gt;;
+pub type MatViewMut&amp;lt;'a, A&amp;gt; = ArrayViewMut&amp;lt;'a, A, (Ix, Ix)&amp;gt;;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
@@ -396,7 +578,7 @@ test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
 
 &lt;p&gt;Because ndarray matrices implement &lt;code class=&quot;highlighter-rouge&quot;&gt;Iterator&lt;/code&gt;, we can use array methods to achieve safety without sacrificing speed. And we get simplicity for free.&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;test &lt;/span&gt;bench_dot_safe            ... bench:     346,677 ns/iter &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;+/- 13,246&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;test &lt;/span&gt;bench_dot_safe            ... bench:     346,677 ns/iter &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;+/- 13,246&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
 
 &lt;span class=&quot;nb&quot;&gt;test &lt;/span&gt;bench_dot_openblas        ... bench:   201,170 ns/iter &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;+/- 18,666&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
