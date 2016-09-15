@@ -67,7 +67,7 @@ We achieved good accuracy in our model. The model had a >98% AUC in prediction, 
   <img src="http://pegasos1.github.io/public/20160913/roccurve.png" width="550" height="400">
 </div>
 
-The model was primarily driven by the frequencies of words related to the */r/rust* subreddit.
+The model was primarily driven by the frequencies of words related to the */r/rust* subreddit. Notice the word "amp", ie "&". Haha.
 
 <div style="margin-left:100px">
   <img src="http://pegasos1.github.io/public/20160913/featimps.png" width="580" height="400">
