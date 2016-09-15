@@ -194,6 +194,7 @@ fn main() {
         .collect_into(&mut processed)
 }
 ```
+
 ### Predictable performance during scaling
 
 We did some comparative benchmarks on the *LabelEncoding* procedure, a very common operation in data science, in which we convert vector of strings to a vector of integer values that the model can understand. In these benchmarks, we compared an out-of-the-box Python implementation of the algorithm from scikit-learn to a custom one we built in Rust.
