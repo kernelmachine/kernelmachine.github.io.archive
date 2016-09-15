@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>
+    
+      The PlayRust Classifier &middot; suchin
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/styles.css">
+  <!-- <link rel="stylesheet" href="/googlecode.css"> -->
+
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/public/square-outline.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/atom+xml" title="suchin" href="/atom.xml">
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-75615851-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+</head>
+
+
+  <body>
+
+    <div class="container content">
+      <header class="masthead">
+        <h3 class="masthead-title">
+          <a href="/" title="Home" style="text-decoration: none;">suchin</a>
+          <small><a href="/" style="text-decoration: none; color: #C0C0C0">writings</a></small>
+          <div class="links">
+          <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
+          <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
+          <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
+          <a  href="http://twitter.com/ssgrn" > <img style="display: inline; margin-left: 15px;" src="https://upload.wikimedia.org/wikipedia/de/thumb/9/9f/Twitter_bird_logo_2012.svg/1000px-Twitter_bird_logo_2012.svg.png"   height="50px" width="50px"></img></a>
+        </div>
+        </h3>
+      </header>
+
+      <main>
+        <article class="post">
+  <h1 class="post-title">The PlayRust Classifier</h1>
+  <time datetime="2016-09-13T00:00:00-07:00" class="post-date">13 Sep 2016</time>
+  <p><em>For those who weren’t able to attend <a href="http://rustconf.com/">RustConf 2016</a>, I thought I’d summarize my and /u/staticassert’s talk in written form. I’ve only focused on the most important points below; for the full talk, check out the upcoming video when it’s posted.</em></p>
+
+<h2 id="technical-debt-in-data-science">Technical Debt in Data Science</h2>
+
+<p>Our RustConf talk, entitled <em><a href="https://slides.com/suchingururangan/playrustclassifier">The PlayRust Classifier</a></em>, was essentially about how to reduce technical debt. It’s something that most software engineers experience regularly – the lack of documentation, unhandled errors, costly scaling, etc. However, technical debt in  machine learning compounds quickly due to unique challenges in the space.</p>
+
+<p>Most data science teams face the basic problem of moving between research and production-level machine learning. These two types of data science have very different motivations and goals. Research data science is usually one-off and includes a lot of proof-of-concept work, while production-level machine learning may run in the cloud or on a low-memory device, and has the same engineering constraints as any other software product. Most technical debt is accrued in the transition between these phases, especially during feature engineering.</p>
+
+<div style="margin-left:175px">
+  <img src="http://pegasos1.github.io/public/20160913/datapic.jpg" width="400" height="400" />
+</div>
+
+<p>The unfortunate reality is that data often sucks in most applicable domains of machine learning.   This means that data scientists spent 99% of their time doing feature engineering – munging through data, building and cleaning features – and only a minority of their time working with machine learning algorithms.</p>
+
+<p>Tech debt during feature engineering comes in many flavors, as outlined by <em><a href="http://research.google.com/pubs/pub43146.html">Machine Learning: The High Interest Credit Card of Technical Debt (2014)</a></em>, a crucial motivator of our talk:</p>
+
+<p>1) <strong>Siloed Teams</strong>: Data scientists and software engineers are usually considered distinct teams. This means that POC research code may not be held up to common engineering standards, and that handoff to production may involve a lot of reimplementation. Furthermore, siloed teams can make ML models more esoteric to those who are tasked with making them production-ready.</p>
+
+<p>2) <strong>Pipeline Jungles</strong>: Complex transformations of data to get it into an ML-friendly format means that the related code can be extremely hard to reason about, and thus difficult to move into production. Extraneous, messy supporting code can leak into your codebase, especially in dynamic languages that give you more freedom over the way you represent and manipulate data. Pipeline jungles can prevent errors from bubbling up, making it very difficult to trace where things are breaking.</p>
+
+<p>3) <strong>Unscalable Experiments</strong>: Code handed off to engineers may be not only monolithic and hard to reason about, but also difficult to scale. Writing code that is difficult to parallelize may lead to costly horizontal scaling in the cloud.</p>
+
+<p>The long story short is that machine learning services are not only dependent on the quality of machine learning models, but also the quality of feature engineering and data ingestion. This realization prompted us to look for tools that would help us become more confident that feature engineering pipelines are reliable and robust in a very non-deterministic domain.</p>
+
+<h2 id="the-rplayrust-classifier">The /r/playrust classifier</h2>
+
+<p>How can Rust help us pay off technical debt in machine learning during the feature engineering stage? To explore the strengths of Rust in this area, my co-speaker and I built a classifier to solve a well-known problem for the Rust reddit community.</p>
+
+<p>From time to time, someone mistakenly publishes a post in the <em><a href="http://reddit.com/r/rust">/r/rust</a></em> subreddit that was intended for the <em><a href="http://reddit.com/r/playrust">/r/playrust</a></em> subreddit, a community for a popular video game <em>Rust</em>. We built a classifier to detect these mistakenly published posts.</p>
+
+<div style="text-align:center">
+  <img src="http://pegasos1.github.io/public/20160913/playrust.png" width="780" height="400" />
+</div>
+
+<p>This toy problem was an optimal medium to explore Rust data science, because we were gifted with naturally labeled training data: posts collected from both subreddits. This let us focus on the implementation details.</p>
+
+<h3 id="the-model">The Model</h3>
+
+<p>Before digging into Rust-specific features of the pipeline we built, let’s look at the model and its accuracy.</p>
+
+<p>We gathered thousands of reddit posts and looked at a number of features to describe their respective subreddits:</p>
+
+<ul>
+  <li>Author popularity</li>
+  <li>Upvotes</li>
+  <li>Downvotes</li>
+  <li>Post length</li>
+  <li>Word frequency</li>
+  <li>Symbol frequency</li>
+  <li>Regex matches on Rust code</li>
+</ul>
+
+<p>We then trained a Random Forest with the crate <em>rustlearn</em> to perform the predictions.</p>
+
+<h3 id="results">Results</h3>
+
+<p>We achieved good accuracy in our model. The model had a &gt;98% AUC in prediction, as seen below.</p>
+
+<div style="margin-left:100px">
+  <img src="http://pegasos1.github.io/public/20160913/roccurve.png" width="550" height="400" />
+</div>
+
+<p>The model was primarily driven by the frequencies of words related to the <em>/r/rust</em> subreddit.</p>
+
+<div style="margin-left:100px">
+  <img src="http://pegasos1.github.io/public/20160913/featimps.png" width="580" height="400" />
+</div>
+
+<p>Some example outputs are below. Notice the third post, with the slightly confusing title, is also slightly confusing to the model.</p>
+
+<div style="margin-left:50px">
+  <img src="http://pegasos1.github.io/public/20160913/examples.png" width="700" height="400" />
+</div>
+
+<h2 id="rust-advantages">Rust advantages</h2>
+
+<p>So what was our experience using Rust to build this model end-to-end? Did Rust showcase strengths in reducing technical debt?</p>
+
+<h3 id="upfront-error-handling">Upfront error handling</h3>
+
+<p>A powerful aspect of the Rust language is the idea that developers must handle potential errors up front.</p>
+
+<div class="language-rust highlighter-rouge"><pre class="highlight"><code><span class="k">pub</span> <span class="k">fn</span> <span class="nf">get_reddit_post</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">url</span> <span class="p">:</span> <span class="o">&amp;</span><span class="nb">str</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">RawPostData</span><span class="o">&gt;</span> <span class="p">{</span>
+   <span class="k">let</span> <span class="k">mut</span> <span class="n">res</span> <span class="o">=</span> <span class="k">self</span><span class="py">.client</span>
+                     <span class="nf">.get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                     <span class="nf">.send</span><span class="p">()</span>
+                     <span class="nf">.unwrap</span><span class="p">();</span>
+
+   <span class="k">let</span> <span class="n">data</span> <span class="o">=</span> <span class="nf">extract_data</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="n">res</span><span class="p">)</span>
+                  <span class="nf">.unwrap</span><span class="p">();</span>
+   <span class="n">data</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>In the above code, we send a <code class="highlighter-rouge">GET</code> request to a url, and extract data from it. You can see that you <em>must</em> handle the potential errors that could surface from each of these operations. For example, the network could go down, or data extraction may fail for some reason. We easily handle potential errors with an <em>unwrap()</em> method, in which we assert that we are sure that this method won’t fail on us. This may be something you see in POC research code. We don’t really need anything fancy here.</p>
+
+<div class="language-rust highlighter-rouge"><pre class="highlight"><code><span class="k">pub</span> <span class="k">fn</span> <span class="nf">get_reddit_post</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">url</span> <span class="p">:</span> <span class="o">&amp;</span><span class="nb">str</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Result</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">RawPostData</span><span class="o">&gt;&gt;</span> <span class="p">{</span>
+     <span class="k">let</span> <span class="k">mut</span> <span class="n">res</span> <span class="o">=</span> <span class="nd">try!</span><span class="p">(</span><span class="k">self</span><span class="py">.client</span>
+                            <span class="nf">.get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                            <span class="nf">.send</span><span class="p">()</span>
+                            <span class="nf">.chain_err</span><span class="p">(||</span>
+                                <span class="nd">format!</span><span class="p">(</span><span class="s">"Failed to GET {}"</span><span class="p">,</span> <span class="n">url</span><span class="p">)));</span>
+
+
+     <span class="k">let</span> <span class="n">data</span> <span class="o">=</span> <span class="nd">try!</span><span class="p">(</span><span class="nf">extract_data</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="n">res</span><span class="p">)</span>
+                    <span class="nf">.chain_err</span><span class="p">(||</span>
+                          <span class="nd">format!</span><span class="p">(</span><span class="s">"Failed to parse data {}"</span><span class="p">,</span> <span class="n">url</span><span class="p">)));</span>
+     <span class="nf">Ok</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>But in production, we definitely want to handle any potential errors in some meaningful way. We can do this with the <code class="highlighter-rouge">try!</code> macro.</p>
+
+<p>This approach to handling errors is different from the unchecked exceptions paradigm in languages like Python or Java. Unlike try/except, <code class="highlighter-rouge">try!</code> is precise. In the former paradigm, you tend to wrap larger codeblocks with try/except, when in reality only parts of the code may fail.</p>
+
+<p>Furthermore, potential errors are  baked into the output type of the function with the <code class="highlighter-rouge">Result</code> type. This means that the caller knows <em>without knowledge of function implementation</em> that the function may return an error. On the developer’s side, it’s easy to move from research code to production, just <code class="highlighter-rouge">Ctrl+F</code> the <code class="highlighter-rouge">unwraps</code>, and handle them with <code class="highlighter-rouge">try!</code> macros.</p>
+
+<h3 id="typed-approach-to-dataframes">Typed approach to Dataframes</h3>
+
+<p>Dataframes are a tabular data format for many languages like Python, R, and Julia. Dataframes are ergonomic, but can lead to technical debt, by allowing things like mixed types per column. This could lead to bugs in which unexpected values crop up where they’re not supposed to – a big headache to trace in large datasets.</p>
+
+<p>In static languages like Rust, we do care about types associated with our data. For the <em>/r/playrust</em> classifier, we stored raw data collected about the subreddits in a struct called <code class="highlighter-rouge">RawPostData</code>:</p>
+
+<div class="language-rust highlighter-rouge"><pre class="highlight"><code><span class="k">struct</span> <span class="n">RawPostData</span> <span class="p">{</span>
+    <span class="n">is_self</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">author_name</span><span class="p">:</span> <span class="nb">String</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">String</span><span class="p">,</span>
+    <span class="n">downvotes</span><span class="p">:</span> <span class="nb">u64</span><span class="p">,</span>
+    <span class="n">upvotes</span><span class="p">:</span> <span class="nb">u64</span><span class="p">,</span>
+    <span class="n">score</span><span class="p">:</span> <span class="nb">u64</span><span class="p">,</span>
+    <span class="n">edited</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">selftext</span><span class="p">:</span> <span class="nb">String</span><span class="p">,</span>
+    <span class="n">subreddit</span><span class="p">:</span> <span class="nb">String</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">String</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>And extracted features were stored in a struct called <code class="highlighter-rouge">ProcessedPostFeatures</code>:</p>
+
+<div class="language-rust highlighter-rouge"><pre class="highlight"><code><span class="k">struct</span> <span class="n">ProcessedPostFeatures</span> <span class="p">{</span>
+   <span class="n">is_self</span><span class="p">:</span> <span class="nb">f32</span><span class="p">,</span>
+   <span class="n">author_popularity</span><span class="p">:</span> <span class="nb">f32</span><span class="p">,</span>
+   <span class="n">downs</span><span class="p">:</span> <span class="nb">f32</span><span class="p">,</span>
+   <span class="n">ups</span><span class="p">:</span> <span class="nb">f32</span><span class="p">,</span>
+   <span class="n">score</span><span class="p">:</span> <span class="nb">f32</span><span class="p">,</span>
+   <span class="n">post_len</span><span class="p">:</span> <span class="nb">f32</span><span class="p">,</span>
+   <span class="n">word_freq</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f32</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="n">symbol_freq</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f32</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="n">regex_matches</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f32</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<div class="language-rust highlighter-rouge"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="n">v</span> <span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">RawPostData</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nf">get_raw_data</span><span class="p">();</span>
+
+    <span class="n">v</span><span class="nf">.iter</span><span class="p">()</span>
+        <span class="nf">.map</span><span class="p">(|</span><span class="n">post</span><span class="p">|</span> <span class="n">post</span><span class="py">.author</span><span class="p">)</span>
+        <span class="nf">.map</span><span class="p">(|</span><span class="n">author</span><span class="p">|</span> <span class="nf">calculate_author_value</span><span class="p">(</span><span class="n">author</span><span class="p">))</span>
+        <span class="nf">.collect</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>Each field of the struct was equivalent to a dataframe column, and each index of the field was equivalent to a dataframe row. This typed approach gave us confidence that we did not populate unexpected values in our dataframe for a particular column. We could apply transformations in our data in the normal way we map over iterators.</p>
+
+<h3 id="parallelization">Parallelization</h3>
+
+<p>Furthermore, this structure to dataframes allowed us to easily parallelize operations with crates like <em>rayon</em>. We just change <code class="highlighter-rouge">iter</code> to <code class="highlighter-rouge">par_iter</code> in the code above, and we’re golden.</p>
+
+<div class="language-rust highlighter-rouge"><pre class="highlight"><code><span class="k">extern</span> <span class="n">crate</span> <span class="n">rayon</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nn">rayon</span><span class="p">::</span><span class="nn">prelude</span><span class="p">::</span><span class="o">*</span><span class="p">;</span>
+
+<span class="k">fn</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="n">v</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">RawPostFeatures</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nf">get_raw_features</span><span class="p">();</span>
+    <span class="k">let</span> <span class="n">processed</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">f64</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nn">Vec</span><span class="p">::</span><span class="nf">with_capacity</span><span class="p">(</span><span class="n">v</span><span class="nf">.len</span><span class="p">());</span>
+
+    <span class="n">v</span><span class="nf">.par_iter</span><span class="p">()</span>
+        <span class="nf">.map</span><span class="p">(|</span><span class="n">post</span><span class="p">|</span> <span class="n">post</span><span class="py">.author</span><span class="p">)</span>
+        <span class="nf">.map</span><span class="p">(|</span><span class="n">author</span><span class="p">|</span> <span class="nf">calculate_author_value</span><span class="p">(</span><span class="n">author</span><span class="p">))</span>
+        <span class="nf">.collect_into</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="n">processed</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+<h3 id="predictable-performance-during-scaling">Predictable performance during scaling</h3>
+
+<p>We did some comparative benchmarks on the <em>LabelEncoding</em> procedure, a very common operation in data science, in which we convert vector of strings to a vector of integer values that the model can understand. In these benchmarks, we compared an out-of-the-box Python implementation of the algorithm from scikit-learn to a custom one we built in Rust.</p>
+
+<p>Our Rust implementation was able to encode 100,000 strings 7x faster than the Python one. More surprising was the benchmark of encoding 1,000,000 strings. In this case, the Rust version was <em>2500x faster</em> than the corresponding Python implementation! The predictability of our Rust code was incredibly useful in scaling our pipeline, as we were sure that we would be able to process larger datasets without unexpected overhead.</p>
+
+<h3 id="other-advantages">Other advantages</h3>
+
+<p>There are other very useful aspects of Rust for the data science pipeline:</p>
+
+<ul>
+  <li>Cargo testing, benchmarking, and documentation help dev follow good practices</li>
+  <li>Major refactoring is really easy</li>
+  <li>Trait composition/generics limit the need for messy glue code</li>
+  <li>Many benchmarks (like those on this blog) support that Rust has strong performance in numerics</li>
+</ul>
+
+<h2 id="rust-disadvantages">Rust disadvantages</h2>
+
+<p>While using Rust was generally a pleasant experience for this project, there were some areas in which Rust fell short.</p>
+
+<h3 id="fragmented-ml-ecosystem">Fragmented ML ecosystem</h3>
+
+<p>The reality is that the current machine learning community is sparse. We found that while there are 60+ crates on crates.io associated with machine learning or linear algebra, many of these libraries provide similar functionality with different APIs. For example, most machine learning tools have custom matrix implementations. This limits the interoperability of crates that makes a language like Python, which builds most of its numeric libraries around the numpy array, very attractive for data science.</p>
+
+<h3 id="data-exploration-difficult-in-a-static-language">Data exploration difficult in a static language</h3>
+
+<p>Dynamic languages like Python and R dominate data investigation, and with good reason. A REPL/interpreter lends itself very well to exploration, because you have instant feedback to tweaks in your code – you don’t need to re-compile to see effects. Furthermore, during the data investigation stage, performance is not that important, so we can get away with ignoring language level details that may slow us down while exploring. Last, Python and R are laden with libraries around graphing and visualization, which is totally non-existent in Rust. Most mature machine learning systems are hybrids of languages and tools specialized for specific tasks, and we envision Python and R still dominating this space.</p>
+
+<h2 id="vision-for-rust-ml">Vision for Rust ML</h2>
+
+<p>We have shown that Rust language features help reduce many technical debt issues that arise in making production level data science systems. We hope that Rust is promoted to improve feature engineering systems. We also hope that implementations of data science tooling become standardized to facilitate interoperability. Finally, we believe that effective domain applications of a language are primarily driven by the community that forms around it. We should start sharing ideas and building a collective metric for success in Rust machine learning and numerics!</p>
+
+</article>
+<!--
+<aside class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/06/05/Introducing-The-Have-I-Been-Pwned-Python-API/">
+            Have I Been Pwned? with Python
+            <small><time datetime="2016-06-05T00:00:00-07:00">05 Jun 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/05/11/Introducing-Cargo-Profiler/">
+            Introducing Cargo Profiler
+            <small><time datetime="2016-05-11T00:00:00-07:00">11 May 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/04/25/Matrix-Multiplication-In-Rust-Pt-1/">
+            Matrix Multiplication in Rust (Part 1)
+            <small><time datetime="2016-04-25T00:00:00-07:00">25 Apr 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</aside> -->
+
+      </main>
+
+      <footer class="footer">
+        <small>
+          &copy; <time datetime="2016-09-14T23:13:05-07:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+        </small>
+      </footer>
+    </div>
+
+  </body>
+</html>
