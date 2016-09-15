@@ -199,7 +199,7 @@ fn main() {
 
 We did some comparative benchmarks on the *LabelEncoding* procedure, a very common operation in data science, in which we convert vector of strings to a vector of integer values that the model can understand. In these benchmarks, we compared an out-of-the-box Python implementation of the algorithm from scikit-learn to a custom one we built in Rust.
 
-Our Rust implementation was able to encode 100,000 strings 7x faster than the Python one. More surprising was the benchmark of encoding 1,000,000 strings. In this case, the Rust version was *2500x faster* than the corresponding Python implementation! The predictability of our Rust code was incredibly useful in scaling our pipeline, as we were sure that we would be able to process larger datasets without unexpected overhead.
+Our Rust implementation was able to encode 100,000 strings used 7x less memory than the Python one. More surprising was the benchmark of encoding 1,000,000 strings. In this case, the Rust version used *2500x less memory* than the corresponding Python implementation. We're still investigating this jump in memory usage -- it's likely due to the implementation details of the Python version. Funny enough, the performance implications of LabelEncoder were just brought up in [this](https://github.com/scikit-learn/scikit-learn/issues/7432) issue. Regardless, the predictability of our Rust code was incredibly useful in scaling our pipeline, as we were sure that we would be able to process larger datasets without unexpected overhead.
 
 ### Other advantages
 
