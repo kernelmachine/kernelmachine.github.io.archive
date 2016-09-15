@@ -195,16 +195,11 @@ fn main() {
 }
 ```
 
-### Predictable performance during scaling
-
-We did some comparative benchmarks on the *LabelEncoding* procedure, a very common operation in data science, in which we convert vector of strings to a vector of integer values that the model can understand. In these benchmarks, we compared an out-of-the-box Python implementation of the algorithm from scikit-learn to a custom one we built in Rust.
-
-Our Rust implementation was able to encode 100,000 strings used 7x less memory than the Python one. More surprising was the benchmark of encoding 1,000,000 strings. In this case, the Rust version used *2500x less memory* than the corresponding Python implementation. We're still investigating this jump in memory usage -- it's likely due to the implementation details of the Python version. Funny enough, the performance implications of LabelEncoder were just brought up in [this](https://github.com/scikit-learn/scikit-learn/issues/7432) issue. Regardless, the predictability of our Rust code was incredibly useful in scaling our pipeline, as we were sure that we would be able to process larger datasets without unexpected overhead.
-
 ### Other advantages
 
 There are many other very useful aspects of Rust for the data science pipeline, including:
 
+* Predictable performance during scaling
 * Cargo testing, benchmarking, and documentation help dev follow good practices
 * Trait composition/generics limit the need for messy glue code
 * Many benchmarks (like those on [this blog](http://www.suchin.co/2016/04/25/Matrix-Multiplication-In-Rust-Pt-1/)) suggest Rust's strong performance in numerics
