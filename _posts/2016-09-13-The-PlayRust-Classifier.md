@@ -86,7 +86,7 @@ So what was our experience using Rust to build this model end-to-end? Did Rust s
 
 ### Upfront error handling
 
-A powerful aspect of the Rust language is the idea that developers must handle potential errors up front.
+A powerful aspect of the Rust language is the idea that developers must handle potential errors upfront.
 
 ```rust
 pub fn get_reddit_post(&self, url : &str) -> Vec<RawPostData> {
@@ -211,7 +211,7 @@ There are many other very useful aspects of Rust for the data science pipeline, 
 
 ## Rust disadvantages
 
-While using Rust was generally a pleasant experience for this project, there were some areas in which Rust fell short.
+While using Rust was generally a pleasant experience for this project, there were some areas in which the language fell short.
 
 ### Fragmented ML ecosystem
 
