@@ -203,10 +203,9 @@ Our Rust implementation was able to encode 100,000 strings 7x faster than the Py
 
 ### Other advantages
 
-There are other very useful aspects of Rust for the data science pipeline:
+There are many other very useful aspects of Rust for the data science pipeline, including:
 
 * Cargo testing, benchmarking, and documentation help dev follow good practices
-* Major refactoring is really easy
 * Trait composition/generics limit the need for messy glue code
 * Many benchmarks (like those on this blog) support that Rust has strong performance in numerics
 
