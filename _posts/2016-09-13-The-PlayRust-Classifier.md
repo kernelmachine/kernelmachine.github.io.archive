@@ -44,7 +44,7 @@ This toy problem was an optimal medium to explore Rust data science, because we 
 
 ### The Model
 
-Before digging into Rust-specific features of the pipeline we built, let's quickly look at the model we built and its accuracy.
+Before digging into Rust-specific features of the pipeline we built, let's quickly look at the resulting model and its accuracy.
 
 We gathered thousands of reddit posts and looked at a number of features to describe their respective subreddits:
 
