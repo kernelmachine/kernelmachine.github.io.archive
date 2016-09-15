@@ -123,7 +123,7 @@ But in production, we definitely want to handle any potential errors in some mea
 
 This approach to handling errors is different from the unchecked exceptions paradigm in languages like Python or Java. Unlike try/except, `try!` is precise. In the former paradigm, you tend to wrap larger codeblocks with try/except, when in reality only parts of the code may fail.
 
-Furthermore, potential errors are  baked into the output type of the function (the `Result` type). This means that the caller knows *without knowledge of function implementation* that the function may return an error. On the developer's side, it's easy to move from research code to production, just `Ctrl+F` the `unwraps`, and handle them with `try!` macros.
+Furthermore, potential errors are  baked into the output type of the function (the `Result` type). This means that proper error handling can occur *without knowledge of function implementation*. On the developer's side, it's easy to move from research code to production, just `Ctrl+F` the `unwraps`, and handle them with `try!` macros.
 
 ### Typed approach to Dataframes
 
