@@ -207,7 +207,7 @@ There are many other very useful aspects of Rust for the data science pipeline, 
 
 * Cargo testing, benchmarking, and documentation help dev follow good practices
 * Trait composition/generics limit the need for messy glue code
-* Many benchmarks (like those on [this blog](http://www.suchin.co/2016/04/25/Matrix-Multiplication-In-Rust-Pt-1/)) support that Rust has strong performance in numerics
+* Many benchmarks (like those on [this blog](http://www.suchin.co/2016/04/25/Matrix-Multiplication-In-Rust-Pt-1/)) suggest Rust's strong performance in numerics
 
 ## Rust disadvantages
 
