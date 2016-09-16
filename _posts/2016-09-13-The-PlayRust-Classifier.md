@@ -73,7 +73,7 @@ The model was primarily driven by the frequencies of words related to the */r/ru
   <img src="http://pegasos1.github.io/public/20160913/featimps.png" width="580" height="400">
 </div>
 
-Some example outputs are below. Notice the third post, with the slightly confusing title, is also slightly confusing to the model.
+The model outputs a score between 0 and 1 that represents the likelihood that the post in question is part of the */r/rust* subreddit. Some example outputs are below. Notice the third post, with the slightly confusing title, is also slightly confusing to the model.
 
 <div style="margin-left:50px">
   <img src="http://pegasos1.github.io/public/20160913/examples.png" width="700" height="400">
