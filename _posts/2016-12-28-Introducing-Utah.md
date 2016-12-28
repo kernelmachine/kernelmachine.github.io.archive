@@ -71,7 +71,7 @@ pub struct DataFrameMut<'a, T>
 The only thing we've changed is the `data` field -- from a `Matrix<T>` to a `MatrixMut<T>`. For simplicity, we'll disregard mutable dataframe for the rest of this post, but know that everything we talk about below extends to the mutable variant.
 
 
-The inner data is of type `Matrix<T>`, which is actually a type alias to an 2 dimensional nd-array, from the ndarray crate.
+The inner data is of type `Matrix<T>`, which is a type alias to an 2 dimensional nd-array, from the ndarray crate.
 
 ```rust
 pub type Matrix<T> = Array2<T>;
@@ -106,7 +106,7 @@ The columns/index are just names of the columns and rows of the dataframe, respe
 
 ### The DataFrameIterator
 
-The `DataFrameIterator` is what we use to actually perform dataframe transformations and computations. The `DataFrameIterator` is of the following type:
+The `DataFrameIterator` is what we use to perform dataframe transformations and computations. The `DataFrameIterator` is of the following type:
 
 ```
 pub struct DataFrameIterator<'a, I, T: 'a>
@@ -206,7 +206,7 @@ let res = df.select(&["a", "c"], UtahAxis::Row);
 
 #### Process combinators
 
-Process combinators are meant for actually changing the original data you're working with. Combinators in this class include `impute` and `mapdf`. Impute replaces missing values of a dataframe with the mean of the corresponding column. Note that these operations require the use of a `DataFrameMut`.
+Process combinators are meant for changing the original data you're working with. Combinators in this class include `impute` and `mapdf`. Impute replaces missing values of a dataframe with the mean of the corresponding column. Note that these operations require the use of a `DataFrameMut`.
 
 ```
 let mut a: DataFrameMut<f64> = dataframe!(
