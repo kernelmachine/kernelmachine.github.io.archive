@@ -71,7 +71,7 @@ pub struct DataFrameMut<'a, T>
 The only thing we've changed is the `data` field -- from a `Matrix<T>` to a `MatrixMut<T>`. For simplicity, we'll disregard mutable dataframe for the rest of this post, but know that everything we talk about below extends to the mutable variant.
 
 
-The inner data is of type `Matrix<T>`, which is a type alias to an 2 dimensional nd-array, from the ndarray crate.
+The inner data is of type `Matrix<T>`, which is a type alias to a [2-d array](http://bluss.github.io/rust-ndarray/master/ndarray/type.Array2.html), from the ndarray crate.
 
 ```rust
 pub type Matrix<T> = Array2<T>;
@@ -128,7 +128,7 @@ Next, the trait bound on the dataframe iterator is `Iterator<Item = Window<'a, T
 pub type Window<'a, T> = (String, ArrayView1<'a, T>);
 ```
 
-The `ArrayView1` is a column or row-wise slice of the original data. The `Iterator` bound tells us that the `DataframeIterator` iterates over _views_ of the data, along with their names (i.e. a column or index value).  The dataframe lives in a contiguous area of memory, and to iterate over it, we just slide a window over the stride of the vector that represents the matrix containing the data.
+The [`ArrayView1`](http://bluss.github.io/rust-ndarray/master/ndarray/type.ArrayView1.html) is a column or row-wise slice of the original data. The `Iterator` bound tells us that the `DataframeIterator` iterates over _views_ of the data, along with their names (i.e. a column or index value).  The dataframe lives in a contiguous area of memory, and to iterate over it, we just slide a window over the stride of the vector that represents the matrix containing the data. The iterator is realized through ndarray's [`AxisIter`]("http://bluss.github.io/rust-ndarray/master/ndarray/struct.AxisIter.html") type.
 
 Finally, the struct fields:
 
