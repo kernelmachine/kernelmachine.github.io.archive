@@ -458,15 +458,20 @@ pub struct MixedDataFrameColIterator<'a, T: 'a>
 
 How do we effectively prevent user errors during data transformation _at compile time_?
 
-So far, the only error handling is in the `new()` function, where we check whether the dimensions of the axis labels match that of the underlying data. This actually handles a ton of common errors, like selecting or removing a column that doesn't exist. But while it does panic in the right situations, the error is not that useful in figuring out what the actual mistake was:
+So far, the only error handling is in the `new()` function, where we check whether the dimensions of the axis labels match that of the underlying data. This actually handles a ton of common errors, like selecting or removing a column that doesn't exist. But while it does panic in the right situations, the errors are not that useful in figuring out what the actual mistake was:
 
 ```
 IndexShapeMismatch(expected: String , actual: String) {
-            display("index shape mismatch. Expected length: {}, Actual length: {}",  expected, actual)
+    display("index shape mismatch. Expected length: {}, Actual length: {}",  expected, actual)
 }
+
+ColumnShapeMismatch(expected: String , actual: String) {
+    display("column shape mismatch. Expected length: {}, Actual length: {}",  expected, actual)
+}
+
 ```
 
-Furthermore, the error is only caught at runtime.
+Furthermore, the errors are only caught at runtime.
 
 One thing I've been thinking about is compile-time dimension checking with the `typenum` and `genericarray` crates, which provide compile-time numeric operations and array dimensions, respectively.
 
