@@ -184,7 +184,7 @@ let file_name = "test.csv";
 let df: Result<DataFrame<InnerType>> = DataFrame::read_csv(file_name);
 ```
 
-Note that utah's `ReadCSV` trait is pretty barebones right now.
+Note that Utah's `ReadCSV` trait is pretty barebones right now.
 
 
 ### Combinators
@@ -199,7 +199,7 @@ These combinators are meant for changing the shape of the data you're working wi
 
 ```
 let a = arr2(&[[2.0, 7.0], [3.0, 4.0], [2.0, 8.0]]);
-let df = DataFrame::new(a).index(&["1", "2", "3"]).columns(&["a", "b"]).unwrap();
+let df = DataFrame::new(a).index(&["a", "b", "c"]).unwrap();
 let res = df.select(&["a", "c"], UtahAxis::Row);
 ```
 
