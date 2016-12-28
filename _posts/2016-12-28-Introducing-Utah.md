@@ -150,7 +150,7 @@ pub enum UtahAxis {
 
 ## Creating a dataframe
 
-There are multiple ways to create a dataframe. The most straightforward way is to use a *builder pattern*, which allows you to overwrite individual fields of the Dataframe successively:
+There are multiple ways to create a dataframe. The most straightforward way is to use a *builder pattern*, which allows you to overwrite individual fields of the dataframe successively:
 
 ```
 
@@ -185,7 +185,7 @@ Note that Utah's `ReadCSV` trait is pretty barebones right now.
 
 ### Combinators
 
-The user interacts with Utah dataframes by chaining combinators, which are essentially iterator extensions (or _adapters_) over the original dataframe. This means that each operation is lazy by default. You can chain as many combinators as you want, but it won't do anything until you invoke a collection operation like `as_df`, which would allocate the results into a new dataframe, or `as_matrix`, which would allocate the results into an ndarray matrix.
+The user interacts with Utah dataframes by chaining combinators, which are adapters over the dataframe iterator. Each operation is lazy by default. You can chain as many combinators as you want, but it won't do anything until you invoke a collection operation like `as_df`, which would allocate the results into a new dataframe, or `as_matrix`, which would allocate the results into a 2-d ndarray.
 
 I've organized the combinators that I've built so far into four different types, but there are naturally many more. The nice thing is that the iterator adapter design makes it extremely easy to add new combinators to the project.
 
@@ -202,7 +202,7 @@ let res = df.select(&["a", "c"], UtahAxis::Row);
 
 #### Process combinators
 
-Process combinators are meant for changing the original data you're working with. Combinators in this class include `impute` and `mapdf`. Impute replaces missing values of a dataframe with the mean of the corresponding column. Note that these operations require the use of a `DataFrameMut`.
+Process combinators are meant for changing the original data you're working with. Combinators in this class include `impute` and `mapdf`. Impute replaces missing values of a dataframe with the mean of the corresponding axis. Note that these operations require the use of a `DataFrameMut`.
 
 ```
 let mut a: DataFrameMut<f64> = dataframe!(
@@ -234,7 +234,7 @@ let res = a.inner_left_join(&b).as_df()?;
 
 #### Aggregate combinators
 
-Aggregate combinators are meant for the reduction of a chain of combinators to some result. These combinators are usually the last operation in a chain, but don't necessarily have to be. Combinators in this class include `sumdf`, `mindf`, `maxdf`, `stdev` (standard deviation), and `mean`. Currently, aggregate combinators are not iterator collection operations, because they do not invoke an iterator chain. This may change in the future.
+Aggregate combinators are meant to reduce a chain of combinators to some result. These combinators are usually the last operation in a chain, but don't necessarily have to be. Combinators in this class include `sumdf`, `mindf`, `maxdf`, `stdev` (standard deviation), and `mean`. Currently, aggregate combinators are not iterator collection operations, because they do not invoke a chain. This may change in the future.
 
 ```
 let a = arr2(&[[2.0, 7.0], [3.0, 4.0], [2.0, 8.0]]);
@@ -244,7 +244,7 @@ let res = df.mean(UtahAxis::Row);
 
 #### Chaining combinators
 
-The real power in combinators come from the ability to chain them together in expressive transformations that are easy to parse. You can do things like this:
+The real power of combinators comes from the ability to chain them together in expressive transformations that are easy to parse. You can do things like this:
 
 ```
 let result = df.df_iter(UtahAxis::Row)
@@ -280,7 +280,7 @@ The combinator should contain an iterator over items of type `Window<'a, T>` -- 
 
 ##### 2. impl Iterator for Combinator
 
-What's the output of this combinator during iteration over the dataframe? In the case of `Sum`, we're just taking the scalar sum of elements in a row or column, depending on the axis of iteration.
+What's the output of this combinator during iteration over the dataframe? In the case of `Sum`, we're just taking the scalar sum of elements in a "window".
 
 
 ```
@@ -331,7 +331,7 @@ pub trait Aggregate<'a, T>
 ```
 
 
-##### 5. Add `fn combinator(df : DataFrame)` to the `Operations` trait
+##### 5. Add `fn combinator(self : DataFrame)` to the `Operations` trait
 
 The function you add should invoke the combinator from an allocated dataframe.
 
@@ -341,6 +341,12 @@ The function you add should invoke the combinator from an allocated dataframe.
   {
     fn sumdf(&'a mut self, axis: UtahAxis) -> SumIter<'a, T>;
   }
+```
+
+`SumIter` is another alias:
+
+```
+pub type SumIter<'a, T> = Sum<'a, DataFrameIterator<'a, T>, T>;
 ```
 
 ##### 6. impl AsDataFrame for Combinator
@@ -355,7 +361,7 @@ The function you add will let you go from the `Combinator` iterator to an alloca
   }
 ```
 
-It's interesting to think about how to reduce combinators to iterators adapters that we're familiar with. For example, the `concat` combinator is just a `Chain`. More complicated combinators like `Groupby` can be thought of as a `Map` of a `Filter`. These conceptual relationships can help you think about how to best implement a new combinator.
+It's interesting to think about how to reduce combinators to iterators adapters that we're familiar with. For example, the `concat` combinator is just a `Chain`. More complicated combinators like `Groupby` can be thought of as a `Map` on a `Filter`. These conceptual relationships can help you think about how to best implement a new combinator.
 
 ### Collection
 
@@ -367,7 +373,7 @@ for x in df.concat(&df_1) {
 }
 ```
 
-But we also have an `AsDataFrame` trait, which dumps the output of chained combinators into a new dataframe, matrix, or array, so we can do something like the following:
+But we also have an `ToDataFrame` trait, which dumps the output of chained combinators into a new dataframe, matrix, or array, so we can do something like the following:
 
 
 ```
@@ -389,19 +395,22 @@ pub enum InnerType {
 }
 ```
 
-With this wrapper, you can have Strings and f64s in the same dataframe.
+With this wrapper, you can have `String` and `f64` in the same dataframe.
 
-In general, this may not be the best approach to supporting mixed types in this project, because are performance hits for computation when working with type wrappers. I discuss alternative avenues to achieving this goal below.
+In general, this may not be the best approach to supporting mixed types in this project, because there are performance hits for computation when working with type wrappers. I discuss alternative avenues to achieving this goal below.
 
 An important consequence of supporting mixed types is that because strings are not `Copy`, the dataframe is not `Copy`. This means that you may run into unexpected ownership problems while building data transformations. There are some API ergonomics to be ironed out.
 
 
 ## Next steps
 
+Next, I'll catalog some of the thoughts on future directions for this project.
+
 #### Comparing a map implementation to a reference-local one
 
-There are drawbacks to the reference-local implementation of the dataframe, mainly that we have to wrap our data with an enum (ie `InnerType`) to be able to support mixed types. Computations are not as fast as they could be.
+There are some drawbacks to the iterator adapter design which may warrant re-visiting the map implementation I mentioned in the beginning of the post. For example, `select` is currently `O(n)` when it could be `O(1)`.
 
+Furthermore, we have to wrap our data with an enum (ie `InnerType`) to be able to support mixed types in the same array. Computations are not as fast as they could be.
 
 Ideally, we could work with raw types directly. An alternate dataframe implementation sacrifices reference locality for the ability to work with raw types in the mixed-context.
 
@@ -409,20 +418,14 @@ Ideally, we could work with raw types directly. An alternate dataframe implement
 pub struct MixedDataFrame<T>
     where T: UtahNum
 {
-    pub data: BTreeMap<String, Row<T>>,
-    pub index: BTreeMap<String, usize>,
+    pub data: HashMap<String, Array1<T>>,
+    pub index: HashMap<String, usize>,
 }
 ```
 
-Here we use a `BTreeMap` to maintain order across columns. `Row<T>` is a type alias to the 1-D ndarray:
+This dataframe's design implies that we will need two separate types for row-wise and column-wise iteration.
 
-```rust
-pub type Row<T> = Array1<T>;
-```
-
-This dataframes design implies that we will need two separate types for row-wise and column-wise iteration.
-
-Row-wise iteration would manifest in terms of a multi-zip operation where we connect each value of the same index across all columns.
+Row-wise iteration would could be a multi-zip operation where we connect each value of the same index across all columns.
 
 ```
 pub struct MixedDataFrameRowIterator<'a, T: 'a>
@@ -436,21 +439,20 @@ pub struct MixedDataFrameRowIterator<'a, T: 'a>
 }
 ```
 
-On the other hand, column-wise iteration would just be an iterator over the BTreeMap.
+On the other hand, column-wise iteration could be an iterator over the HashMap.
 
 ```
 pub struct MixedDataFrameColIterator<'a, T: 'a>
-    where T: UtahNum,
-          S: Identifier,
-          BTreeIter<'a, String, Row<T>>: Iterator
+    where T: UtahNum
+          Iter<'a, String, Array1<T>>: Iterator
 {
-    pub data: BTreeIter<'a, String, Row<T>>,
+    pub data: Iter<'a, String, Array1<T>>,
     pub other: Vec<String>,
     pub axis: UtahAxis,
 }
 ```
 
-`BTreeIter` is a type alias to the BTreeMap iterator.
+Further explorations into the map implementation are needed to see if it realizes performance benefits over the reference-local one.
 
 #### Better Error handling with compile time dimension checking
 
@@ -487,7 +489,7 @@ pub struct DataFrame<T, N, M, O, P>
     pub data: GenericArray<GenericArray<T,O>, P>,
     pub index: GenericArray<String, N>,
     phantom_0: PhantomData<<N as Same<O>>::Output>,
-    phantom_1: PhantomData<<P as Same<M>>::Output>,
+    phantom_1: PhantomData<<M as Same<P>>::Output>,
 }
 ```
 
@@ -496,7 +498,9 @@ The trait bounds imply that a combinator chain will not compile if the length of
 #### Streaming DataFrames
 
 
-In reality, the current dataframe implementation is an imperfect workaround of what I _really_ want the dataframe and its combinators to be. The data owner (`DataFrame`) is separated from the iterator (`DataFrameIterator`) and the combinators. This is because it's impossible to return values whose lifetime is tied to the iterator itself. I would like the dataframe to be an iterator over some data held in disk, and each combinator borrowed values from a buffer maintained by the dataframe.  Then the real power of the iterator adapter design is realized: we can work with datasets that may not fit into memory.
+In reality, the current implementation is an imperfect workaround of what I _really_ want the dataframe and its combinators to be. Right now, the data owner (`DataFrame`) is separated from the iterator (`DataFrameIterator`) and the combinators.
+
+I would like the dataframe to be an iterator over some data held in disk, and each combinator borrowed values from a buffer maintained by the dataframe.  Then the real power of the iterator adapter design is realized: we can work with datasets that may not fit into memory.
 
 What I'm essentially talking about are _streaming iterators_, which has been discussed at length [here](https://users.rust-lang.org/t/returning-borrowed-values-from-an-iterator/1096) and [here](https://github.com/emk/rust-streaming). There's another [interesting crate](https://github.com/sfackler/streaming-iterator) around this effort too. It's an exciting concept.
 
