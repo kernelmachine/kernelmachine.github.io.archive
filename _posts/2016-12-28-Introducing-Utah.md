@@ -9,7 +9,7 @@ Recently, I've been working on a Rust crate for tabular data manipulation. I'm e
 
 ## A dataframe for Rust
 
-Languages like [Python](http://pandas.pydata.org/), [R](http://www.r-tutor.com/r-introduction/data-frame), and [Julia](https://github.com/JuliaStats/DataFrames.jl) have popularized the  _dataframe_, which is an abstraction over a collection of _named_ arrays. The dataframe allows users to access, transform, and compute over two-dimensional data that may or may not have mixed types.
+Languages like [Python](http://pandas.pydata.org/), [R](http://www.r-tutor.com/r-introduction/data-frame), and [Julia](https://github.com/JuliaStats/DataFrames.jl) have popularized the  _dataframe_, which is an abstraction over a collection of _named_ arrays. The dataframe allows users to access, transform, and compute over two-dimensional data that may have mixed types.
 
 [**Utah**](https://github.com/pegasos1/utah) is a dataframe crate backed by [ndarray](https://github.com/bluss/rust-ndarray) for type-conscious tabular data manipulation with an expressive, functional interface.
 
@@ -17,7 +17,7 @@ Languages like [Python](http://pandas.pydata.org/), [R](http://www.r-tutor.com/r
 
 #### Functional interface to transform data
 
-Transformations are composable, repeatable, and readable. This can be a real boon in preventing pipeline jungles that are hard to parse.
+Transformations are composable, repeatable, and readable.
 
 #### Iterator adapter implementations for performance and laziness
 
@@ -25,17 +25,17 @@ Data transformations are implemented with Rust's iterators, which are fast, safe
 
 #### Leverage reference locality for performance
 
-Most implementations of the dataframe involve some sort of map between column names and the underlying data. You're likely incurring performance hits while chasing pointers around in memory. In particular, row-wise operations can be much slower than column-wise ones.
+Most implementations of the dataframe involve some sort of map between column names and the underlying data. So during computations, you're likely incurring performance hits while chasing pointers around in memory. In particular, row-wise operations can be much slower than column-wise ones.
 
-I wanted to explore the effects of keeping your data close together in memory, while supporting mixed types. This crate is backed by ndarray to hold data, and enums to support mixed types. At the end of this post, I'll describe an alternate implementation that sacrifices data locality to be able to have mixed types without wrappers.
+I wanted to explore the effects of keeping data close together in memory. This crate is backed by ndarray to hold data, and enums to support mixed types. At the end of this post, I'll describe an alternate implementation that sacrifices data locality to be able to have mixed types without wrappers.
 
 #### Solid error handling
 
-This an area of the project that I haven't completed yet, but has a ton of potential. There are many errors that can occur while querying dataframes. For example, imagine selecting a column that doesn't exist in the dataframe, or joining two dataframes that don't have a common key. Such simple errors can be hidden in a sea of complex data transformations, potentially leading to a lot of technical debt when building data pipelines. The goal here is to provide compile-time error handling of these sorts of mistakes. I explore potential avenues to accomplish this goal at the end of this post.
+There are many errors that can occur while querying dataframes. For example, imagine selecting a column that doesn't exist, or joining two dataframes that don't have a common key. Such simple errors can be hidden in a sea of complex data transformations. The goal here is to provide compile-time error handling of these sorts of mistakes. I explore potential avenues to accomplish this goal at the end of this post.
 
 ## Internals
 
-*Note: The internals of the project are subject to change in the future; I'll try to keep an updated post describing changes.*
+*Note: The internals of the project are subject to alter in the future; I'll try to keep an updated post describing changes.*
 
 ### The DataFrame
 
@@ -54,7 +54,7 @@ pub struct DataFrame<T>
 }
 ```
 
-The `DataFrame` takes the generic parameter *T*, which corresponds to the type of inner matrix of data.
+The `DataFrame` takes the generic parameter *T*, which corresponds to the type of data in the inner matrix.
 
 The `DataFrame` is read-only by default. To operate on a dataframe that is read-write, you can use a `DataFrameMut`:
 
@@ -68,10 +68,10 @@ pub struct DataFrameMut<'a, T>
 }
 ```
 
-The only thing we've changed is the `data` field -- from a `Matrix<T>` to a `MatrixMut<T>`. For simplicity, we'll disregard mutable dataframe for the rest of this post, but know that everything we talk about below extends to the mutable variant.
+The only thing we've changed is the `data` field -- from a `Matrix<T>` to a `MatrixMut<T>`. For simplicity, we'll disregard the mutable dataframe for the rest of this post, but know that everything we talk about below extends to the mutable variant.
 
 
-The inner data is of type `Matrix<T>`, which is a type alias to a [2-d array](http://bluss.github.io/rust-ndarray/master/ndarray/type.Array2.html), from the ndarray crate.
+The inner data is of type `Matrix<T>`, an alias to a [2-d array](http://bluss.github.io/rust-ndarray/master/ndarray/type.Array2.html) from the ndarray crate.
 
 ```rust
 pub type Matrix<T> = Array2<T>;
@@ -80,7 +80,7 @@ pub type Matrix<T> = Array2<T>;
 
 The data that the Matrix contains implement all the traits associated with the custom trait *UtahNum* (ie `Add`,`Sub`,`Mul`,`Div`, `One` and `Zero`) for computations, as well as the custom trait *Empty*.
 
-Empty values are an unfortunate reality of most datasets. We use the `Empty` trait to define empty values for any type we want to use in a dataframe:
+Empty values are an unfortunate reality of most datasets, and manifest itself in different types depending on the context. For example, empty values may be `NAN` if you're working with float data, an empty string with `String` data, or `0` with `Int` data. We use the `Empty` trait to define empty values for any type we want to use in a dataframe:
 
 ```rust
 pub trait Empty<T> {
@@ -89,7 +89,7 @@ pub trait Empty<T> {
 }
 ```
 
-We ask, for type `T`, what should we consider as an empty value, and when is a value equal to empty? In the case of `f64`, empty values will usually be `NaN`, so we might implement it as follows:
+We ask, for type `T`, what should we consider as an empty value, and when is a value equal to empty? In the case of `f64`, we might implement the trait as follows:
 
 ```rust
 impl Empty<f64> for f64 {
@@ -106,7 +106,7 @@ The columns/index are just names of the columns and rows of the dataframe, respe
 
 ### The DataFrameIterator
 
-The `DataFrameIterator` is what we use to perform dataframe transformations and computations. The `DataFrameIterator` is of the following type:
+The `DataFrameIterator` is what we use to perform transformations and computations. The `DataFrameIterator` is of the following type:
 
 ```
 pub struct DataFrameIterator<'a, I, T: 'a>
@@ -128,17 +128,13 @@ Next, the trait bound on the dataframe iterator is `Iterator<Item = Window<'a, T
 pub type Window<'a, T> = (String, ArrayView1<'a, T>);
 ```
 
-The `ArrayView1` [type](`http://bluss.github.io/rust-ndarray/master/ndarray/type.ArrayView1.html`) is a column or row-wise slice of the original data. The `Iterator` bound tells us that the `DataframeIterator` iterates over _views_ of the data, along with their names (i.e. a column or index value).  The dataframe lives in a contiguous area of memory, and to iterate over it, we just slide a window over the stride of the vector that represents the matrix containing the data. The iterator is realized through ndarray's `AxisIter`[type]("http://bluss.github.io/rust-ndarray/master/ndarray/struct.AxisIter.html").
+The `ArrayView1` [type](`http://bluss.github.io/rust-ndarray/master/ndarray/type.ArrayView1.html`) is a column or row slice of the original data. The `Iterator` bound tells us that the `DataframeIterator` iterates over _views_ of the data, along with their names (i.e. a column or index value).  The dataframe lives in a contiguous area of memory, and to iterate over it, we just slide a window over the stride of the vector that represents the matrix containing the data. The iterator is realized through ndarray's `AxisIter`[type]("http://bluss.github.io/rust-ndarray/master/ndarray/struct.AxisIter.html").
 
 Finally, the struct fields:
 
 * `data` just houses the iterator over the "windows" we just discussed.
 
-* `names` is an abstraction over the dataframe's rows or columns, depending on how we're iterating over the data during transformation. If we're iterating over the dataframe column-wise, `names` will be an iterator over the `columns` field. If we're iterating row-wise, `names` will be an iterator over the `index` field.
-
-* `other` houses the axis label that you're *not* iterating over. For example, in the case of a column-wise dataframe iterator, `other` would be the original index. We just hold onto this value in case you want to allocate the transformation into a new dataframe.
-
-* `axis`, which is of type `UtahAxis`, is an enum over two different directions of iteration:
+* `axis` tells the dataframe iterator which direction you want to iterate over. This field is of type `UtahAxis`, an enum over two different directions of iteration:
 
 ```rust
 pub enum UtahAxis {
@@ -147,9 +143,9 @@ pub enum UtahAxis {
 }
 ```
 
-This tells the dataframe iterator which direction you want to iterate over. For example, if you eventually want to take a sum of the columns, you'd use the `UtahAxis::Column` when creating the dataframe iterator.
+* `names` is an iterator over the axis label (index or columns) you're iterating over.
 
-Now, ideally dataframes should be able to support mixed types. I'll discuss how Utah handles this below. But an important thing to note is that because strings are not `Copy`, the dataframe is not `Copy`. This means that you may run into unexpected ownership problems while building data transformations. There are some API ergonomics to be ironed out.
+* `other` is the axis label that you're *not* iterating over. We just hold onto this value in case you want to allocate the transformation into a new dataframe.
 
 
 ## Creating a dataframe
@@ -396,6 +392,8 @@ pub enum InnerType {
 With this wrapper, you can have Strings and f64s in the same dataframe.
 
 In general, this may not be the best approach to supporting mixed types in this project, because are performance hits for computation when working with type wrappers. I discuss alternative avenues to achieving this goal below.
+
+An important consequence of supporting mixed types is that because strings are not `Copy`, the dataframe is not `Copy`. This means that you may run into unexpected ownership problems while building data transformations. There are some API ergonomics to be ironed out.
 
 
 ## Next steps
