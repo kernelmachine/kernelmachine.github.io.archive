@@ -500,7 +500,7 @@ The trait bounds imply that a combinator chain will not compile if the length of
 
 In reality, the current dataframe implementation is an imperfect workaround of what I _really_ want the dataframe and its combinators to be. The data owner (`DataFrame`) is separated from the iterator (`DataFrameIterator`) and the combinators. This is because it's impossible to return values whose lifetime is tied to the iterator itself. I would like the dataframe to be an iterator over some data held in disk, and each combinator borrowed values from a buffer maintained by the dataframe.  Then the real power of the iterator adapter design is realized: we can work with datasets that may not fit into memory.
 
-What I'm essentially talking about is _streaming iterators_, which has been discussed at length [here](https://users.rust-lang.org/t/returning-borrowed-values-from-an-iterator/1096) and [here](https://github.com/emk/rust-streaming). There's another [interesting crate](https://github.com/sfackler/streaming-iterator) around this effort too. It's an exciting concept.
+What I'm essentially talking about are _streaming iterators_, which has been discussed at length [here](https://users.rust-lang.org/t/returning-borrowed-values-from-an-iterator/1096) and [here](https://github.com/emk/rust-streaming). There's another [interesting crate](https://github.com/sfackler/streaming-iterator) around this effort too. It's an exciting concept.
 
 ## Conclusion
 
