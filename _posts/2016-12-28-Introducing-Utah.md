@@ -71,7 +71,7 @@ pub struct DataFrameMut<'a, T>
 The only thing we've changed is the `data` field -- from a `Matrix<T>` to a `MatrixMut<T>`. For simplicity, we'll disregard the mutable dataframe for the rest of this post, but know that everything we talk about below extends to the mutable variant.
 
 
-The inner data is of type `Matrix<T>`, an alias to a [2-d array](http://bluss.github.io/rust-ndarray/master/ndarray/type.Array2.html) from the ndarray crate.
+The inner data is of type `Matrix<T>`, an alias to a [2-D array](http://bluss.github.io/rust-ndarray/master/ndarray/type.Array2.html) from the ndarray crate.
 
 ```rust
 pub type Matrix<T> = Array2<T>;
@@ -185,7 +185,7 @@ Note that Utah's `ReadCSV` trait is pretty barebones right now.
 
 ### Combinators
 
-The user interacts with Utah dataframes by chaining combinators, which are adapters over the dataframe iterator. Each operation is lazy by default. You can chain as many combinators as you want, but it won't do anything until you invoke a collection operation like `as_df`, which would allocate the results into a new dataframe, or `as_matrix`, which would allocate the results into a 2-d ndarray.
+The user interacts with Utah dataframes by chaining combinators, which are adapters over the dataframe iterator. Each operation is lazy by default. You can chain as many combinators as you want, but it won't do anything until you invoke a collection operation like `as_df`, which would allocate the results into a new dataframe, or `as_matrix`, which would allocate the results into a 2-D ndarray.
 
 I've organized the combinators that I've built so far into four different types, but there are naturally many more. The nice thing is that the iterator adapter design makes it extremely easy to add new combinators to the project.
 
