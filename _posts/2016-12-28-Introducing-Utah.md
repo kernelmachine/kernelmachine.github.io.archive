@@ -461,12 +461,12 @@ How do we effectively prevent user errors during data transformation _at compile
 So far, the only error handling is in the `new()` function, where we check whether the dimensions of the axis labels match that of the underlying data. This actually handles a ton of common errors, like selecting or removing a column that doesn't exist. But while it does panic in the right situations, the errors are not that useful in figuring out what the actual mistake was:
 
 ```
-IndexShapeMismatch(expected: String , actual: String) {
-    display("index shape mismatch. Expected length: {}, Actual length: {}",  expected, actual)
+IndexShapeMismatch(exp: String , act: String) {
+  display("index shape mismatch. Expected length: {}, Actual length: {}",  exp, act)
 }
 
-ColumnShapeMismatch(expected: String , actual: String) {
-    display("column shape mismatch. Expected length: {}, Actual length: {}",  expected, actual)
+ColumnShapeMismatch(exp: String , act: String) {
+  display("column shape mismatch. Expected length: {}, Actual length: {}",  exp, act)
 }
 
 ```
