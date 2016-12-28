@@ -122,13 +122,13 @@ pub struct DataFrameIterator<'a, I, T: 'a>
 
 First up, notice that we've now got lifetimes in the type. The DataFrameIterator is just a reference to a dataframe that owns the original data, and cannot outlive it. Ideally, you'll have to read the data into memory only once.
 
-Next, The trait bound we have on the dataframe iterator is `Iterator<Item = Window<'a, T>>`. `Window<'a, T>` is another type alias:
+Next, the trait bound on the dataframe iterator is `Iterator<Item = Window<'a, T>>`. `Window<'a, T>` is another type alias:
 
 ```
 pub type Window<'a, T> = (String, ArrayView1<'a, T>);
 ```
 
-This bound is telling us that the Dataframe iterator is an over _views_ of the data, along with its name (i.e. a column or index value). `ArrayViews` are column or row-wise slices of the original data. The dataframe lives in a continguous area of memory, and to iterate over it, we just slide a window over the stride of the vector that represents the matrix containing the data.
+The `ArrayView1` is a column or row-wise slice of the original data. The `Iterator` bound tells us that the `DataframeIterator` iterates over _views_ of the data, along with their names (i.e. a column or index value).  The dataframe lives in a contiguous area of memory, and to iterate over it, we just slide a window over the stride of the vector that represents the matrix containing the data.
 
 Finally, the struct fields:
 
