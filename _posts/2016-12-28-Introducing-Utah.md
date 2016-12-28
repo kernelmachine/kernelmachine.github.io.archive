@@ -511,4 +511,4 @@ I've introduced a new Rust crate for handling complex data transformations with 
   3. We get all the benefits of working with Rust's iterators, which are fast, safe, and lazy.
   4. There's a lot of interesting future work on better mixed type support, compile time numbers, and streaming.
 
-That's all from me; happy holidays!
+That's all from me -- happy holidays!
