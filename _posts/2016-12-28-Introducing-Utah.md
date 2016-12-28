@@ -128,13 +128,13 @@ Next, the trait bound on the dataframe iterator is `Iterator<Item = Window<'a, T
 pub type Window<'a, T> = (String, ArrayView1<'a, T>);
 ```
 
-The [`ArrayView1`](http://bluss.github.io/rust-ndarray/master/ndarray/type.ArrayView1.html) is a column or row-wise slice of the original data. The `Iterator` bound tells us that the `DataframeIterator` iterates over _views_ of the data, along with their names (i.e. a column or index value).  The dataframe lives in a contiguous area of memory, and to iterate over it, we just slide a window over the stride of the vector that represents the matrix containing the data. The iterator is realized through ndarray's [`AxisIter`]("http://bluss.github.io/rust-ndarray/master/ndarray/struct.AxisIter.html") type.
+The `ArrayView1` [type](`http://bluss.github.io/rust-ndarray/master/ndarray/type.ArrayView1.html`) is a column or row-wise slice of the original data. The `Iterator` bound tells us that the `DataframeIterator` iterates over _views_ of the data, along with their names (i.e. a column or index value).  The dataframe lives in a contiguous area of memory, and to iterate over it, we just slide a window over the stride of the vector that represents the matrix containing the data. The iterator is realized through ndarray's `AxisIter`[type]("http://bluss.github.io/rust-ndarray/master/ndarray/struct.AxisIter.html").
 
 Finally, the struct fields:
 
 * `data` just houses the iterator over the "windows" we just discussed.
 
-* `names` is an abstraction over the dataframe's rows or columns, depending on how we're iterating over the data during transformation. If we're iterating over the dataframe column-wise, `names` will be an iterator over the `columns` field, whereas if we're iterating row-wise, `names` will be an iterator over the `index` field.
+* `names` is an abstraction over the dataframe's rows or columns, depending on how we're iterating over the data during transformation. If we're iterating over the dataframe column-wise, `names` will be an iterator over the `columns` field. If we're iterating row-wise, `names` will be an iterator over the `index` field.
 
 * `other` houses the axis label that you're *not* iterating over. For example, in the case of a column-wise dataframe iterator, `other` would be the original index. We just hold onto this value in case you want to allocate the transformation into a new dataframe.
 
@@ -233,7 +233,7 @@ let b: DataFrame<f64> = dataframe!(
         "b" =>  column!([NAN, 3., 2.]),
         "c" =>  column!([2., NAN, 2.])
     });
-let res = a.inner_left_join(b).as_df()?;
+let res = a.inner_left_join(&b).as_df()?;
 ```
 
 #### Aggregate combinators
