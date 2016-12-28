@@ -167,13 +167,13 @@ let df: DataFrame<f64> = DataFrame::new(c)
 
 The `?` operator, newly introduced syntax for accessing the `Result` type, is there to prevent you from adding columns or indices that don't match the dimensions of the underlying data.
 
-There's also a `dataframe!` macro which you can use to create new dataframes on the fly:
+There's also `dataframe!` and `col!` macros which you can use to create new dataframes on the fly:
 
 ```
 let k: DataFrame<f64> = dataframe!(
     {
-        "a" =>  column!([2., 3., 2.]),
-        "b" =>  column!([2., NAN, 2.])
+        "a" =>  col!([2., 3., 2.]),
+        "b" =>  col!([2., NAN, 2.])
     });
 ```
 
@@ -211,8 +211,8 @@ Process combinators are meant for changing the original data you're working with
 ```
 let mut a: DataFrameMut<f64> = dataframe!(
     {
-        "a" =>  column!([NAN, 3., 2.]),
-        "b" =>  column!([2., NAN, 2.])
+        "a" =>  col!([NAN, 3., 2.]),
+        "b" =>  col!([2., NAN, 2.])
     });
 let res = df.impute(ImputeStrategy::Mean, UtahAxis::Column);
 ```
