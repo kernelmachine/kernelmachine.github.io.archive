@@ -473,7 +473,7 @@ ColumnShapeMismatch(expected: String , actual: String) {
 
 Furthermore, the errors are only caught at runtime.
 
-One thing I've been thinking about is compile-time dimension checking with the `typenum` and `genericarray` crates, which provide compile-time numeric operations and array dimensions, respectively.
+One thing I've been thinking about is compile-time dimension checking with the [typenum](https://github.com/paholg/typenum) and [genericarray](https://github.com/fizyk20/generic-array) crates, which provide compile-time numeric operations and array dimensions, respectively.
 
 Using these crates, the dimensions of the inner data and axis labels could be embedded in trait bounds:
 
