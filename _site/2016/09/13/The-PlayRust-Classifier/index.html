@@ -60,7 +60,7 @@
         <article class="post">
   <h1 class="post-title">The PlayRust Classifier</h1>
   <time datetime="2016-09-13T00:00:00-07:00" class="post-date">13 Sep 2016</time>
-  <p><em>For those who weren’t able to attend <a href="http://rustconf.com/">RustConf 2016</a>, I thought I’d summarize my and /u/staticassert’s talk in written form. I’ve only focused on the most important points below; for the full talk, check out the upcoming video when it’s posted.</em></p>
+  <p><em>For those who weren’t able to attend <a href="http://rustconf.com/">RustConf 2016</a>, I thought I’d provide a synopsis of my and /u/staticassert’s talk. I’ve only focused on a subset of talking points below; for the full talk, check out the upcoming video when it’s posted.</em></p>
 
 <h2 id="technical-debt-in-data-science">Technical Debt in Data Science</h2>
 
@@ -98,7 +98,7 @@
 
 <h3 id="the-model">The Model</h3>
 
-<p>Before digging into Rust-specific features of the pipeline we built, let’s look at the model and its accuracy.</p>
+<p>Before digging into Rust-specific features of the pipeline we built, let’s quickly look at the resulting model and its accuracy.</p>
 
 <p>We gathered thousands of reddit posts and looked at a number of features to describe their respective subreddits:</p>
 
@@ -122,13 +122,13 @@
   <img src="http://pegasos1.github.io/public/20160913/roccurve.png" width="550" height="400" />
 </div>
 
-<p>The model was primarily driven by the frequencies of words related to the <em>/r/rust</em> subreddit.</p>
+<p>The model was primarily driven by the frequencies of words related to the <em>/r/rust</em> subreddit. Notice the word “amp”, ie “&amp;”. Haha.</p>
 
 <div style="margin-left:100px">
   <img src="http://pegasos1.github.io/public/20160913/featimps.png" width="580" height="400" />
 </div>
 
-<p>Some example outputs are below. Notice the third post, with the slightly confusing title, is also slightly confusing to the model.</p>
+<p>The model outputs a score between 0 and 1 that represents the likelihood that the post in question is part of the <em>/r/rust</em> subreddit. Some example outputs are below. Notice the third post, with the slightly confusing title, is also slightly confusing to the model.</p>
 
 <div style="margin-left:50px">
   <img src="http://pegasos1.github.io/public/20160913/examples.png" width="700" height="400" />
@@ -140,7 +140,7 @@
 
 <h3 id="upfront-error-handling">Upfront error handling</h3>
 
-<p>A powerful aspect of the Rust language is the idea that developers must handle potential errors up front.</p>
+<p>A powerful aspect of the Rust language is the idea that developers must handle potential errors upfront.</p>
 
 <div class="language-rust highlighter-rouge"><pre class="highlight"><code><span class="k">pub</span> <span class="k">fn</span> <span class="nf">get_reddit_post</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">url</span> <span class="p">:</span> <span class="o">&amp;</span><span class="nb">str</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">RawPostData</span><span class="o">&gt;</span> <span class="p">{</span>
    <span class="k">let</span> <span class="k">mut</span> <span class="n">res</span> <span class="o">=</span> <span class="k">self</span><span class="py">.client</span>
@@ -177,7 +177,7 @@
 
 <p>This approach to handling errors is different from the unchecked exceptions paradigm in languages like Python or Java. Unlike try/except, <code class="highlighter-rouge">try!</code> is precise. In the former paradigm, you tend to wrap larger codeblocks with try/except, when in reality only parts of the code may fail.</p>
 
-<p>Furthermore, potential errors are  baked into the output type of the function with the <code class="highlighter-rouge">Result</code> type. This means that the caller knows <em>without knowledge of function implementation</em> that the function may return an error. On the developer’s side, it’s easy to move from research code to production, just <code class="highlighter-rouge">Ctrl+F</code> the <code class="highlighter-rouge">unwraps</code>, and handle them with <code class="highlighter-rouge">try!</code> macros.</p>
+<p>Furthermore, potential errors are  baked into the output type of the function (the <code class="highlighter-rouge">Result</code> type). This means that proper error handling can occur <em>without knowledge of function implementation</em>. On the developer’s side, it’s easy to move from research code to production, just <code class="highlighter-rouge">Ctrl+F</code> the <code class="highlighter-rouge">unwraps</code>, and handle them with <code class="highlighter-rouge">try!</code> macros.</p>
 
 <h3 id="typed-approach-to-dataframes">Typed approach to Dataframes</h3>
 
@@ -248,26 +248,21 @@
 <span class="p">}</span>
 </code></pre>
 </div>
-<h3 id="predictable-performance-during-scaling">Predictable performance during scaling</h3>
-
-<p>We did some comparative benchmarks on the <em>LabelEncoding</em> procedure, a very common operation in data science, in which we convert vector of strings to a vector of integer values that the model can understand. In these benchmarks, we compared an out-of-the-box Python implementation of the algorithm from scikit-learn to a custom one we built in Rust.</p>
-
-<p>Our Rust implementation was able to encode 100,000 strings 7x faster than the Python one. More surprising was the benchmark of encoding 1,000,000 strings. In this case, the Rust version was <em>2500x faster</em> than the corresponding Python implementation! The predictability of our Rust code was incredibly useful in scaling our pipeline, as we were sure that we would be able to process larger datasets without unexpected overhead.</p>
 
 <h3 id="other-advantages">Other advantages</h3>
 
-<p>There are other very useful aspects of Rust for the data science pipeline:</p>
+<p>There are many other very useful aspects of Rust for the data science pipeline, including:</p>
 
 <ul>
-  <li>Cargo testing, benchmarking, and documentation help dev follow good practices</li>
-  <li>Major refactoring is really easy</li>
+  <li>Predictable performance during scaling</li>
+  <li>Cargo testing, benchmarking, and docs help devs follow good coding practices</li>
   <li>Trait composition/generics limit the need for messy glue code</li>
-  <li>Many benchmarks (like those on this blog) support that Rust has strong performance in numerics</li>
+  <li>Many benchmarks (like <a href="http://www.suchin.co/2016/04/25/Matrix-Multiplication-In-Rust-Pt-1/">this</a> one) suggest Rust’s strong performance in numerics</li>
 </ul>
 
 <h2 id="rust-disadvantages">Rust disadvantages</h2>
 
-<p>While using Rust was generally a pleasant experience for this project, there were some areas in which Rust fell short.</p>
+<p>While using Rust was generally a pleasant experience for this project, there were some areas in which the language fell short.</p>
 
 <h3 id="fragmented-ml-ecosystem">Fragmented ML ecosystem</h3>
 
@@ -279,13 +274,22 @@
 
 <h2 id="vision-for-rust-ml">Vision for Rust ML</h2>
 
-<p>We have shown that Rust language features help reduce many technical debt issues that arise in making production level data science systems. We hope that Rust is promoted to improve feature engineering systems. We also hope that implementations of data science tooling become standardized to facilitate interoperability. Finally, we believe that effective domain applications of a language are primarily driven by the community that forms around it. We should start sharing ideas and building a collective metric for success in Rust machine learning and numerics!</p>
+<p>We have shown that Rust language features help reduce many technical debt issues that arise in making production level data science systems. We hope that Rust is promoted to improve feature engineering systems. We also hope that implementations of data science tooling become standardized to facilitate interoperability. Finally, we believe that effective domain applications of a language are primarily driven by the community that forms around it. We should start sharing ideas and building a collective metric for success in Rust machine learning and numerics.</p>
 
 </article>
 <!--
 <aside class="related">
   <h2>Related Posts</h2>
   <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/12/28/Introducing-Utah/">
+            Introducing Utah
+            <small><time datetime="2016-12-28T00:00:00-08:00">28 Dec 2016</time></small>
+          </a>
+        </h3>
+      </li>
     
       <li>
         <h3>
@@ -305,15 +309,6 @@
         </h3>
       </li>
     
-      <li>
-        <h3>
-          <a href="/2016/04/25/Matrix-Multiplication-In-Rust-Pt-1/">
-            Matrix Multiplication in Rust (Part 1)
-            <small><time datetime="2016-04-25T00:00:00-07:00">25 Apr 2016</time></small>
-          </a>
-        </h3>
-      </li>
-    
   </ul>
 </aside> -->
 
@@ -321,7 +316,7 @@
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2016-09-14T23:13:05-07:00">2016</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2017-01-04T13:05:24-08:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>

@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="https://suchin.co/atom.xml" rel="self"/>
  <link href="https://suchin.co/"/>
- <updated>2016-09-14T23:13:05-07:00</updated>
+ <updated>2017-01-04T13:05:24-08:00</updated>
  <id>https://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -13,11 +13,527 @@
 
  
  <entry>
+   <title>Introducing Utah</title>
+   <link href="https://suchin.co/2016/12/28/Introducing-Utah/"/>
+   <updated>2016-12-28T00:00:00-08:00</updated>
+   <id>https://suchin.co/2016/12/28/Introducing-Utah</id>
+   <content type="html">&lt;p&gt;Recently, I’ve been working on a Rust crate for tabular data manipulation. I’m excited to share the current state of the project.&lt;/p&gt;
+
+&lt;h2 id=&quot;a-dataframe-for-rust&quot;&gt;A dataframe for Rust&lt;/h2&gt;
+
+&lt;p&gt;Languages like &lt;a href=&quot;http://pandas.pydata.org/&quot;&gt;Python&lt;/a&gt;, &lt;a href=&quot;http://www.r-tutor.com/r-introduction/data-frame&quot;&gt;R&lt;/a&gt;, and &lt;a href=&quot;https://github.com/JuliaStats/DataFrames.jl&quot;&gt;Julia&lt;/a&gt; have popularized the  &lt;em&gt;dataframe&lt;/em&gt;, which is an abstraction over a collection of &lt;em&gt;named&lt;/em&gt; arrays. The dataframe allows users to access, transform, and compute over two-dimensional data that may have mixed types.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/pegasos1/utah&quot;&gt;&lt;strong&gt;Utah&lt;/strong&gt;&lt;/a&gt; is a dataframe crate backed by &lt;a href=&quot;https://github.com/bluss/rust-ndarray&quot;&gt;ndarray&lt;/a&gt; for type-conscious tabular data manipulation with an expressive, functional interface.&lt;/p&gt;
+
+&lt;h2 id=&quot;overall-goals-of-project&quot;&gt;Overall goals of project&lt;/h2&gt;
+
+&lt;h4 id=&quot;functional-interface-to-transform-data&quot;&gt;Functional interface to transform data&lt;/h4&gt;
+
+&lt;p&gt;Transformations are composable, repeatable, and readable.&lt;/p&gt;
+
+&lt;h4 id=&quot;iterator-adapter-implementations-for-performance-and-laziness&quot;&gt;Iterator adapter implementations for performance and laziness&lt;/h4&gt;
+
+&lt;p&gt;Data transformations are implemented with Rust’s iterators, which are fast, safe, and lazy.&lt;/p&gt;
+
+&lt;h4 id=&quot;leverage-reference-locality-for-performance&quot;&gt;Leverage reference locality for performance&lt;/h4&gt;
+
+&lt;p&gt;Most implementations of the dataframe involve some sort of map between column names and the underlying data. So during computations, you’re likely incurring performance hits while chasing pointers around in memory. In particular, row-wise operations can be much slower than column-wise ones.&lt;/p&gt;
+
+&lt;p&gt;I wanted to explore the effects of keeping data close together in memory. This crate is backed by ndarray to hold data, and enums to support mixed types. At the end of this post, I’ll describe an alternate implementation that sacrifices data locality to be able to have mixed types without wrappers.&lt;/p&gt;
+
+&lt;h4 id=&quot;solid-error-handling&quot;&gt;Solid error handling&lt;/h4&gt;
+
+&lt;p&gt;There are many errors that can occur while querying dataframes. For example, imagine selecting a column that doesn’t exist, or joining two dataframes that don’t have a common key. Such simple errors can be hidden in a sea of complex data transformations. The goal here is to provide compile-time error handling of these sorts of mistakes. I explore potential avenues to accomplish this goal at the end of this post.&lt;/p&gt;
+
+&lt;h2 id=&quot;internals&quot;&gt;Internals&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;Note: The internals of the project are subject to alter in the future; I’ll try to keep an updated post describing changes.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;the-dataframe&quot;&gt;The DataFrame&lt;/h3&gt;
+
+&lt;p&gt;There are two core types in Utah: the &lt;strong&gt;DataFrame&lt;/strong&gt; and the &lt;strong&gt;DataFrameIterator&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Utah dataframes are defined as follows:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DataFrame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;where&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;UtahNum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+          &lt;span class=&quot;c&quot;&gt;// ^ math ops like Add/Mul/etc, Empty, and others.&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Matrix&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;DataFrame&lt;/code&gt; takes the generic parameter &lt;em&gt;T&lt;/em&gt;, which corresponds to the type of data in the inner matrix.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;DataFrame&lt;/code&gt; is read-only by default. To operate on a dataframe that is read-write, you can use a &lt;code class=&quot;highlighter-rouge&quot;&gt;DataFrameMut&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub struct DataFrameMut&amp;lt;'a, T&amp;gt;
+    where T: 'a + UtahNum
+{
+    pub columns: Vec&amp;lt;String&amp;gt;,
+    pub data: MatrixMut&amp;lt;'a, T&amp;gt;,
+    pub index: Vec&amp;lt;String&amp;gt;,
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The only thing we’ve changed is the &lt;code class=&quot;highlighter-rouge&quot;&gt;data&lt;/code&gt; field – from a &lt;code class=&quot;highlighter-rouge&quot;&gt;Matrix&amp;lt;T&amp;gt;&lt;/code&gt; to a &lt;code class=&quot;highlighter-rouge&quot;&gt;MatrixMut&amp;lt;T&amp;gt;&lt;/code&gt;. For simplicity, we’ll disregard the mutable dataframe for the rest of this post, but know that everything we talk about below extends to the mutable variant.&lt;/p&gt;
+
+&lt;p&gt;The inner data is of type &lt;code class=&quot;highlighter-rouge&quot;&gt;Matrix&amp;lt;T&amp;gt;&lt;/code&gt;, an alias to a &lt;a href=&quot;http://bluss.github.io/rust-ndarray/master/ndarray/type.Array2.html&quot;&gt;2-D array&lt;/a&gt; from the ndarray crate.&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Matrix&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Array2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The data that the Matrix contains implement all the traits associated with the custom trait &lt;em&gt;UtahNum&lt;/em&gt; (ie &lt;code class=&quot;highlighter-rouge&quot;&gt;Add&lt;/code&gt;,&lt;code class=&quot;highlighter-rouge&quot;&gt;Sub&lt;/code&gt;,&lt;code class=&quot;highlighter-rouge&quot;&gt;Mul&lt;/code&gt;,&lt;code class=&quot;highlighter-rouge&quot;&gt;Div&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;One&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;Zero&lt;/code&gt;) for computations, as well as the custom trait &lt;em&gt;Empty&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Empty values are an unfortunate reality of most datasets, and manifest itself in different types depending on the context. For example, empty values may be &lt;code class=&quot;highlighter-rouge&quot;&gt;NAN&lt;/code&gt; if you’re working with float data, an empty string with &lt;code class=&quot;highlighter-rouge&quot;&gt;String&lt;/code&gt; data, or &lt;code class=&quot;highlighter-rouge&quot;&gt;0&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;Int&lt;/code&gt; data. We use the &lt;code class=&quot;highlighter-rouge&quot;&gt;Empty&lt;/code&gt; trait to define empty values for any type we want to use in a dataframe:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Empty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;is_empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;bool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;We ask, for type &lt;code class=&quot;highlighter-rouge&quot;&gt;T&lt;/code&gt;, what should we consider as an empty value, and when is a value equal to empty? In the case of &lt;code class=&quot;highlighter-rouge&quot;&gt;f64&lt;/code&gt;, we might implement the trait as follows:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;impl&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Empty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;NAN&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;is_empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.is_nan&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The columns/index are just names of the columns and rows of the dataframe, respectively.&lt;/p&gt;
+
+&lt;h3 id=&quot;the-dataframeiterator&quot;&gt;The DataFrameIterator&lt;/h3&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;DataFrameIterator&lt;/code&gt; is what we use to perform transformations and computations. The &lt;code class=&quot;highlighter-rouge&quot;&gt;DataFrameIterator&lt;/code&gt; is of the following type:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub struct DataFrameIterator&amp;lt;'a, I, T: 'a&amp;gt;
+    where I: Iterator&amp;lt;Item = Window&amp;lt;'a, T&amp;gt;&amp;gt;
+{
+    pub names: Iter&amp;lt;'a, String&amp;gt;,
+    pub data: I,
+    pub other: Vec&amp;lt;String&amp;gt;,
+    pub axis: UtahAxis,
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;First up, notice that we’ve now got lifetimes in the type. The DataFrameIterator is just a reference to a dataframe that owns the original data, and cannot outlive it. Ideally, you’ll have to read the data into memory only once.&lt;/p&gt;
+
+&lt;p&gt;Next, the trait bound on the dataframe iterator is &lt;code class=&quot;highlighter-rouge&quot;&gt;Iterator&amp;lt;Item = Window&amp;lt;'a, T&amp;gt;&amp;gt;&lt;/code&gt;. &lt;code class=&quot;highlighter-rouge&quot;&gt;Window&amp;lt;'a, T&amp;gt;&lt;/code&gt; is another type alias:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub type Window&amp;lt;'a, T&amp;gt; = (String, ArrayView1&amp;lt;'a, T&amp;gt;);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayView1&lt;/code&gt; &lt;a href=&quot;`http://bluss.github.io/rust-ndarray/master/ndarray/type.ArrayView1.html`&quot;&gt;type&lt;/a&gt; is a column or row slice of the original data. The &lt;code class=&quot;highlighter-rouge&quot;&gt;Iterator&lt;/code&gt; bound tells us that the &lt;code class=&quot;highlighter-rouge&quot;&gt;DataframeIterator&lt;/code&gt; iterates over &lt;em&gt;views&lt;/em&gt; of the data, along with their names (i.e. a column or index value).  The dataframe lives in a contiguous area of memory, and to iterate over it, we just slide a window over the stride of the vector that represents the matrix containing the data. The iterator is realized through ndarray’s &lt;code class=&quot;highlighter-rouge&quot;&gt;AxisIter&lt;/code&gt;&lt;a href=&quot;&amp;quot;http://bluss.github.io/rust-ndarray/master/ndarray/struct.AxisIter.html&amp;quot;&quot;&gt;type&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Finally, the struct fields:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;data&lt;/code&gt; just houses the iterator over the “windows” we just discussed.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;axis&lt;/code&gt; tells the dataframe iterator which direction you want to iterate over. This field is of type &lt;code class=&quot;highlighter-rouge&quot;&gt;UtahAxis&lt;/code&gt;, an enum over two different directions of iteration:&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;enum&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;UtahAxis&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Column&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;names&lt;/code&gt; is an iterator over the axis label (index or columns) you’re iterating over.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;other&lt;/code&gt; is the axis label that you’re &lt;em&gt;not&lt;/em&gt; iterating over. We just hold onto this value in case you want to allocate the transformation into a new dataframe.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;creating-a-dataframe&quot;&gt;Creating a dataframe&lt;/h2&gt;
+
+&lt;p&gt;There are multiple ways to create a dataframe. The most straightforward way is to use a &lt;em&gt;builder pattern&lt;/em&gt;, which allows you to overwrite individual fields of the dataframe successively:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+use utah::prelude::*;
+let c = arr2(&amp;amp;[[2., 6.], [3., 4.], [2., 1.]]);
+let df: DataFrame&amp;lt;f64&amp;gt; = DataFrame::new(c)
+                                  .columns(&amp;amp;[&quot;a&quot;, &quot;b&quot;])?
+                                  .index(&amp;amp;[&quot;1&quot;, &quot;2&quot;, &quot;3&quot;])?;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;?&lt;/code&gt; operator, newly introduced syntax for accessing the &lt;code class=&quot;highlighter-rouge&quot;&gt;Result&lt;/code&gt; type, is there to prevent you from adding columns or indices that don’t match the dimensions of the underlying data.&lt;/p&gt;
+
+&lt;p&gt;There’s also &lt;code class=&quot;highlighter-rouge&quot;&gt;dataframe!&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;col!&lt;/code&gt; macros which you can use to create new dataframes on the fly:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;let k: DataFrame&amp;lt;f64&amp;gt; = dataframe!(
+    {
+        &quot;a&quot; =&amp;gt;  col!([2., 3., 2.]),
+        &quot;b&quot; =&amp;gt;  col!([2., NAN, 2.])
+    });
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Finally, you can import data from a CSV.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;let file_name = &quot;test.csv&quot;;                            
+let df: Result&amp;lt;DataFrame&amp;lt;InnerType&amp;gt;&amp;gt; = DataFrame::read_csv(file_name);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Note that Utah’s &lt;code class=&quot;highlighter-rouge&quot;&gt;ReadCSV&lt;/code&gt; trait is pretty barebones right now.&lt;/p&gt;
+
+&lt;h3 id=&quot;combinators&quot;&gt;Combinators&lt;/h3&gt;
+
+&lt;p&gt;The user interacts with Utah dataframes by chaining combinators, which are adapters over the dataframe iterator. Each operation is lazy by default. You can chain as many combinators as you want, but it won’t do anything until you invoke a collection operation like &lt;code class=&quot;highlighter-rouge&quot;&gt;as_df&lt;/code&gt;, which would allocate the results into a new dataframe, or &lt;code class=&quot;highlighter-rouge&quot;&gt;as_matrix&lt;/code&gt;, which would allocate the results into a 2-D ndarray.&lt;/p&gt;
+
+&lt;p&gt;I’ve organized the combinators that I’ve built so far into four different types, but there are naturally many more. The nice thing is that the iterator adapter design makes it extremely easy to add new combinators to the project.&lt;/p&gt;
+
+&lt;h4 id=&quot;transform-combinators&quot;&gt;Transform combinators&lt;/h4&gt;
+
+&lt;p&gt;These combinators are meant for changing the shape of the data you’re working with. Combinators in this class include &lt;code class=&quot;highlighter-rouge&quot;&gt;select&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;remove&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;append&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;let a = arr2(&amp;amp;[[2.0, 7.0], [3.0, 4.0], [2.0, 8.0]]);
+let df = DataFrame::new(a).index(&amp;amp;[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]).unwrap();
+let res = df.select(&amp;amp;[&quot;a&quot;, &quot;c&quot;], UtahAxis::Row);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;process-combinators&quot;&gt;Process combinators&lt;/h4&gt;
+
+&lt;p&gt;Process combinators are meant for changing the original data you’re working with. Combinators in this class include &lt;code class=&quot;highlighter-rouge&quot;&gt;impute&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;mapdf&lt;/code&gt;. Impute replaces missing values of a dataframe with the mean of the corresponding axis. Note that these operations require the use of a &lt;code class=&quot;highlighter-rouge&quot;&gt;DataFrameMut&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;let mut a: DataFrameMut&amp;lt;f64&amp;gt; = dataframe!(
+    {
+        &quot;a&quot; =&amp;gt;  col!([NAN, 3., 2.]),
+        &quot;b&quot; =&amp;gt;  col!([2., NAN, 2.])
+    });
+let res = df.impute(ImputeStrategy::Mean, UtahAxis::Column);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;interact-combinators&quot;&gt;Interact combinators&lt;/h4&gt;
+
+&lt;p&gt;Interact combinators are meant for interactions between dataframes. They generally take at least two dataframe arguments. Combinators in this class include &lt;code class=&quot;highlighter-rouge&quot;&gt;inner_left_join&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;outer_left_join&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;inner_right_join&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;outer_right_join&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;concat&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;let a: DataFrame&amp;lt;f64&amp;gt; = dataframe!(
+    {
+        &quot;a&quot; =&amp;gt;  column!([NAN, 3., 2.]),
+        &quot;b&quot; =&amp;gt;  column!([2., NAN, 2.])
+    });
+let b: DataFrame&amp;lt;f64&amp;gt; = dataframe!(
+    {
+        &quot;b&quot; =&amp;gt;  column!([NAN, 3., 2.]),
+        &quot;c&quot; =&amp;gt;  column!([2., NAN, 2.])
+    });
+let res = a.inner_left_join(&amp;amp;b).as_df()?;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;aggregate-combinators&quot;&gt;Aggregate combinators&lt;/h4&gt;
+
+&lt;p&gt;Aggregate combinators are meant to reduce a chain of combinators to some result. These combinators are usually the last operation in a chain, but don’t necessarily have to be. Combinators in this class include &lt;code class=&quot;highlighter-rouge&quot;&gt;sumdf&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;mindf&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;maxdf&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;stdev&lt;/code&gt; (standard deviation), and &lt;code class=&quot;highlighter-rouge&quot;&gt;mean&lt;/code&gt;. Currently, aggregate combinators are not iterator collection operations, because they do not invoke a chain. This may change in the future.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;let a = arr2(&amp;amp;[[2.0, 7.0], [3.0, 4.0], [2.0, 8.0]]);
+let df = DataFrame::new(a).index(&amp;amp;[1, 2, 3])?.columns(&amp;amp;[&quot;a&quot;, &quot;b&quot;])?;
+let res = df.mean(UtahAxis::Row);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;chaining-combinators&quot;&gt;Chaining combinators&lt;/h4&gt;
+
+&lt;p&gt;The real power of combinators comes from the ability to chain them together in expressive transformations that are easy to parse. You can do things like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;let result = df.df_iter(UtahAxis::Row)
+               .remove(&amp;amp;[&quot;1&quot;])
+               .select(&amp;amp;[&quot;2&quot;])
+               .append(&quot;8&quot;, new_data.view())
+               .inner_left_join(df_1)
+               .sumdf()
+               .as_df()?
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Because we’ve built the chain on a row-wise dataframe iterator, each subsequent operation will only operate on the rows of the dataframe.&lt;/p&gt;
+
+&lt;h2 id=&quot;creating-new-combinators&quot;&gt;Creating new combinators&lt;/h2&gt;
+
+&lt;p&gt;Rust’s trait system allows for repeatable patterns throughout the project, especially when it comes to designing combinators. By following these steps, you can easily add your own combinators for new transformations or computations.&lt;/p&gt;
+
+&lt;h5 id=&quot;define-a-new-struct-combinator-with-necessary-data&quot;&gt;1. Define a new struct &lt;code class=&quot;highlighter-rouge&quot;&gt;Combinator&lt;/code&gt;, with necessary data.&lt;/h5&gt;
+
+&lt;p&gt;The combinator should contain an iterator over items of type &lt;code class=&quot;highlighter-rouge&quot;&gt;Window&amp;lt;'a, T&amp;gt;&lt;/code&gt; – a matrix slice and its name.  &lt;code class=&quot;highlighter-rouge&quot;&gt;Sum&lt;/code&gt; contains the Iterator, the axis label it’s not iterating over, and the axis of iteration.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    pub struct Sum&amp;lt;'a, I: 'a, T: 'a, S&amp;gt;
+      where I: Iterator&amp;lt;Item = Window&amp;lt;'a, T&amp;gt;&amp;gt; + 'a,
+            T: UtahNum,
+            S: Identifier
+  {
+      data: I,
+      other: Vec&amp;lt;String&amp;gt;,
+      axis: UtahAxis,
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h5 id=&quot;impl-iterator-for-combinator&quot;&gt;2. impl Iterator for Combinator&lt;/h5&gt;
+
+&lt;p&gt;What’s the output of this combinator during iteration over the dataframe? In the case of &lt;code class=&quot;highlighter-rouge&quot;&gt;Sum&lt;/code&gt;, we’re just taking the scalar sum of elements in a “window”.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;      impl&amp;lt;'a, I, T&amp;gt; Iterator for Sum&amp;lt;'a, I, T&amp;gt;
+        where I: Iterator&amp;lt;Item = Window&amp;lt;'a, T&amp;gt;&amp;gt;,
+              T: UtahNum    
+    {
+        type Item = T;
+        fn next(&amp;amp;mut self) -&amp;gt; Option&amp;lt;Self::Item&amp;gt; {
+            match self.data.next() {
+                None =&amp;gt; return None,
+                Some((_, dat)) =&amp;gt; return Some(dat.scalar_sum()),
+            }
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h5 id=&quot;add-impl-combinator-with-a-fn-new&quot;&gt;3. Add &lt;code class=&quot;highlighter-rouge&quot;&gt;impl Combinator&lt;/code&gt; with a &lt;code class=&quot;highlighter-rouge&quot;&gt;fn new()&lt;/code&gt;.&lt;/h5&gt;
+
+&lt;p&gt;How do you create this combinator from scratch? That’s easy:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;      impl&amp;lt;'a, I, T&amp;gt; Sum&amp;lt;'a, I, T&amp;gt;
+        where I: Iterator&amp;lt;Item = Window&amp;lt;'a, T&amp;gt;&amp;gt;,
+              T: UtahNum
+    {
+        pub fn new(df: I, other: Vec&amp;lt;String&amp;gt;, axis: UtahAxis) -&amp;gt; Sum&amp;lt;'a, I, T&amp;gt; {
+            Sum {
+                data: df,
+                other: other,
+                axis: axis,
+            }
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h5 id=&quot;add-fn-combinatorself--iterator-to-its-categorical-trait&quot;&gt;4. Add &lt;code class=&quot;highlighter-rouge&quot;&gt;fn combinator(self : Iterator)&lt;/code&gt; to its categorical trait&lt;/h5&gt;
+
+&lt;p&gt;The function you add should invoke the &lt;code class=&quot;highlighter-rouge&quot;&gt;new&lt;/code&gt; constructor defined in the third step. In the case of &lt;code class=&quot;highlighter-rouge&quot;&gt;Sum&lt;/code&gt;, we’ll add it to the &lt;code class=&quot;highlighter-rouge&quot;&gt;Aggregate&lt;/code&gt; trait. Define a new categorical trait if the new combinator doesn’t fit with the built-in ones.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub trait Aggregate&amp;lt;'a, T&amp;gt;
+    where T: UtahNum
+  {
+    fn sumdf(self) -&amp;gt; Sum&amp;lt;'a, Self, T&amp;gt;
+        where Self: Sized + Iterator&amp;lt;Item = Window&amp;lt;'a, T&amp;gt;&amp;gt;;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h5 id=&quot;add-fn-combinatorself--dataframe-to-the-operations-trait&quot;&gt;5. Add &lt;code class=&quot;highlighter-rouge&quot;&gt;fn combinator(self : DataFrame)&lt;/code&gt; to the &lt;code class=&quot;highlighter-rouge&quot;&gt;Operations&lt;/code&gt; trait&lt;/h5&gt;
+
+&lt;p&gt;The function you add should invoke the combinator from an allocated dataframe.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  pub trait Operations&amp;lt;'a, T&amp;gt;
+    where T: 'a + UtahNum
+  {
+    fn sumdf(&amp;amp;'a mut self, axis: UtahAxis) -&amp;gt; SumIter&amp;lt;'a, T&amp;gt;;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;SumIter&lt;/code&gt; is another alias:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub type SumIter&amp;lt;'a, T&amp;gt; = Sum&amp;lt;'a, DataFrameIterator&amp;lt;'a, T&amp;gt;, T&amp;gt;;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h5 id=&quot;impl-asdataframe-for-combinator&quot;&gt;6. impl AsDataFrame for Combinator&lt;/h5&gt;
+
+&lt;p&gt;The function you add will let you go from the &lt;code class=&quot;highlighter-rouge&quot;&gt;Combinator&lt;/code&gt; iterator to an allocated dataframe/matrix/array. Read next section for more details on this trait.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  pub trait ToDataFrame&amp;lt;'a, I, T&amp;gt;
+    where T: UtahNum + 'a
+  {
+          fn as_df(self) -&amp;gt; Result&amp;lt;DataFrame&amp;lt;T&amp;gt;&amp;gt; where Self: Sized + Iterator&amp;lt;Item = I&amp;gt;;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It’s interesting to think about how to reduce combinators to iterators adapters that we’re familiar with. For example, the &lt;code class=&quot;highlighter-rouge&quot;&gt;concat&lt;/code&gt; combinator is just a &lt;code class=&quot;highlighter-rouge&quot;&gt;Chain&lt;/code&gt;. More complicated combinators like &lt;code class=&quot;highlighter-rouge&quot;&gt;Groupby&lt;/code&gt; can be thought of as a &lt;code class=&quot;highlighter-rouge&quot;&gt;Map&lt;/code&gt; on a &lt;code class=&quot;highlighter-rouge&quot;&gt;Filter&lt;/code&gt;. These conceptual relationships can help you think about how to best implement a new combinator.&lt;/p&gt;
+
+&lt;h3 id=&quot;collection&quot;&gt;Collection&lt;/h3&gt;
+
+&lt;p&gt;There are many ways you can access or store the result of your chained operations. Because each data transformation is just an iterator, we can naturally collect the output of chained operations via &lt;code class=&quot;highlighter-rouge&quot;&gt;collect()&lt;/code&gt; or a &lt;code class=&quot;highlighter-rouge&quot;&gt;for&lt;/code&gt; loop:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;for x in df.concat(&amp;amp;df_1) {
+   println!(&quot;{:?}&quot;, x)
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;But we also have an &lt;code class=&quot;highlighter-rouge&quot;&gt;ToDataFrame&lt;/code&gt; trait, which dumps the output of chained combinators into a new dataframe, matrix, or array, so we can do something like the following:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;let maximum_values = df.concat(&amp;amp;df_1).maxdf(UtahAxis::Column).as_df()?;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;the-innertype&quot;&gt;The InnerType&lt;/h3&gt;
+
+&lt;p&gt;Now, I mentioned in the beginning that most dataframes provide mixed types, and I wanted to provide a similar functionality here. In the module &lt;code class=&quot;highlighter-rouge&quot;&gt;utah::mixedtypes&lt;/code&gt;, I’ve defined &lt;code class=&quot;highlighter-rouge&quot;&gt;InnerType&lt;/code&gt;, which is an enum over various types of data that can co-exist in the same dataframe:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub enum InnerType {
+    Float(f64),
+    Int64(i64),
+    Int32(i32),
+    Str(String),
+    Empty,
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;With this wrapper, you can have &lt;code class=&quot;highlighter-rouge&quot;&gt;String&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;f64&lt;/code&gt; in the same dataframe.&lt;/p&gt;
+
+&lt;p&gt;In general, this may not be the best approach to supporting mixed types in this project, because there are performance hits for computation when working with type wrappers. I discuss alternative avenues to achieving this goal below.&lt;/p&gt;
+
+&lt;p&gt;An important consequence of supporting mixed types is that because strings are not &lt;code class=&quot;highlighter-rouge&quot;&gt;Copy&lt;/code&gt;, the dataframe is not &lt;code class=&quot;highlighter-rouge&quot;&gt;Copy&lt;/code&gt;. This means that you may run into unexpected ownership problems while building data transformations. There are some API ergonomics to be ironed out.&lt;/p&gt;
+
+&lt;h2 id=&quot;next-steps&quot;&gt;Next steps&lt;/h2&gt;
+
+&lt;p&gt;Next, I’ll catalog some of the thoughts on future directions for this project.&lt;/p&gt;
+
+&lt;h4 id=&quot;comparing-a-map-implementation-to-a-reference-local-one&quot;&gt;Comparing a map implementation to a reference-local one&lt;/h4&gt;
+
+&lt;p&gt;There are some drawbacks to the iterator adapter design which may warrant re-visiting the map implementation I mentioned in the beginning of the post. For example, &lt;code class=&quot;highlighter-rouge&quot;&gt;select&lt;/code&gt; is currently &lt;code class=&quot;highlighter-rouge&quot;&gt;O(n)&lt;/code&gt; when it could be &lt;code class=&quot;highlighter-rouge&quot;&gt;O(1)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Furthermore, we have to wrap our data with an enum (ie &lt;code class=&quot;highlighter-rouge&quot;&gt;InnerType&lt;/code&gt;) to be able to support mixed types in the same array. Computations are not as fast as they could be.&lt;/p&gt;
+
+&lt;p&gt;Ideally, we could work with raw types directly. An alternate dataframe implementation sacrifices reference locality for the ability to work with raw types in the mixed-context.&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MixedDataFrame&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;where&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;UtahNum&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HashMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Array1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HashMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;usize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This dataframe’s design implies that we will need two separate types for row-wise and column-wise iteration.&lt;/p&gt;
+
+&lt;p&gt;Row-wise iteration would could be a multi-zip operation where we connect each value of the same index across all columns.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub struct MixedDataFrameRowIterator&amp;lt;'a, T: 'a&amp;gt;
+    where T: UtahNum
+          Zip&amp;lt;AxisIter&amp;lt;'a, T, usize&amp;gt;&amp;gt;: Iterator
+{
+    pub names: Iter&amp;lt;'a, String&amp;gt;,
+    pub data: Zip&amp;lt;AxisIter&amp;lt;'a, T, usize&amp;gt;&amp;gt;,
+    pub other: Vec&amp;lt;String&amp;gt;,
+    pub axis: UtahAxis,
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;On the other hand, column-wise iteration could be an iterator over the HashMap.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub struct MixedDataFrameColIterator&amp;lt;'a, T: 'a&amp;gt;
+    where T: UtahNum
+          Iter&amp;lt;'a, String, Array1&amp;lt;T&amp;gt;&amp;gt;: Iterator
+{
+    pub data: Iter&amp;lt;'a, String, Array1&amp;lt;T&amp;gt;&amp;gt;,
+    pub other: Vec&amp;lt;String&amp;gt;,
+    pub axis: UtahAxis,
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Further explorations into the map implementation are needed to see if it realizes performance benefits over the reference-local one.&lt;/p&gt;
+
+&lt;h4 id=&quot;better-error-handling-with-compile-time-dimension-checking&quot;&gt;Better Error handling with compile time dimension checking&lt;/h4&gt;
+
+&lt;p&gt;How do we effectively prevent user errors during data transformation &lt;em&gt;at compile time&lt;/em&gt;?&lt;/p&gt;
+
+&lt;p&gt;So far, the only error handling is in the &lt;code class=&quot;highlighter-rouge&quot;&gt;new()&lt;/code&gt; function, where we check whether the dimensions of the axis labels match that of the underlying data. This actually handles a ton of common errors, like selecting or removing a column that doesn’t exist. But while it does panic in the right situations, the errors are not that useful in figuring out what the actual mistake was:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;IndexShapeMismatch(exp: String , act: String) {
+  display(&quot;index shape mismatch. Expected length: {}, Actual length: {}&quot;,  exp, act)
+}
+
+ColumnShapeMismatch(exp: String , act: String) {
+  display(&quot;column shape mismatch. Expected length: {}, Actual length: {}&quot;,  exp, act)
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Furthermore, the errors are only caught at runtime.&lt;/p&gt;
+
+&lt;p&gt;One thing I’ve been thinking about is compile-time dimension checking with the &lt;a href=&quot;https://github.com/paholg/typenum&quot;&gt;typenum&lt;/a&gt; and &lt;a href=&quot;https://github.com/fizyk20/generic-array&quot;&gt;genericarray&lt;/a&gt; crates, which provide compile-time numeric operations and array dimensions, respectively.&lt;/p&gt;
+
+&lt;p&gt;Using these crates, the dimensions of the inner data and axis labels could be embedded in trait bounds:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pub struct DataFrame&amp;lt;T, N, M, O, P&amp;gt;
+    where T: UtahNum
+          M: ArrayLength&amp;lt;String&amp;gt; + Same&amp;lt;P&amp;gt;,
+          P: ArrayLength&amp;lt;T&amp;gt; + Same&amp;lt;M&amp;gt;,
+          N: ArrayLength&amp;lt;String&amp;gt; + Same&amp;lt;O&amp;gt;,
+          O: ArrayLength&amp;lt;T&amp;gt; + Same&amp;lt;N&amp;gt;,
+{
+    pub columns: GenericArray&amp;lt;String, M&amp;gt;,
+    pub data: GenericArray&amp;lt;GenericArray&amp;lt;T,O&amp;gt;, P&amp;gt;,
+    pub index: GenericArray&amp;lt;String, N&amp;gt;,
+    phantom_0: PhantomData&amp;lt;&amp;lt;N as Same&amp;lt;O&amp;gt;&amp;gt;::Output&amp;gt;,
+    phantom_1: PhantomData&amp;lt;&amp;lt;M as Same&amp;lt;P&amp;gt;&amp;gt;::Output&amp;gt;,
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The trait bounds imply that a combinator chain will not compile if the length of the index &lt;code class=&quot;highlighter-rouge&quot;&gt;M&lt;/code&gt; and columns &lt;code class=&quot;highlighter-rouge&quot;&gt;N&lt;/code&gt; don’t match the dimensions of the underlying data.&lt;/p&gt;
+
+&lt;h4 id=&quot;streaming-dataframes&quot;&gt;Streaming DataFrames&lt;/h4&gt;
+
+&lt;p&gt;In reality, the current implementation is an imperfect workaround of what I &lt;em&gt;really&lt;/em&gt; want the dataframe and its combinators to be. Right now, the data owner (&lt;code class=&quot;highlighter-rouge&quot;&gt;DataFrame&lt;/code&gt;) is separated from the iterator (&lt;code class=&quot;highlighter-rouge&quot;&gt;DataFrameIterator&lt;/code&gt;) and the combinators.&lt;/p&gt;
+
+&lt;p&gt;I would like the dataframe to be an iterator over some data held in disk, and each combinator borrowed values from a buffer maintained by the dataframe.  Then the real power of the iterator adapter design is realized: we can work with datasets that may not fit into memory.&lt;/p&gt;
+
+&lt;p&gt;What I’m essentially talking about are &lt;em&gt;streaming iterators&lt;/em&gt;, which has been discussed at length &lt;a href=&quot;https://users.rust-lang.org/t/returning-borrowed-values-from-an-iterator/1096&quot;&gt;here&lt;/a&gt; and &lt;a href=&quot;https://github.com/emk/rust-streaming&quot;&gt;here&lt;/a&gt;. There’s another &lt;a href=&quot;https://github.com/sfackler/streaming-iterator&quot;&gt;interesting crate&lt;/a&gt; around this effort too. It’s an exciting concept.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;I’ve introduced a new Rust crate for handling complex data transformations with two dimensional iterator adapters. This crate, while extremely nascent, has shown a few strengths so far:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Functional chaining of combinators makes code easy to understand.&lt;/li&gt;
+  &lt;li&gt;Iterator adapter design makes the code extremely repeatable and easy to extend to new domains.&lt;/li&gt;
+  &lt;li&gt;We get all the benefits of working with Rust’s iterators, which are fast, safe, and lazy.&lt;/li&gt;
+  &lt;li&gt;There’s a lot of interesting future work on better mixed type support, compile time numbers, and streaming.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;That’s all from me – happy holidays!&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
    <title>The PlayRust Classifier</title>
    <link href="https://suchin.co/2016/09/13/The-PlayRust-Classifier/"/>
    <updated>2016-09-13T00:00:00-07:00</updated>
    <id>https://suchin.co/2016/09/13/The-PlayRust-Classifier</id>
-   <content type="html">&lt;p&gt;&lt;em&gt;For those who weren’t able to attend &lt;a href=&quot;http://rustconf.com/&quot;&gt;RustConf 2016&lt;/a&gt;, I thought I’d summarize my and /u/staticassert’s talk in written form. I’ve only focused on the most important points below; for the full talk, check out the upcoming video when it’s posted.&lt;/em&gt;&lt;/p&gt;
+   <content type="html">&lt;p&gt;&lt;em&gt;For those who weren’t able to attend &lt;a href=&quot;http://rustconf.com/&quot;&gt;RustConf 2016&lt;/a&gt;, I thought I’d provide a synopsis of my and /u/staticassert’s talk. I’ve only focused on a subset of talking points below; for the full talk, check out the upcoming video when it’s posted.&lt;/em&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;technical-debt-in-data-science&quot;&gt;Technical Debt in Data Science&lt;/h2&gt;
 
@@ -55,7 +571,7 @@
 
 &lt;h3 id=&quot;the-model&quot;&gt;The Model&lt;/h3&gt;
 
-&lt;p&gt;Before digging into Rust-specific features of the pipeline we built, let’s look at the model and its accuracy.&lt;/p&gt;
+&lt;p&gt;Before digging into Rust-specific features of the pipeline we built, let’s quickly look at the resulting model and its accuracy.&lt;/p&gt;
 
 &lt;p&gt;We gathered thousands of reddit posts and looked at a number of features to describe their respective subreddits:&lt;/p&gt;
 
@@ -79,13 +595,13 @@
   &lt;img src=&quot;http://pegasos1.github.io/public/20160913/roccurve.png&quot; width=&quot;550&quot; height=&quot;400&quot; /&gt;
 &lt;/div&gt;
 
-&lt;p&gt;The model was primarily driven by the frequencies of words related to the &lt;em&gt;/r/rust&lt;/em&gt; subreddit.&lt;/p&gt;
+&lt;p&gt;The model was primarily driven by the frequencies of words related to the &lt;em&gt;/r/rust&lt;/em&gt; subreddit. Notice the word “amp”, ie “&amp;amp;”. Haha.&lt;/p&gt;
 
 &lt;div style=&quot;margin-left:100px&quot;&gt;
   &lt;img src=&quot;http://pegasos1.github.io/public/20160913/featimps.png&quot; width=&quot;580&quot; height=&quot;400&quot; /&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Some example outputs are below. Notice the third post, with the slightly confusing title, is also slightly confusing to the model.&lt;/p&gt;
+&lt;p&gt;The model outputs a score between 0 and 1 that represents the likelihood that the post in question is part of the &lt;em&gt;/r/rust&lt;/em&gt; subreddit. Some example outputs are below. Notice the third post, with the slightly confusing title, is also slightly confusing to the model.&lt;/p&gt;
 
 &lt;div style=&quot;margin-left:50px&quot;&gt;
   &lt;img src=&quot;http://pegasos1.github.io/public/20160913/examples.png&quot; width=&quot;700&quot; height=&quot;400&quot; /&gt;
@@ -97,7 +613,7 @@
 
 &lt;h3 id=&quot;upfront-error-handling&quot;&gt;Upfront error handling&lt;/h3&gt;
 
-&lt;p&gt;A powerful aspect of the Rust language is the idea that developers must handle potential errors up front.&lt;/p&gt;
+&lt;p&gt;A powerful aspect of the Rust language is the idea that developers must handle potential errors upfront.&lt;/p&gt;
 
 &lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_reddit_post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RawPostData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.client&lt;/span&gt;
@@ -134,7 +650,7 @@
 
 &lt;p&gt;This approach to handling errors is different from the unchecked exceptions paradigm in languages like Python or Java. Unlike try/except, &lt;code class=&quot;highlighter-rouge&quot;&gt;try!&lt;/code&gt; is precise. In the former paradigm, you tend to wrap larger codeblocks with try/except, when in reality only parts of the code may fail.&lt;/p&gt;
 
-&lt;p&gt;Furthermore, potential errors are  baked into the output type of the function with the &lt;code class=&quot;highlighter-rouge&quot;&gt;Result&lt;/code&gt; type. This means that the caller knows &lt;em&gt;without knowledge of function implementation&lt;/em&gt; that the function may return an error. On the developer’s side, it’s easy to move from research code to production, just &lt;code class=&quot;highlighter-rouge&quot;&gt;Ctrl+F&lt;/code&gt; the &lt;code class=&quot;highlighter-rouge&quot;&gt;unwraps&lt;/code&gt;, and handle them with &lt;code class=&quot;highlighter-rouge&quot;&gt;try!&lt;/code&gt; macros.&lt;/p&gt;
+&lt;p&gt;Furthermore, potential errors are  baked into the output type of the function (the &lt;code class=&quot;highlighter-rouge&quot;&gt;Result&lt;/code&gt; type). This means that proper error handling can occur &lt;em&gt;without knowledge of function implementation&lt;/em&gt;. On the developer’s side, it’s easy to move from research code to production, just &lt;code class=&quot;highlighter-rouge&quot;&gt;Ctrl+F&lt;/code&gt; the &lt;code class=&quot;highlighter-rouge&quot;&gt;unwraps&lt;/code&gt;, and handle them with &lt;code class=&quot;highlighter-rouge&quot;&gt;try!&lt;/code&gt; macros.&lt;/p&gt;
 
 &lt;h3 id=&quot;typed-approach-to-dataframes&quot;&gt;Typed approach to Dataframes&lt;/h3&gt;
 
@@ -205,26 +721,21 @@
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;h3 id=&quot;predictable-performance-during-scaling&quot;&gt;Predictable performance during scaling&lt;/h3&gt;
-
-&lt;p&gt;We did some comparative benchmarks on the &lt;em&gt;LabelEncoding&lt;/em&gt; procedure, a very common operation in data science, in which we convert vector of strings to a vector of integer values that the model can understand. In these benchmarks, we compared an out-of-the-box Python implementation of the algorithm from scikit-learn to a custom one we built in Rust.&lt;/p&gt;
-
-&lt;p&gt;Our Rust implementation was able to encode 100,000 strings 7x faster than the Python one. More surprising was the benchmark of encoding 1,000,000 strings. In this case, the Rust version was &lt;em&gt;2500x faster&lt;/em&gt; than the corresponding Python implementation! The predictability of our Rust code was incredibly useful in scaling our pipeline, as we were sure that we would be able to process larger datasets without unexpected overhead.&lt;/p&gt;
 
 &lt;h3 id=&quot;other-advantages&quot;&gt;Other advantages&lt;/h3&gt;
 
-&lt;p&gt;There are other very useful aspects of Rust for the data science pipeline:&lt;/p&gt;
+&lt;p&gt;There are many other very useful aspects of Rust for the data science pipeline, including:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Cargo testing, benchmarking, and documentation help dev follow good practices&lt;/li&gt;
-  &lt;li&gt;Major refactoring is really easy&lt;/li&gt;
+  &lt;li&gt;Predictable performance during scaling&lt;/li&gt;
+  &lt;li&gt;Cargo testing, benchmarking, and docs help devs follow good coding practices&lt;/li&gt;
   &lt;li&gt;Trait composition/generics limit the need for messy glue code&lt;/li&gt;
-  &lt;li&gt;Many benchmarks (like those on this blog) support that Rust has strong performance in numerics&lt;/li&gt;
+  &lt;li&gt;Many benchmarks (like &lt;a href=&quot;http://www.suchin.co/2016/04/25/Matrix-Multiplication-In-Rust-Pt-1/&quot;&gt;this&lt;/a&gt; one) suggest Rust’s strong performance in numerics&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;rust-disadvantages&quot;&gt;Rust disadvantages&lt;/h2&gt;
 
-&lt;p&gt;While using Rust was generally a pleasant experience for this project, there were some areas in which Rust fell short.&lt;/p&gt;
+&lt;p&gt;While using Rust was generally a pleasant experience for this project, there were some areas in which the language fell short.&lt;/p&gt;
 
 &lt;h3 id=&quot;fragmented-ml-ecosystem&quot;&gt;Fragmented ML ecosystem&lt;/h3&gt;
 
@@ -236,7 +747,7 @@
 
 &lt;h2 id=&quot;vision-for-rust-ml&quot;&gt;Vision for Rust ML&lt;/h2&gt;
 
-&lt;p&gt;We have shown that Rust language features help reduce many technical debt issues that arise in making production level data science systems. We hope that Rust is promoted to improve feature engineering systems. We also hope that implementations of data science tooling become standardized to facilitate interoperability. Finally, we believe that effective domain applications of a language are primarily driven by the community that forms around it. We should start sharing ideas and building a collective metric for success in Rust machine learning and numerics!&lt;/p&gt;
+&lt;p&gt;We have shown that Rust language features help reduce many technical debt issues that arise in making production level data science systems. We hope that Rust is promoted to improve feature engineering systems. We also hope that implementations of data science tooling become standardized to facilitate interoperability. Finally, we believe that effective domain applications of a language are primarily driven by the community that forms around it. We should start sharing ideas and building a collective metric for success in Rust machine learning and numerics.&lt;/p&gt;
 </content>
  </entry>
  
