@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>
+    
+      Crash Course on Support Vector Machines &middot; suchin
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/styles.css">
+  <!-- <link rel="stylesheet" href="/googlecode.css"> -->
+
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/public/square-outline.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/atom+xml" title="suchin" href="/atom.xml">
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-75615851-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+</head>
+
+
+  <body>
+
+    <div class="container content">
+      <header class="masthead">
+        <h3 class="masthead-title">
+          <a href="/" title="Home" style="text-decoration: none;">suchin</a>
+          <small><a href="/" style="text-decoration: none; color: #C0C0C0">writings</a></small>
+          <div class="links">
+          <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
+          <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
+          <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
+          <a  href="http://twitter.com/ssgrn" > <img style="display: inline; margin-left: 15px;" src="https://upload.wikimedia.org/wikipedia/de/thumb/9/9f/Twitter_bird_logo_2012.svg/1000px-Twitter_bird_logo_2012.svg.png"   height="50px" width="50px"></img></a>
+        </div>
+        </h3>
+      </header>
+
+      <main>
+        <article class="post">
+  <h1 class="post-title">Crash Course on Support Vector Machines</h1>
+  <time datetime="2017-03-04T00:00:00-08:00" class="post-date">04 Mar 2017</time>
+  <p>The support vector machine (SVM) is one of the basic linear classifiers. This post will breakdown how the vanilla algorithm is implemented.</p>
+
+<h2 id="basic-approach">Basic approach</h2>
+
+<p>Let’s first get some preliminaries out of the way. Let <script type="math/tex">\{x_1,...,x_n\} \in X</script> be a dataset describing our classification problem, and <script type="math/tex">\{w_1,...,w_n\} \in W</script> be a weight matrix that we want to optimize. The SVM takes the data in <script type="math/tex">X \in \mathbb{R}^N</script> and weights in <script type="math/tex">W \in \mathbb{R}^N</script> to compute the vectors <script type="math/tex">W^TX</script> of scores for each data sample per class. In other words, the value <script type="math/tex">w^T_jx_i</script> denotes the score for j-th class for the i-th data sample. Suppose we are futher given the labels <script type="math/tex">\{y_1,...,y_n\}</script> that specifies the <em>index</em> of the correct class for each data sample. For example, <script type="math/tex">w^T_{y_i}x_i</script> is the score for the <em>true</em> class for the i-th data sample.</p>
+
+<p>The basic problem of the support vector machine is to find the best <em>hyperplane(s)</em>, or subspace(s) of one less dimension than the ambient space, that best separate data points into distinct classes.</p>
+
+<p>How does one identify the optimal hyperplane? Well, every hyperplane can be written in the form:</p>
+
+<script type="math/tex; mode=display">w^Tx_i=\text{b} \implies w^Tx_i - b = 0</script>
+
+<p>Where <script type="math/tex">w^Tx_i</script> is some vector translated by the norm of <script type="math/tex">b</script>, called the bias term.</p>
+
+<p>The SVM amounts to finding hyperplanes such that</p>
+
+<script type="math/tex; mode=display">w^T_{j}x_i - w^T_{y_i}x_i  - b  \ge \delta \text{   } \forall  \text{   }  j \neq y_i</script>
+
+<p><script type="math/tex">\delta</script> is called the <em>margin</em>, and corresponds to the euclidean distance between the separating hyperplanes. We essentially don’t want data points to fall inside the margin, and the optimal decision boundary lies at the midpoint of the margin.</p>
+
+<p>This is an example of a <em>soft margin</em> SVM. There is also a <em>hard margin</em> version, in which the margin is completely determined by the closest data-points to the decision boundary,  called the <em>support vectors</em>.</p>
+
+<p><img src="http://pegasos1.github.io/public/20170304/svm.png" /></p>
+
+<p>Note that it can be shown that the canonical binary classification SVM problem is just a special case of the multi-class formulation above. In particular, it can be shown that in the binary case the above formulation reduces to</p>
+
+<script type="math/tex; mode=display">sgn(w^Tx_i - b) \ge \delta</script>
+
+<p>Finally, note that from here on out we will disregard the bias term <script type="math/tex">b</script> in the above formulation, and will assume that the bias term is incorporated into the weight matrix <script type="math/tex">W</script> as an extra column.</p>
+
+<h2 id="loss-function">Loss Function</h2>
+
+<p>Now that we’ve defined the general approach to classifying data with the SVM, we have to derive the loss function for the problem, which enforces how weights <script type="math/tex">W</script> get updated during learning.</p>
+
+<p>The SVM aims to minimize the following loss function <script type="math/tex">L_i</script> for each data sample <script type="math/tex">x_i \in X</script>:</p>
+
+<script type="math/tex; mode=display">L_i = \sum\limits_{j \neq y_i} max (0, w^T_{j}x_i - w^T_{y_i}x_i + \delta)</script>
+
+<p>Essentially, we’re saying that we incur loss if the difference between the scores of the correct class and those of the incorrect classes are within some margin of each other. However, once that difference passes the threshold of the margin, we always incur zero loss.</p>
+
+<p>The loss function scales with:
+  1) the size of the margin and
+  2) how much smaller the score at the index of the incorrect class is to the score at the index of the correct class.</p>
+
+<p>This implies that the SVM’s output are  uncalibrated scores that roughly relate to <em>center of mass</em> of the score vector. We want the score vector for the i-th data sample to be highly concentrated at the index of the correct class.</p>
+
+<h2 id="regularization">Regularization</h2>
+
+<p>We enforce preference over particular weights during optimization through <em>regularization</em>, an extra term that we add to the loss function above:</p>
+
+<script type="math/tex; mode=display">R(W) = \lambda \sum\limits_{j}\sum\limits_{i}W_{ij}^2</script>
+
+<p>Because we are using the <script type="math/tex">L_2</script>-norm (i.e. the global sum of the squared matrix), <script type="math/tex">R(W)</script> is called <script type="math/tex">L_2</script> regularization. The <script type="math/tex">\lambda</script> term is called the <em>regularization constant</em>, which is a hyperparameter we can optimize empirically.</p>
+
+<p>The loss function for each data sample now looks like this:</p>
+
+<script type="math/tex; mode=display">L_i = \sum\limits_{j \neq y_i} max (0, w^T_{j}x_i - w^T_{y_i}x_i + \delta) + \lambda\sum\limits_{j}\sum\limits_{i}W_{ij}^2</script>
+
+<p>By adding the regularization term to the loss function, we are saying that we prefer score vectors that have a lower <script type="math/tex">L_2</script>-norm, which  corresponds to scores that are <em>lower and diffuse</em>. Lower, diffuse scores improve model generalization because a single dimension doesn’t have overwhelming contribution to the overall prediction.</p>
+
+<p><img src="http://pegasos1.github.io/public/20170304/reg.png" /></p>
+
+<p>The final loss function for the SVM is just the average loss over <em>all</em> data samples:</p>
+
+<script type="math/tex; mode=display">L = \frac{1}{N}\sum\limits_iL_i + R(W) = \frac{1}{N}\sum\limits_i\sum\limits_{j \neq y_i} max (0, w^T_{j}x_i - w^T_{y_i}x_i + \delta) + \lambda\sum\limits_{i}\sum\limits_{j}W_{ij}^2</script>
+
+<p>Here’s the code for the SVM loss function in Python:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">svm_loss</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">reg</span><span class="p">):</span>
+
+  <span class="c">## number training samples</span>
+  <span class="n">num_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+  <span class="c">## get scores</span>
+  <span class="n">scores</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+  <span class="c"># calculate margins</span>
+  <span class="n">margins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">scores</span> <span class="o">-</span> <span class="n">scores</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">delta</span><span class="p">)</span>
+
+  <span class="c"># margins at the index of the correct class should be zero</span>
+  <span class="n">margins</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+
+  <span class="c"># calculate l2 regularization</span>
+  <span class="n">l2_reg</span> <span class="o">=</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">W</span> <span class="o">*</span> <span class="n">W</span><span class="p">)</span>
+
+  <span class="c"># average over all samples</span>
+  <span class="n">data_loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">margins</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_train</span>
+
+  <span class="n">L</span> <span class="o">=</span> <span class="n">data_loss</span> <span class="o">+</span> <span class="n">l2_reg</span>
+
+  <span class="k">return</span> <span class="n">L</span><span class="p">,</span> <span class="n">margins</span>
+</code></pre>
+</div>
+
+<h2 id="optimization-step">Optimization step</h2>
+
+<p>Now that we have defined the loss function for the SVM, how do we update the weights <script type="math/tex">W</script> to minimize loss?</p>
+
+<p>First we calculate the gradient of <script type="math/tex">L</script> with respect to our weights <script type="math/tex">W</script>. Then, we update our weights to descend along our loss function in the steepest direction. We can scale how large of a step size we take along the gradient with a <em>learning rate</em> parameter.</p>
+
+<p>With respect to the SVM, we first take the derivative of its loss function, which involves taking the derivative of the <script type="math/tex">max(0, -)</script> function. That may sound scary, but it’s actually pretty easy once you split out the possible ranges of the function:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+H_i = \sum\limits_{j \neq y_i}max (0, w_{j}^Tx_i- w_{y_i}^Tx_i + \delta) = \left\{\begin{aligned}
+& 0 &&: \text{if score outside margin} \\
+&w^T_{j}x_i - w^T_{y_i}x_i + \delta &&:  \text{if score inside margin}
+\end{aligned}
+\right. %]]></script>
+
+<p>Let’s look at a simple scenario to see what the derivative would look like, and generalize from there.</p>
+
+<p>Suppose we had a three dimensional weight vector <script type="math/tex">\{w_1,w_2,w_3\}</script> that we wanted to optimize with respect to the data sample <script type="math/tex">x_i</script>, and let’s suppose that of the three classes <script type="math/tex">x_i</script> could map to, the 2nd class was the true class. <script type="math/tex">H_i</script> would then expand to:</p>
+
+<script type="math/tex; mode=display">H_i = \sum\limits_{j \neq y_i} max (0, w^T_{j}x_i - w^T_{y_i}x_i + \delta)\\
+ = max (0, w^T_{1}x_i - w^T_{2}x_i + \delta) + max (0, w^T_{3}x_i - w^T_{2}x_i + \delta)\\
+ = [w^T_{1}x_i - w^T_{2}x_i + \delta > 0] (w^T_{1}x_i - w^T_{2}x_i + \delta)  + [w^T_{3}x_i - w^T_{2}x_i + \delta > 0] (w^T_{3}x_i - w^T_{2}x_i + \delta)</script>
+
+<p>Then we take the derivative of <script type="math/tex">L_i</script> with respect to <script type="math/tex">w_2</script> and <script type="math/tex">\{w_1, w_3\}</script>:</p>
+
+<script type="math/tex; mode=display">\frac{dH_i}{dw_{2}} = -x([w^T_{1}x_i - w^T_{2}x_i + \delta > 0] + [w^T_{3}x_i - w^T_{2}x_i + \delta > 0])\\
+\frac{dH_i}{dw_{1}} = x([w^T_{1}x_i - w^T_{2}x_i + \delta > 0])\\
+\frac{dH_i}{dw_{3}} = x([w^T_{3}x_i - w^T_{2}x_i + \delta > 0])</script>
+
+<p>Not so bad!</p>
+
+<p>We can generalize the above procedure as follows:</p>
+
+<script type="math/tex; mode=display">\frac{dH_i}{dW_{y_i}} = -x(\sum\limits_{j \neq y_i}[w^Tx_j - w_{y_i}^Tx + \delta > 0])\\
+  \frac{dH_i}{dW_{j}} =x(w^T_jx - w_{y_i}^Tx + \delta > 0)</script>
+
+<p>where <script type="math/tex">j \neq y_i</script>.</p>
+
+<p>In simple words, the gradient amounts to counting the number of times an class prediction falls within the margins of our decision boundary, scaled by <script type="math/tex">X</script>.</p>
+
+<p>In its entirety, the gradient of the loss function is the average gradient across all samples, also taking into account the regularization term:</p>
+
+<script type="math/tex; mode=display">\triangledown L = \frac{1}{N}\sum\limits_i[\frac{dH_i}{dW_{y_i}} + \frac{dH_i}{dW_{j}}] + \lambda\sum\limits_{i}\sum\limits_{j}W_{ij}</script>
+
+<p>Here’s the code for computing the gradient for the SVM:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">compute_gradient</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">margins</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">reg</span><span class="p">):</span>
+
+  <span class="c">## get number of training samples</span>
+  <span class="n">num_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+  <span class="c">## compute number of errors</span>
+  <span class="n">num_errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">margins</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+  <span class="c">## compute derivative</span>
+  <span class="n">dH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">W</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+  <span class="c">## for dH/dWj where j != y</span>
+  <span class="n">dH</span><span class="p">[</span><span class="n">margins</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+  <span class="c">## for DH/dWy</span>
+  <span class="n">dH</span><span class="p">[</span><span class="n">y</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="o">-</span><span class="n">num_errors</span>
+
+  <span class="n">dLdW</span> <span class="o">=</span> <span class="n">dH</span> <span class="o">*</span> <span class="n">X</span> <span class="o">/</span> <span class="n">num_train</span> <span class="o">+</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">dLdW</span>
+</code></pre>
+</div>
+
+<p>To do the weight update, we perform the simple procedure:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+
+    <span class="c">## compute loss and margins</span>
+    <span class="n">L</span><span class="p">,</span> <span class="n">margins</span> <span class="o">=</span> <span class="n">svm_loss</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">reg</span><span class="p">)</span>
+
+    <span class="c">## compute gradient</span>
+    <span class="n">dLdW</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">margins</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">reg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">L</span><span class="p">,</span> <span class="n">dLdW</span>
+
+<span class="k">def</span> <span class="nf">update_weights</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+
+    <span class="c">## compute loss and gradient</span>
+    <span class="n">L</span><span class="p">,</span> <span class="n">dLdW</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
+
+    <span class="c">## update weights</span>
+    <span class="n">W</span> <span class="o">+=</span> <span class="o">-</span><span class="n">learning_rate</span> <span class="o">*</span> <span class="n">dLdW</span>
+
+    <span class="k">return</span> <span class="n">L</span><span class="p">,</span> <span class="n">W</span>
+</code></pre>
+</div>
+
+<p>Finally, we can create a vanilla SVM training function by initializing <script type="math/tex">W</script> with random values:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">):</span>
+
+  <span class="c">## get appropriate dimensions</span>
+  <span class="n">dim</span><span class="p">,</span> <span class="n">num_train</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">num_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+  <span class="c">## initialize W with random values</span>
+  <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+
+  <span class="c">## repeat update</span>
+  <span class="n">curr</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">while</span> <span class="n">L</span> <span class="o">&gt;</span> <span class="n">tol</span> <span class="ow">and</span> <span class="n">curr</span> <span class="o">&lt;</span> <span class="n">max_iter</span><span class="p">:</span>
+    <span class="n">L</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">update_weights</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
+    <span class="n">curr</span> <span class="o">+=</span> <span class="mi">1</span>
+
+  <span class="k">return</span> <span class="n">W</span>
+
+</code></pre>
+</div>
+
+<p>As a side note, in the real world, instead of computing the gradient over the <em>entire</em> training dataset, we compute gradients over subsamples. This is just more efficient for large scale applications in which the entire dataset isn’t necessary to make a single step along the gradient of the loss function.</p>
+
+<h2 id="advantages-and-issues">Advantages and Issues</h2>
+
+<p>As with all other learning algorithms, the SVM has strengths and weaknesses.</p>
+
+<p>First off, one big issue with the SVM is that its scores can be difficult to interpret. Because they are uncalibrated scores, it’s hard to compare them.</p>
+
+<p>Futhermore, in principle SVMs should be highly resistant to over-fitting, due to things like regularization and margins, but in practice this depends on the careful choice of these hyperparameters, which is pretty nontrivial.</p>
+
+<p>However, the SVM (especially the hard-margin version) is more memory efficient than other algorithms because it primarily optimizes the classifier based on euclidean distance between support vectors, a small subset of the data. Furthermore, if a data point is outside of the margin, loss is zero no matter what. That means that the algorithm is less sensitive to outliers in the dataset.</p>
+
+<p>Finally, for simplicity we have only considered the linear SVM here, but there are a multitude of non-linear and kernel-based SVMs that can fit quite intricate decision boundaries to the data. In fact, the SVM is pretty versatile once kernels are introduced.</p>
+
+</article>
+<!--
+<aside class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/12/28/Introducing-Utah/">
+            Introducing Utah
+            <small><time datetime="2016-12-28T00:00:00-08:00">28 Dec 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/09/13/The-PlayRust-Classifier/">
+            The PlayRust Classifier
+            <small><time datetime="2016-09-13T00:00:00-07:00">13 Sep 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/06/05/Introducing-The-Have-I-Been-Pwned-Python-API/">
+            Have I Been Pwned? with Python
+            <small><time datetime="2016-06-05T00:00:00-07:00">05 Jun 2016</time></small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</aside> -->
+
+      </main>
+
+      <footer class="footer">
+        <small>
+          &copy; <time datetime="2017-03-05T14:56:44-08:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
+        </small>
+      </footer>
+    </div>
+
+  </body>
+</html>

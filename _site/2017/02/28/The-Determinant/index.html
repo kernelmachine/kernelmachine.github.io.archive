@@ -10,7 +10,7 @@
 
   <title>
     
-      Hello, World! &middot; suchin
+      The Determinant &middot; suchin
     
   </title>
 
@@ -58,9 +58,35 @@
 
       <main>
         <article class="post">
-  <h1 class="post-title">Hello, World!</h1>
-  <time datetime="2016-02-12T00:00:00-08:00" class="post-date">12 Feb 2016</time>
-  <p>Just testing out my blog.</p>
+  <h1 class="post-title">The Determinant</h1>
+  <time datetime="2017-02-28T00:00:00-08:00" class="post-date">28 Feb 2017</time>
+  <p>Perhaps one of the most important concepts of linear algebra is that of the <em>determinant</em>. Most students learn about the determinant as an aside to more interesting topics, but in reality the determinant is a fundamental idea that defines how we solve linear systems. This post will define the determinant and why it is useful.</p>
+
+<p>Most students have seen the following linear system of equations in high school algebra:</p>
+
+<script type="math/tex; mode=display">a_{11}x_1 + a_{12}x2 + ... + a_{1n}x_n = b_1 \\
+a_{21}x_1 + a_{22}x2 + ... + a_{2n}x_n = b_2 \\
+.\\
+.\\
+.\\
+a_{k1}x_1 + a_{k2}x2 + ... + a_{kn}x_n = b_k \\</script>
+
+<p>where <script type="math/tex">x_1,...,x_n</script> are unknown, <script type="math/tex">b_1,...b_k</script> are oonstants, and <script type="math/tex">a_1,...,a_k</script> are coefficients. The classic problem is to solve for <script type="math/tex">\textbf{x}</script>.</p>
+
+<p>But there could exist many solutions to a linear system, or none at all. Formally, a linear system can be <em>compatible</em> (have at least one solution) or <em>incompatible</em> (have no solution). Furthermore, a compatible system can be <em>determinate</em> (have a unique solution) or <em>indeterminate</em> (have more than one solution). We use determinants to identify <em>compatible</em>, <em>determinate</em> systems of which there is one unique solution.</p>
+
+<p>To see more concretely where the determinant comes in when solving linear systems, see the following two dimensional system:</p>
+
+<script type="math/tex; mode=display">a_{11}x_1 + a_{12}x_2 = b_1\\
+a_{21}x_1 + a_{21}x_2 = b_2\\</script>
+
+<p>Using the usual method, we solve for <script type="math/tex">x_1</script> and <script type="math/tex">x_2</script>:</p>
+
+<script type="math/tex; mode=display">x_1 = \frac{b_1a_{22}-b_2a_{12}}{a_{11}a_{22}-a_{21}a_{12}}\\
+
+x_2 = \frac{a_{11}b_2 - a_{21}b_1}{a_{11}a_{22} - a_{21}a_{12}}</script>
+
+<p>The determinant is essentially the formalized study of the denominators of this equation. We will prove that <em>a system of linear equations has a unique solution if and only if the determinant is not zero</em>.</p>
 
 </article>
 <!--
@@ -102,7 +128,7 @@
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2017-03-05T14:56:44-08:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2017-03-05T14:52:57-08:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>
