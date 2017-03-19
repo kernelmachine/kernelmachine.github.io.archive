@@ -14,6 +14,8 @@ $$ \frac{\partial f}{\partial x_i} \approx \lim_{h \rightarrow 0} \frac{f(x_i + 
 
 where $$h > 0$$ is some small step size. Essentially, given some tangent line between $$f(x_i)$$ and $$f(x_i + h)$$, we estimate its slope by calculating the slope of *secant line*  between $$(x, f(x))$$ and $$(x_i + h , f(x_i + h))$$, and say that as $$h$$ approaches 0, the derivative of the secant line approaches the derivative of the tangent line. Here's a graphic of that process:
 
+<img src="http://127.0.0.1:4000/public/20170318/num_diff.png">
+
 The issue with numerical differentiation is that it is inherently ill-conditioned and unstable. It cannot be exactly fitted to a finite representation without rounding or truncation, thus introducing approximation errors in the computation. The size of $$h$$ directly correlates with the amount of instability in the differentiation. If $$h$$ is too small, then the subtraction from $$x_i$$ will yield a larger rounding error. On the other hand, if $$h$$ is too large, the estimate of the slope of the tangent could be worse. Most people advise against using the finite differences approximation of the derivative in machine learning systems.
 
 ## Symbolic differentiation
@@ -160,6 +162,7 @@ To compute $$\bar x_1$$ and $$ \bar x_2 $$, we must recognize that $$x_1$$ and $
 
 In fact, it is helpful to view the forward pass as a computation graph, to visualize this point:
 
+<img src="http://127.0.0.1:4000/public/20170318/graph.png">
 
 $$x_1$$ only affects $$f$$ through $$v_2$$ and $$v_5$$, which means that through the multi-dimensional chain rule:
 
@@ -187,7 +190,9 @@ Reverse autodifferentation is known as *backpropagation* in deep learning, and f
 
 Consider a two layer neural network. Given an input matrix $$X \in R^{N x M}$$ and output labels $$y \in R^N$$, let $$W_1$$ and $$W_2$$ be weight matrices corresponding to layer 1 and 2 respectively, and $$b_1$$ and $$b_2$$ be bias vectors corresponding to each weight matrix. Between layer 1 and 2 imagine we have an ReLU activation function $$f(x) = max(0, x)$$, and imagine that we apply a softmax classifier after layer 2 to squash its output between $$[0, 1]$$.
 
-The neural network looks like the following:
+Here's a rough diagram of the network we'll be working with.
+
+<img src="http://127.0.0.1:4000/public/20170318/nnet.png">
 
 During learning, we want to provide input to the neural network, and then update the weights at each layer depending on the error computed by the loss function at the output. We'll use reverse AD (or *backpropagation*) to find the gradients of the loss function with respect to each weight matrix. Note that all the layers can be updated by merely knowing the derivative of the *last stage of computation*, because as we saw in the last section, all previous stages' derivatives can then be computed. This means that we'll have to figure out what the derivative of our the softmax loss function is, and then we're golden.
 
