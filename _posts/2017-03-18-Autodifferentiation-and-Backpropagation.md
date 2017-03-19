@@ -4,6 +4,8 @@ title: Autodifferentiation and Backpropagation
 comments: true
 ---
 
+*Much of this blog post was inspired by [CS231n](http://cs231n.github.io) and [this](https://arxiv.org/abs/1502.05767) paper. Highly recommended reads.*
+
 The derivative is an important operation in machine learning, primarily for parameter optimization with loss functions. However, computing analytic derivatives in the finite context of 32 or 64 bit computers has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we'll discuss numerical differentiation, which, while simple and intuitive, suffers from floating point errors. Then, we'll discuss symbolic differentiation, which suffers from complexity problems. Finally, we'll discuss auto-differentiation, the most popular method to compute derivatives with both exactness and simplicity. We'll also discuss *backpropagation*, an analogue of auto-differentiation that is the primary method of learning in neural networks.
 
 ## Numerical differentiation
@@ -30,7 +32,7 @@ or
 
 $$ \frac{\partial}{\partial x}(\frac{f(x)}{g(x)}) = \frac{g(x)\frac{\partial f}{\partial x} - f(x)\frac{\partial g}{\partial x}}{g(x)^2}$$
 
-Symbolic differentiation is a representational problem, and can quickly become extremely complex, depending on the function to be manipulated. But once the representation is achieved, derivatives can be computed much more accurately than with finite differences approximation. I won't be going into more detail on symbolic differentiation's internals, mainly because it's complex, but I'll point you to a few links here if you want more details.
+Symbolic differentiation is a representational problem, and can quickly become extremely complex, depending on the function to be manipulated. But once the representation is achieved, derivatives can be computed much more accurately than with finite differences approximation. I won't be going into more detail on symbolic differentiation's internals, mainly because it's complex, but I'll point you [here](http://homepage.divms.uiowa.edu/~stroyan/CTLC3rdEd/3rdCTLCText/Chapters/ch6.pdf) if you want more details.
 
 ## Forward Autodifferentiation
 
