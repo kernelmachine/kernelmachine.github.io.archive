@@ -4,8 +4,7 @@ title: Autodifferentiation and Backpropagation
 comments: true
 ---
 
-The derivative is an important operation in machine learning, primarily in the context of numerical optimization on loss functions.
-However, since the derivative is an analytic procedure in the continuous realm, its translation to discrete computation has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we'll discuss numerical differentiation, which while simple and intuitive, suffer from floating point rounding errors. Next, we'll discuss symbolic differentiation, which suffers from complexity problems. Last, we'll discuss auto-differentiation, the method of choice to compute derivatives of arbitrary functions with both exactness and simplicity. We'll also discuss *backpropagation*, the method of updating weights in neural networks during learning that is an analogue to auto-differentiation.
+The derivative is an important operation in machine learning, primarily in the context of numerical optimization on loss functions. However, since the derivative is an analytic procedure in the continuous realm, its translation to discrete computation has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we'll discuss numerical differentiation, which while simple and intuitive, suffer from floating point rounding errors. Next, we'll discuss symbolic differentiation, which suffers from complexity problems. Last, we'll discuss auto-differentiation, the method of choice to compute derivatives of arbitrary functions with both exactness and simplicity. We'll also discuss *backpropagation*, the method of updating weights in neural networks during learning that is an analogue to auto-differentiation.
 
 ## Numerical differentiation
 
@@ -107,6 +106,41 @@ $$\bar v_i = \frac{\partial f}{\partial v_i}$$
 where $$v_i$$ is some intermediate stage in the overall function computation.  
 
 Reverse AD proceeds in two phases, one of a forward pass computation, and then reverse accumulation. The forward pass, like we outlined in the previous section, helps us keep track of the computational stages that make up the arbitrary function $$f$$. The reverse accumulation then measures the sensitivity of the output of the forward pass with respect to a particular stage (ie, $$\bar v_i$$). We continue to compute derivatives backwards until we arrive at the original input: $$\bar x = \frac{\partial f}{\partial x}$$. Reverse AD is the preferred procedure over Forward AD when the function $$f : \mathbb{R}^N \rightarrow \mathbb{R}^M$$ we're trying to find the derivative of has $$ N >> M $$ because in reverse AD we only have to make $$m$$ passes to compute the multi-dimensional gradient $$f$$.
+
+For example, if
+
+$$\triangledown f = (\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2},...,\frac{\partial f}{\partial x_n})$$
+
+Then we only have to do 1 pass of reverse AD to compute $$\triangledown f$$, while we have to do $$N$$ passes of forward AD to get the same answer.
+
+Let's go through an example of doing reverse AD to make the procedure clearer.
+
+Let
+
+$$f(x_1, x_2) = \frac{ln(x_1) + x_2^2} {sin(x_1)x_2}$$
+
+First we do a forward pass computation of the output of this $$f$$
+
+$$
+\begin{align}
+& v_0 = x_1\\
+& v_1 = x_2\\
+& v_2 = ln(v_0) \\
+& v_3 = v_1^2 \\
+& v_4 = v_2 + v_3 \\
+& v_5 = sin(v_0)v_1\\
+& v_6 = \frac{v_4}{v_5}\\
+& f = v_6
+\end{align}
+$$
+
+Then we begin at the output $$f = v_6$$ and propagate its derivative backwards using the chain rule:
+
+$$
+\begin{align}
+& \bar v_6 = \bar f\\
+& \bar v_5 = \bar v_6 \frac{\partial v_6}{\partial v_5} = \bar v_6 \frac{-v_4}{v_5^2}\\
+& \bar v_4 = \bar v_6 \frac{\partial v_6}{\partial v_4} = \bar v_6 \frac{1}{v_5}  \\
 & \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} \\
 & \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}\\
 & \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1\\
@@ -255,6 +289,14 @@ $$
 
 Basically to get the derivative of $$L$$, we just subtract its output with a binary indicator that is set to 1 when the index is the one of the true class.
 
+Now we have to compute $$\bar W_1$$.
+
+$$\bar W_2 = \bar Y_1 X  = \bar A_1 \frac{\partial A_1}{\partial Y_1} X $$
+
+How do we compute $$\frac{\partial A_1}{\partial Y_1}$$?
+
+Well $$ A_1 = max(0, Y_1) $$, the leaky ReLU. We have that $$\frac{\partial A_1}{\partial Y_1}=\mathbb{1}(x>0)$$. Combined with the chain rule, we see that the ReLU unit lets the gradient pass through unchanged if its input was greater than 0, but kills it if its input was less than zero during the forward pass.
+
 
 ## Code 'em up
 
@@ -267,10 +309,9 @@ First, we perform the forward pass, computing the class scores for the input.
 import numpy  as np
 
 Y1 = X.dot(W1) + b1 # first layer
-A1 = np.maximum(0, Y1) # leaky ReLU
+A1 = np.maximum(0, Y1) # leaky ReLU activation
 Y2 = A1.dot(W2)+ b2 # second layer
-exp_Y2 = np.exp(Y2)
-scores = exp_Y2 / np.sum(exp_Y2, axis=1, keepdims=True) # softmax
+scores = np.exp(Y2) / np.sum(np.exp(Y2), axis=1, keepdims=True) # softmax
 ```
 
 Then, we compute the loss:

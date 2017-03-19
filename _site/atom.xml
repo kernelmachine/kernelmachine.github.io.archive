@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="https://suchin.co/atom.xml" rel="self"/>
  <link href="https://suchin.co/"/>
- <updated>2017-03-18T22:50:47-07:00</updated>
+ <updated>2017-03-18T23:06:49-07:00</updated>
  <id>https://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -17,8 +17,7 @@
    <link href="https://suchin.co/2017/03/18/Autodifferentiation-and-Backpropagation/"/>
    <updated>2017-03-18T00:00:00-07:00</updated>
    <id>https://suchin.co/2017/03/18/Autodifferentiation-and-Backpropagation</id>
-   <content type="html">&lt;p&gt;The derivative is an important operation in machine learning, primarily in the context of numerical optimization on loss functions.
-However, since the derivative is an analytic procedure in the continuous realm, its translation to discrete computation has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we’ll discuss numerical differentiation, which while simple and intuitive, suffer from floating point rounding errors. Next, we’ll discuss symbolic differentiation, which suffers from complexity problems. Last, we’ll discuss auto-differentiation, the method of choice to compute derivatives of arbitrary functions with both exactness and simplicity. We’ll also discuss &lt;em&gt;backpropagation&lt;/em&gt;, the method of updating weights in neural networks during learning that is an analogue to auto-differentiation.&lt;/p&gt;
+   <content type="html">&lt;p&gt;The derivative is an important operation in machine learning, primarily in the context of numerical optimization on loss functions. However, since the derivative is an analytic procedure in the continuous realm, its translation to discrete computation has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we’ll discuss numerical differentiation, which while simple and intuitive, suffer from floating point rounding errors. Next, we’ll discuss symbolic differentiation, which suffers from complexity problems. Last, we’ll discuss auto-differentiation, the method of choice to compute derivatives of arbitrary functions with both exactness and simplicity. We’ll also discuss &lt;em&gt;backpropagation&lt;/em&gt;, the method of updating weights in neural networks during learning that is an analogue to auto-differentiation.&lt;/p&gt;
 
 &lt;h2 id=&quot;numerical-differentiation&quot;&gt;Numerical differentiation&lt;/h2&gt;
 
@@ -124,15 +123,48 @@ N &lt;&lt; M %]]&gt;&lt;/script&gt;, then forward pass is extremely efficient in
 
 &lt;p&gt;where &lt;script type=&quot;math/tex&quot;&gt;v_i&lt;/script&gt; is some intermediate stage in the overall function computation.&lt;/p&gt;
 
-&lt;p&gt;Reverse AD proceeds in two phases, one of a forward pass computation, and then reverse accumulation. The forward pass, like we outlined in the previous section, helps us keep track of the computational stages that make up the arbitrary function &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;. The reverse accumulation then measures the sensitivity of the output of the forward pass with respect to a particular stage (ie, &lt;script type=&quot;math/tex&quot;&gt;\bar v_i&lt;/script&gt;). We continue to compute derivatives backwards until we arrive at the original input: &lt;script type=&quot;math/tex&quot;&gt;\bar x = \frac{\partial f}{\partial x}&lt;/script&gt;. Reverse AD is the preferred procedure over Forward AD when the function &lt;script type=&quot;math/tex&quot;&gt;f : \mathbb{R}^N \rightarrow \mathbb{R}^M&lt;/script&gt; we’re trying to find the derivative of has &lt;script type=&quot;math/tex&quot;&gt;N &gt;&gt; M&lt;/script&gt; because in reverse AD we only have to make &lt;script type=&quot;math/tex&quot;&gt;m&lt;/script&gt; passes to compute the multi-dimensional gradient &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;.
-&amp;amp; \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} &lt;br /&gt;
-&amp;amp; \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}&lt;br /&gt;
-&amp;amp; \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1&lt;br /&gt;
-&amp;amp; \bar v_0 = \bar v_2 \frac{\partial v_2}{\partial v_0} = \bar v_2 \frac{1}{v_0}&lt;br /&gt;
-&amp;amp; \bar x_2 = \bar v_1&lt;br /&gt;
-&amp;amp; \bar x_1 = \bar v_0&lt;br /&gt;
-\end{align}
-$$&lt;/p&gt;
+&lt;p&gt;Reverse AD proceeds in two phases, one of a forward pass computation, and then reverse accumulation. The forward pass, like we outlined in the previous section, helps us keep track of the computational stages that make up the arbitrary function &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;. The reverse accumulation then measures the sensitivity of the output of the forward pass with respect to a particular stage (ie, &lt;script type=&quot;math/tex&quot;&gt;\bar v_i&lt;/script&gt;). We continue to compute derivatives backwards until we arrive at the original input: &lt;script type=&quot;math/tex&quot;&gt;\bar x = \frac{\partial f}{\partial x}&lt;/script&gt;. Reverse AD is the preferred procedure over Forward AD when the function &lt;script type=&quot;math/tex&quot;&gt;f : \mathbb{R}^N \rightarrow \mathbb{R}^M&lt;/script&gt; we’re trying to find the derivative of has &lt;script type=&quot;math/tex&quot;&gt;N &gt;&gt; M&lt;/script&gt; because in reverse AD we only have to make &lt;script type=&quot;math/tex&quot;&gt;m&lt;/script&gt; passes to compute the multi-dimensional gradient &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;For example, if&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\triangledown f = (\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2},...,\frac{\partial f}{\partial x_n})&lt;/script&gt;
+
+&lt;p&gt;Then we only have to do 1 pass of reverse AD to compute &lt;script type=&quot;math/tex&quot;&gt;\triangledown f&lt;/script&gt;, while we have to do &lt;script type=&quot;math/tex&quot;&gt;N&lt;/script&gt; passes of forward AD to get the same answer.&lt;/p&gt;
+
+&lt;p&gt;Let’s go through an example of doing reverse AD to make the procedure clearer.&lt;/p&gt;
+
+&lt;p&gt;Let&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f(x_1, x_2) = \frac{ln(x_1) + x_2^2} {sin(x_1)x_2}&lt;/script&gt;
+
+&lt;p&gt;First we do a forward pass computation of the output of this &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+&amp; v_0 = x_1\\
+&amp; v_1 = x_2\\
+&amp; v_2 = ln(v_0) \\
+&amp; v_3 = v_1^2 \\
+&amp; v_4 = v_2 + v_3 \\
+&amp; v_5 = sin(v_0)v_1\\
+&amp; v_6 = \frac{v_4}{v_5}\\
+&amp; f = v_6
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Then we begin at the output &lt;script type=&quot;math/tex&quot;&gt;f = v_6&lt;/script&gt; and propagate its derivative backwards using the chain rule:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+&amp; \bar v_6 = \bar f\\
+&amp; \bar v_5 = \bar v_6 \frac{\partial v_6}{\partial v_5} = \bar v_6 \frac{-v_4}{v_5^2}\\
+&amp; \bar v_4 = \bar v_6 \frac{\partial v_6}{\partial v_4} = \bar v_6 \frac{1}{v_5}  \\
+&amp; \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} \\
+&amp; \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}\\
+&amp; \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1\\
+&amp; \bar v_0 = \bar v_2 \frac{\partial v_2}{\partial v_0} = \bar v_2 \frac{1}{v_0}\\
+&amp; \bar x_2 = \bar v_1\\
+&amp; \bar x_1 = \bar v_0\\
+\end{align} %]]&gt;&lt;/script&gt;
 
 &lt;p&gt;To compute &lt;script type=&quot;math/tex&quot;&gt;\bar x_1&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\bar x_2&lt;/script&gt;, we must recognize that &lt;script type=&quot;math/tex&quot;&gt;x_1&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;x_2&lt;/script&gt; affect the output &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; in distinct ways.&lt;/p&gt;
 
@@ -255,6 +287,14 @@ $$&lt;/p&gt;
 
 &lt;p&gt;Basically to get the derivative of &lt;script type=&quot;math/tex&quot;&gt;L&lt;/script&gt;, we just subtract its output with a binary indicator that is set to 1 when the index is the one of the true class.&lt;/p&gt;
 
+&lt;p&gt;Now we have to compute &lt;script type=&quot;math/tex&quot;&gt;\bar W_1&lt;/script&gt;.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar W_2 = \bar Y_1 X  = \bar A_1 \frac{\partial A_1}{\partial Y_1} X&lt;/script&gt;
+
+&lt;p&gt;How do we compute &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial A_1}{\partial Y_1}&lt;/script&gt;?&lt;/p&gt;
+
+&lt;p&gt;Well &lt;script type=&quot;math/tex&quot;&gt;A_1 = max(0, Y_1)&lt;/script&gt;, the leaky ReLU. We have that &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial A_1}{\partial Y_1}=\mathbb{1}(x&gt;0)&lt;/script&gt;. Combined with the chain rule, we see that the ReLU unit lets the gradient pass through unchanged if its input was greater than 0, but kills it if its input was less than zero during the forward pass.&lt;/p&gt;
+
 &lt;h2 id=&quot;code-em-up&quot;&gt;Code ‘em up&lt;/h2&gt;
 
 &lt;p&gt;As mentioned before, autodifferentiation lends itself very well to iterative programming. Here we’ll create a neural network in Python and update its parameters during learning with backpropagation.&lt;/p&gt;
@@ -264,10 +304,9 @@ $$&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt;  &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;np&lt;/span&gt;
 
 &lt;span class=&quot;n&quot;&gt;Y1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;W1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# first layer&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;A1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maximum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Y1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# leaky ReLU&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;A1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maximum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Y1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# leaky ReLU activation&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;Y2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;W2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# second layer&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;exp_Y2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Y2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;exp_Y2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exp_Y2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keepdims&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# softmax&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Y2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Y2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keepdims&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# softmax&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 

@@ -60,8 +60,7 @@
         <article class="post">
   <h1 class="post-title">Autodifferentiation and Backpropagation</h1>
   <time datetime="2017-03-18T00:00:00-07:00" class="post-date">18 Mar 2017</time>
-  <p>The derivative is an important operation in machine learning, primarily in the context of numerical optimization on loss functions.
-However, since the derivative is an analytic procedure in the continuous realm, its translation to discrete computation has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we’ll discuss numerical differentiation, which while simple and intuitive, suffer from floating point rounding errors. Next, we’ll discuss symbolic differentiation, which suffers from complexity problems. Last, we’ll discuss auto-differentiation, the method of choice to compute derivatives of arbitrary functions with both exactness and simplicity. We’ll also discuss <em>backpropagation</em>, the method of updating weights in neural networks during learning that is an analogue to auto-differentiation.</p>
+  <p>The derivative is an important operation in machine learning, primarily in the context of numerical optimization on loss functions. However, since the derivative is an analytic procedure in the continuous realm, its translation to discrete computation has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we’ll discuss numerical differentiation, which while simple and intuitive, suffer from floating point rounding errors. Next, we’ll discuss symbolic differentiation, which suffers from complexity problems. Last, we’ll discuss auto-differentiation, the method of choice to compute derivatives of arbitrary functions with both exactness and simplicity. We’ll also discuss <em>backpropagation</em>, the method of updating weights in neural networks during learning that is an analogue to auto-differentiation.</p>
 
 <h2 id="numerical-differentiation">Numerical differentiation</h2>
 
@@ -167,15 +166,48 @@ N << M %]]></script>, then forward pass is extremely efficient in computing the 
 
 <p>where <script type="math/tex">v_i</script> is some intermediate stage in the overall function computation.</p>
 
-<p>Reverse AD proceeds in two phases, one of a forward pass computation, and then reverse accumulation. The forward pass, like we outlined in the previous section, helps us keep track of the computational stages that make up the arbitrary function <script type="math/tex">f</script>. The reverse accumulation then measures the sensitivity of the output of the forward pass with respect to a particular stage (ie, <script type="math/tex">\bar v_i</script>). We continue to compute derivatives backwards until we arrive at the original input: <script type="math/tex">\bar x = \frac{\partial f}{\partial x}</script>. Reverse AD is the preferred procedure over Forward AD when the function <script type="math/tex">f : \mathbb{R}^N \rightarrow \mathbb{R}^M</script> we’re trying to find the derivative of has <script type="math/tex">N >> M</script> because in reverse AD we only have to make <script type="math/tex">m</script> passes to compute the multi-dimensional gradient <script type="math/tex">f</script>.
-&amp; \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} <br />
-&amp; \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}<br />
-&amp; \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1<br />
-&amp; \bar v_0 = \bar v_2 \frac{\partial v_2}{\partial v_0} = \bar v_2 \frac{1}{v_0}<br />
-&amp; \bar x_2 = \bar v_1<br />
-&amp; \bar x_1 = \bar v_0<br />
-\end{align}
-$$</p>
+<p>Reverse AD proceeds in two phases, one of a forward pass computation, and then reverse accumulation. The forward pass, like we outlined in the previous section, helps us keep track of the computational stages that make up the arbitrary function <script type="math/tex">f</script>. The reverse accumulation then measures the sensitivity of the output of the forward pass with respect to a particular stage (ie, <script type="math/tex">\bar v_i</script>). We continue to compute derivatives backwards until we arrive at the original input: <script type="math/tex">\bar x = \frac{\partial f}{\partial x}</script>. Reverse AD is the preferred procedure over Forward AD when the function <script type="math/tex">f : \mathbb{R}^N \rightarrow \mathbb{R}^M</script> we’re trying to find the derivative of has <script type="math/tex">N >> M</script> because in reverse AD we only have to make <script type="math/tex">m</script> passes to compute the multi-dimensional gradient <script type="math/tex">f</script>.</p>
+
+<p>For example, if</p>
+
+<script type="math/tex; mode=display">\triangledown f = (\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2},...,\frac{\partial f}{\partial x_n})</script>
+
+<p>Then we only have to do 1 pass of reverse AD to compute <script type="math/tex">\triangledown f</script>, while we have to do <script type="math/tex">N</script> passes of forward AD to get the same answer.</p>
+
+<p>Let’s go through an example of doing reverse AD to make the procedure clearer.</p>
+
+<p>Let</p>
+
+<script type="math/tex; mode=display">f(x_1, x_2) = \frac{ln(x_1) + x_2^2} {sin(x_1)x_2}</script>
+
+<p>First we do a forward pass computation of the output of this <script type="math/tex">f</script></p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}
+& v_0 = x_1\\
+& v_1 = x_2\\
+& v_2 = ln(v_0) \\
+& v_3 = v_1^2 \\
+& v_4 = v_2 + v_3 \\
+& v_5 = sin(v_0)v_1\\
+& v_6 = \frac{v_4}{v_5}\\
+& f = v_6
+\end{align} %]]></script>
+
+<p>Then we begin at the output <script type="math/tex">f = v_6</script> and propagate its derivative backwards using the chain rule:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}
+& \bar v_6 = \bar f\\
+& \bar v_5 = \bar v_6 \frac{\partial v_6}{\partial v_5} = \bar v_6 \frac{-v_4}{v_5^2}\\
+& \bar v_4 = \bar v_6 \frac{\partial v_6}{\partial v_4} = \bar v_6 \frac{1}{v_5}  \\
+& \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} \\
+& \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}\\
+& \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1\\
+& \bar v_0 = \bar v_2 \frac{\partial v_2}{\partial v_0} = \bar v_2 \frac{1}{v_0}\\
+& \bar x_2 = \bar v_1\\
+& \bar x_1 = \bar v_0\\
+\end{align} %]]></script>
 
 <p>To compute <script type="math/tex">\bar x_1</script> and <script type="math/tex">\bar x_2</script>, we must recognize that <script type="math/tex">x_1</script> and <script type="math/tex">x_2</script> affect the output <script type="math/tex">f</script> in distinct ways.</p>
 
@@ -298,6 +330,14 @@ $$</p>
 
 <p>Basically to get the derivative of <script type="math/tex">L</script>, we just subtract its output with a binary indicator that is set to 1 when the index is the one of the true class.</p>
 
+<p>Now we have to compute <script type="math/tex">\bar W_1</script>.</p>
+
+<script type="math/tex; mode=display">\bar W_2 = \bar Y_1 X  = \bar A_1 \frac{\partial A_1}{\partial Y_1} X</script>
+
+<p>How do we compute <script type="math/tex">\frac{\partial A_1}{\partial Y_1}</script>?</p>
+
+<p>Well <script type="math/tex">A_1 = max(0, Y_1)</script>, the leaky ReLU. We have that <script type="math/tex">\frac{\partial A_1}{\partial Y_1}=\mathbb{1}(x>0)</script>. Combined with the chain rule, we see that the ReLU unit lets the gradient pass through unchanged if its input was greater than 0, but kills it if its input was less than zero during the forward pass.</p>
+
 <h2 id="code-em-up">Code ‘em up</h2>
 
 <p>As mentioned before, autodifferentiation lends itself very well to iterative programming. Here we’ll create a neural network in Python and update its parameters during learning with backpropagation.</p>
@@ -307,10 +347,9 @@ $$</p>
 <div class="highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span>  <span class="kn">as</span> <span class="nn">np</span>
 
 <span class="n">Y1</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b1</span> <span class="c"># first layer</span>
-<span class="n">A1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Y1</span><span class="p">)</span> <span class="c"># leaky ReLU</span>
+<span class="n">A1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Y1</span><span class="p">)</span> <span class="c"># leaky ReLU activation</span>
 <span class="n">Y2</span> <span class="o">=</span> <span class="n">A1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W2</span><span class="p">)</span><span class="o">+</span> <span class="n">b2</span> <span class="c"># second layer</span>
-<span class="n">exp_Y2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Y2</span><span class="p">)</span>
-<span class="n">scores</span> <span class="o">=</span> <span class="n">exp_Y2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">exp_Y2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c"># softmax</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Y2</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Y2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c"># softmax</span>
 </code></pre>
 </div>
 
@@ -388,7 +427,7 @@ $$</p>
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2017-03-18T22:50:47-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2017-03-18T23:06:49-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>
