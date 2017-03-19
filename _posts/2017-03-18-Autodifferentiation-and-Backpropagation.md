@@ -312,7 +312,7 @@ $$
 \triangledown H_k =  p_k - \mathbb{1}(k = y_i)
 $$
 
-Where 1 is just a binary indicator function that evaluates to 1 when the predicate is true.
+Where $$\mathbb{1}$$ is just a binary indicator function that evaluates to 1 when the predicate is true.
 
 Now we can code the backpropagation onto the softmax loss function:
 
@@ -329,7 +329,9 @@ $$
 \triangledown L = \frac{\triangledown H}{N} + \lambda\sum\limits_{i}\sum\limits_{j}W_{ij}
 $$
 
-We can then easily calculate $$ \bar W_2 $$ and $$\bar b_2$$
+We'll add the regularization gradient at the end of the backpropagation.
+
+With the gradient of the loss function, we can easily calculate $$ \bar W_2 $$ and $$\bar b_2$$
 
 ```python
 grads = {}

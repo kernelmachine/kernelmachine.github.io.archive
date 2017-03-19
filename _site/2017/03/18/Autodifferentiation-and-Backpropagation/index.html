@@ -359,7 +359,7 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <script type="math/tex; mode=display">\triangledown H_k =  p_k - \mathbb{1}(k = y_i)</script>
 
-<p>Where 1 is just a binary indicator function that evaluates to 1 when the predicate is true.</p>
+<p>Where <script type="math/tex">\mathbb{1}</script> is just a binary indicator function that evaluates to 1 when the predicate is true.</p>
 
 <p>Now we can code the backpropagation onto the softmax loss function:</p>
 
@@ -374,7 +374,9 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <script type="math/tex; mode=display">\triangledown L = \frac{\triangledown H}{N} + \lambda\sum\limits_{i}\sum\limits_{j}W_{ij}</script>
 
-<p>We can then easily calculate <script type="math/tex">\bar W_2</script> and <script type="math/tex">\bar b_2</script></p>
+<p>We’ll add the regularization gradient at the end of the backpropagation.</p>
+
+<p>With the gradient of the loss function, we can easily calculate <script type="math/tex">\bar W_2</script> and <script type="math/tex">\bar b_2</script></p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code><span class="n">grads</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="c"># backprop onto W2 and b2</span>
@@ -497,7 +499,7 @@ grads['W1'] += reg * W1
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2017-03-19T14:36:02-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2017-03-19T14:51:45-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>

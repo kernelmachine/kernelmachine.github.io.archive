@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="https://suchin.co/atom.xml" rel="self"/>
  <link href="https://suchin.co/"/>
- <updated>2017-03-19T14:36:02-07:00</updated>
+ <updated>2017-03-19T14:51:45-07:00</updated>
  <id>https://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -316,7 +316,7 @@ N &lt;&lt; M %]]&gt;&lt;/script&gt;, then the forward pass is extremely efficien
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\triangledown H_k =  p_k - \mathbb{1}(k = y_i)&lt;/script&gt;
 
-&lt;p&gt;Where 1 is just a binary indicator function that evaluates to 1 when the predicate is true.&lt;/p&gt;
+&lt;p&gt;Where &lt;script type=&quot;math/tex&quot;&gt;\mathbb{1}&lt;/script&gt; is just a binary indicator function that evaluates to 1 when the predicate is true.&lt;/p&gt;
 
 &lt;p&gt;Now we can code the backpropagation onto the softmax loss function:&lt;/p&gt;
 
@@ -331,7 +331,9 @@ N &lt;&lt; M %]]&gt;&lt;/script&gt;, then the forward pass is extremely efficien
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\triangledown L = \frac{\triangledown H}{N} + \lambda\sum\limits_{i}\sum\limits_{j}W_{ij}&lt;/script&gt;
 
-&lt;p&gt;We can then easily calculate &lt;script type=&quot;math/tex&quot;&gt;\bar W_2&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\bar b_2&lt;/script&gt;&lt;/p&gt;
+&lt;p&gt;We’ll add the regularization gradient at the end of the backpropagation.&lt;/p&gt;
+
+&lt;p&gt;With the gradient of the loss function, we can easily calculate &lt;script type=&quot;math/tex&quot;&gt;\bar W_2&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\bar b_2&lt;/script&gt;&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;grads&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;# backprop onto W2 and b2&lt;/span&gt;
