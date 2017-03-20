@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="https://suchin.co/atom.xml" rel="self"/>
  <link href="https://suchin.co/"/>
- <updated>2017-03-19T15:17:40-07:00</updated>
+ <updated>2017-03-19T19:30:01-07:00</updated>
  <id>https://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -29,7 +29,7 @@
 
 &lt;p&gt;where &lt;script type=&quot;math/tex&quot;&gt;h &gt; 0&lt;/script&gt; is some small step size. Essentially, given some tangent line between &lt;script type=&quot;math/tex&quot;&gt;f(x_i)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;f(x_i + h)&lt;/script&gt;, we estimate its slope by calculating the slope of &lt;em&gt;secant line&lt;/em&gt;  between &lt;script type=&quot;math/tex&quot;&gt;(x, f(x))&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(x_i + h , f(x_i + h))&lt;/script&gt;, and say that as &lt;script type=&quot;math/tex&quot;&gt;h&lt;/script&gt; approaches 0, the derivative of the secant line approaches the derivative of the tangent line. Here’s a graphic of that process:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://127.0.0.1:4000/public/20170318/num_diff.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://pegasos1.github.io/public/20170318/num_diff.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The issue with numerical differentiation is that it is inherently ill-conditioned and unstable. It cannot be exactly fitted to a finite representation without rounding or truncation, thus introducing approximation errors in the computation. The size of &lt;script type=&quot;math/tex&quot;&gt;h&lt;/script&gt; directly correlates with the amount of instability in the differentiation. If &lt;script type=&quot;math/tex&quot;&gt;h&lt;/script&gt; is too small, then the subtraction from &lt;script type=&quot;math/tex&quot;&gt;x_i&lt;/script&gt; will yield a larger rounding error. On the other hand, if &lt;script type=&quot;math/tex&quot;&gt;h&lt;/script&gt; is too large, the estimate of the slope of the tangent could be worse. Most people advise against using the finite differences approximation of the derivative in machine learning systems.&lt;/p&gt;
 
@@ -180,7 +180,7 @@ N &lt;&lt; M %]]&gt;&lt;/script&gt;, then the forward pass is extremely efficien
 
 &lt;p&gt;In fact, it is helpful to view the forward pass as a computation graph, to visualize this point:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://127.0.0.1:4000/public/20170318/graph.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://pegasos1.github.io/public/20170318/graph.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;x_1&lt;/script&gt; only affects &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; through &lt;script type=&quot;math/tex&quot;&gt;v_2&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;v_5&lt;/script&gt;, which means that through the multi-dimensional chain rule:&lt;/p&gt;
 
@@ -210,7 +210,7 @@ N &lt;&lt; M %]]&gt;&lt;/script&gt;, then the forward pass is extremely efficien
 
 &lt;p&gt;Here’s a rough diagram of the network we’ll be working with.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://127.0.0.1:4000/public/20170318/nnet.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://pegasos1.github.io/public/20170318/nnet.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;During learning, we want to provide input to the neural network, and then update the weights at each layer depending on the error computed by the loss function at the output. We’ll use reverse AD (or &lt;em&gt;backpropagation&lt;/em&gt;) to find the gradients of the loss function with respect to each weight matrix. Note that all the layers can be updated by merely knowing the derivative of the &lt;em&gt;last stage of computation&lt;/em&gt;, because as we saw in the last section, all previous stages’ derivatives can then be computed. This means that we’ll have to figure out what the derivative of our the softmax loss function is, and then we’re golden.&lt;/p&gt;
 

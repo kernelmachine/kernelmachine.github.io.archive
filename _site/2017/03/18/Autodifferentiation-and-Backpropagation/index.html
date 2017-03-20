@@ -72,7 +72,7 @@
 
 <p>where <script type="math/tex">h > 0</script> is some small step size. Essentially, given some tangent line between <script type="math/tex">f(x_i)</script> and <script type="math/tex">f(x_i + h)</script>, we estimate its slope by calculating the slope of <em>secant line</em>  between <script type="math/tex">(x, f(x))</script> and <script type="math/tex">(x_i + h , f(x_i + h))</script>, and say that as <script type="math/tex">h</script> approaches 0, the derivative of the secant line approaches the derivative of the tangent line. Here’s a graphic of that process:</p>
 
-<p><img src="http://127.0.0.1:4000/public/20170318/num_diff.png" /></p>
+<p><img src="https://pegasos1.github.io/public/20170318/num_diff.png" /></p>
 
 <p>The issue with numerical differentiation is that it is inherently ill-conditioned and unstable. It cannot be exactly fitted to a finite representation without rounding or truncation, thus introducing approximation errors in the computation. The size of <script type="math/tex">h</script> directly correlates with the amount of instability in the differentiation. If <script type="math/tex">h</script> is too small, then the subtraction from <script type="math/tex">x_i</script> will yield a larger rounding error. On the other hand, if <script type="math/tex">h</script> is too large, the estimate of the slope of the tangent could be worse. Most people advise against using the finite differences approximation of the derivative in machine learning systems.</p>
 
@@ -223,7 +223,7 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <p>In fact, it is helpful to view the forward pass as a computation graph, to visualize this point:</p>
 
-<p><img src="http://127.0.0.1:4000/public/20170318/graph.png" /></p>
+<p><img src="https://pegasos1.github.io/public/20170318/graph.png" /></p>
 
 <p><script type="math/tex">x_1</script> only affects <script type="math/tex">f</script> through <script type="math/tex">v_2</script> and <script type="math/tex">v_5</script>, which means that through the multi-dimensional chain rule:</p>
 
@@ -253,7 +253,7 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <p>Here’s a rough diagram of the network we’ll be working with.</p>
 
-<p><img src="http://127.0.0.1:4000/public/20170318/nnet.png" /></p>
+<p><img src="https://pegasos1.github.io/public/20170318/nnet.png" /></p>
 
 <p>During learning, we want to provide input to the neural network, and then update the weights at each layer depending on the error computed by the loss function at the output. We’ll use reverse AD (or <em>backpropagation</em>) to find the gradients of the loss function with respect to each weight matrix. Note that all the layers can be updated by merely knowing the derivative of the <em>last stage of computation</em>, because as we saw in the last section, all previous stages’ derivatives can then be computed. This means that we’ll have to figure out what the derivative of our the softmax loss function is, and then we’re golden.</p>
 
@@ -501,7 +501,7 @@ grads['W1'] += reg * W1
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2017-03-19T15:17:40-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2017-03-19T19:30:01-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>
