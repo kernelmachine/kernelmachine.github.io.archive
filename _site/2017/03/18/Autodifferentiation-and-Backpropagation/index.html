@@ -204,22 +204,7 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 & f = v_6
 \end{align} %]]></script>
 
-<p>Then we begin at the output <script type="math/tex">f = v_6</script> and propagate its derivative backwards using the chain rule:</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-\begin{align}
-& \bar v_6 = \bar f\\
-& \bar v_5 = \bar v_6 \frac{\partial v_6}{\partial v_5} = \bar v_6 \frac{-v_4}{v_5^2}\\
-& \bar v_4 = \bar v_6 \frac{\partial v_6}{\partial v_4} = \bar v_6 \frac{1}{v_5}  \\
-& \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} \\
-& \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}\\
-& \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1\\
-& \bar v_0 = \bar v_2 \frac{\partial v_2}{\partial v_0} = \bar v_2 \frac{1}{v_0}\\
-& \bar x_2 = \bar v_1\\
-& \bar x_1 = \bar v_0\\
-\end{align} %]]></script>
-
-<p>To compute <script type="math/tex">\bar x_1</script> and <script type="math/tex">\bar x_2</script>, we must recognize that <script type="math/tex">x_1</script> and <script type="math/tex">x_2</script> affect the output <script type="math/tex">f</script> in distinct ways.</p>
+<p>To compute <script type="math/tex">\bar x_1 = \frac{\partial f}{\partial x_1}</script> and <script type="math/tex">\bar x_2 = \frac{\partial f}{\partial x_2}</script>, recognize that <script type="math/tex">x_1</script> and <script type="math/tex">x_2</script> affect the output <script type="math/tex">f</script> in distinct ways.</p>
 
 <p>In fact, it is helpful to view the forward pass as a computation graph, to visualize this point:</p>
 
@@ -241,9 +226,24 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <script type="math/tex; mode=display">\bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} +  \bar v_5 \frac{\partial v_5 }{\partial v_1}</script>
 
-<p>Thus we show that with reverse AD, we can compute <script type="math/tex">\frac{\partial f}{\partial x_1}</script> and <script type="math/tex">\frac{\partial f}{\partial x_2}</script> with very elementary operations. As an exercise, set <script type="math/tex">\bar v_6 = 1</script> and compute the gradient of <script type="math/tex">f</script>.</p>
+<p>So, we can compute <script type="math/tex">\frac{\partial f}{\partial x_1}</script> and <script type="math/tex">\frac{\partial f}{\partial x_2}</script> with very elementary operations.</p>
 
-<p>By keeping track of stages in the forward pass of the reverse AD, the bottleneck of computing <script type="math/tex">\frac{\partial f}{\partial x_1}</script> and  <script type="math/tex">\frac{\partial f}{\partial x_2}</script> is reduced to computing <script type="math/tex">\bar v_6</script>, which is only dependent on the complexity of the final stage of computation in <script type="math/tex">f</script>.</p>
+<p>To calculate these decompositions of our gradient, we begin at the output <script type="math/tex">f = v_6</script> and propagate its derivative backwards:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}
+& \bar v_6 = \bar f\\
+& \bar v_5 = \bar v_6 \frac{\partial v_6}{\partial v_5} = \bar v_6 \frac{-v_4}{v_5^2}\\
+& \bar v_4 = \bar v_6 \frac{\partial v_6}{\partial v_4} = \bar v_6 \frac{1}{v_5}  \\
+& \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} \\
+& \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}\\
+& \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1\\
+& \bar v_0 = \bar v_2 \frac{\partial v_2}{\partial v_0} = \bar v_2 \frac{1}{v_0}\\
+& \bar x_2 = \bar v_1\\
+& \bar x_1 = \bar v_0\\
+\end{align} %]]></script>
+
+<p>By keeping track of stages in the forward pass of the reverse AD, the bottleneck of computing <script type="math/tex">\frac{\partial f}{\partial x_1}</script> and  <script type="math/tex">\frac{\partial f}{\partial x_2}</script> is reduced to computing <script type="math/tex">\bar v_6</script>, which is only dependent on the complexity of the final stage of computation in <script type="math/tex">f</script>. As an exercise, set <script type="math/tex">\bar v_6 = 1</script> and compute the gradient of <script type="math/tex">f</script>.</p>
 
 <p>Reverse autodifferentation is known as <em>backpropagation</em> in deep learning, and forms the basic way that we update parameters of a neural network during learning. In the next section, we’ll dive into how to apply reverse autodifferentation to train neural networks.</p>
 
@@ -501,7 +501,7 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
       <footer class="footer">
         <small>
-          &copy; <time datetime="2017-03-21T09:06:59-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
+          &copy; <time datetime="2017-03-21T09:13:00-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
         </small>
       </footer>
     </div>

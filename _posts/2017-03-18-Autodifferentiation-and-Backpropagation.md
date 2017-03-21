@@ -144,23 +144,8 @@ $$
 \end{align}
 $$
 
-Then we begin at the output $$f = v_6$$ and propagate its derivative backwards using the chain rule:
 
-$$
-\begin{align}
-& \bar v_6 = \bar f\\
-& \bar v_5 = \bar v_6 \frac{\partial v_6}{\partial v_5} = \bar v_6 \frac{-v_4}{v_5^2}\\
-& \bar v_4 = \bar v_6 \frac{\partial v_6}{\partial v_4} = \bar v_6 \frac{1}{v_5}  \\
-& \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} \\
-& \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}\\
-& \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1\\
-& \bar v_0 = \bar v_2 \frac{\partial v_2}{\partial v_0} = \bar v_2 \frac{1}{v_0}\\
-& \bar x_2 = \bar v_1\\
-& \bar x_1 = \bar v_0\\
-\end{align}
-$$
-
-To compute $$\bar x_1$$ and $$ \bar x_2 $$, we must recognize that $$x_1$$ and $$x_2$$ affect the output $$f$$ in distinct ways.
+To compute $$\bar x_1 = \frac{\partial f}{\partial x_1}$$ and $$\bar x_2 = \frac{\partial f}{\partial x_2}$$, recognize that $$x_1$$ and $$x_2$$ affect the output $$f$$ in distinct ways.
 
 In fact, it is helpful to view the forward pass as a computation graph, to visualize this point:
 
@@ -182,9 +167,25 @@ or
 
 $$ \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} +  \bar v_5 \frac{\partial v_5 }{\partial v_1}$$
 
-Thus we show that with reverse AD, we can compute $$\frac{\partial f}{\partial x_1}$$ and $$\frac{\partial f}{\partial x_2}$$ with very elementary operations. As an exercise, set $$\bar v_6 = 1$$ and compute the gradient of $$f$$.
+So, we can compute $$\frac{\partial f}{\partial x_1}$$ and $$\frac{\partial f}{\partial x_2}$$ with very elementary operations.
 
-By keeping track of stages in the forward pass of the reverse AD, the bottleneck of computing $$\frac{\partial f}{\partial x_1}$$ and  $$\frac{\partial f}{\partial x_2}$$ is reduced to computing $$\bar v_6$$, which is only dependent on the complexity of the final stage of computation in $$f$$.
+To calculate these decompositions of our gradient, we begin at the output $$f = v_6$$ and propagate its derivative backwards:
+
+$$
+\begin{align}
+& \bar v_6 = \bar f\\
+& \bar v_5 = \bar v_6 \frac{\partial v_6}{\partial v_5} = \bar v_6 \frac{-v_4}{v_5^2}\\
+& \bar v_4 = \bar v_6 \frac{\partial v_6}{\partial v_4} = \bar v_6 \frac{1}{v_5}  \\
+& \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} \\
+& \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}\\
+& \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1\\
+& \bar v_0 = \bar v_2 \frac{\partial v_2}{\partial v_0} = \bar v_2 \frac{1}{v_0}\\
+& \bar x_2 = \bar v_1\\
+& \bar x_1 = \bar v_0\\
+\end{align}
+$$
+
+By keeping track of stages in the forward pass of the reverse AD, the bottleneck of computing $$\frac{\partial f}{\partial x_1}$$ and  $$\frac{\partial f}{\partial x_2}$$ is reduced to computing $$\bar v_6$$, which is only dependent on the complexity of the final stage of computation in $$f$$. As an exercise, set $$\bar v_6 = 1$$ and compute the gradient of $$f$$.
 
 Reverse autodifferentation is known as *backpropagation* in deep learning, and forms the basic way that we update parameters of a neural network during learning. In the next section, we'll dive into how to apply reverse autodifferentation to train neural networks.
 

@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="https://suchin.co/atom.xml" rel="self"/>
  <link href="https://suchin.co/"/>
- <updated>2017-03-21T09:06:59-07:00</updated>
+ <updated>2017-03-21T09:13:00-07:00</updated>
  <id>https://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -161,22 +161,7 @@ N &lt;&lt; M %]]&gt;&lt;/script&gt;, then the forward pass is extremely efficien
 &amp; f = v_6
 \end{align} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;Then we begin at the output &lt;script type=&quot;math/tex&quot;&gt;f = v_6&lt;/script&gt; and propagate its derivative backwards using the chain rule:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-&amp; \bar v_6 = \bar f\\
-&amp; \bar v_5 = \bar v_6 \frac{\partial v_6}{\partial v_5} = \bar v_6 \frac{-v_4}{v_5^2}\\
-&amp; \bar v_4 = \bar v_6 \frac{\partial v_6}{\partial v_4} = \bar v_6 \frac{1}{v_5}  \\
-&amp; \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} \\
-&amp; \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}\\
-&amp; \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1\\
-&amp; \bar v_0 = \bar v_2 \frac{\partial v_2}{\partial v_0} = \bar v_2 \frac{1}{v_0}\\
-&amp; \bar x_2 = \bar v_1\\
-&amp; \bar x_1 = \bar v_0\\
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;To compute &lt;script type=&quot;math/tex&quot;&gt;\bar x_1&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\bar x_2&lt;/script&gt;, we must recognize that &lt;script type=&quot;math/tex&quot;&gt;x_1&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;x_2&lt;/script&gt; affect the output &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; in distinct ways.&lt;/p&gt;
+&lt;p&gt;To compute &lt;script type=&quot;math/tex&quot;&gt;\bar x_1 = \frac{\partial f}{\partial x_1}&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\bar x_2 = \frac{\partial f}{\partial x_2}&lt;/script&gt;, recognize that &lt;script type=&quot;math/tex&quot;&gt;x_1&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;x_2&lt;/script&gt; affect the output &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; in distinct ways.&lt;/p&gt;
 
 &lt;p&gt;In fact, it is helpful to view the forward pass as a computation graph, to visualize this point:&lt;/p&gt;
 
@@ -198,9 +183,24 @@ N &lt;&lt; M %]]&gt;&lt;/script&gt;, then the forward pass is extremely efficien
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} +  \bar v_5 \frac{\partial v_5 }{\partial v_1}&lt;/script&gt;
 
-&lt;p&gt;Thus we show that with reverse AD, we can compute &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial f}{\partial x_1}&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial f}{\partial x_2}&lt;/script&gt; with very elementary operations. As an exercise, set &lt;script type=&quot;math/tex&quot;&gt;\bar v_6 = 1&lt;/script&gt; and compute the gradient of &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;.&lt;/p&gt;
+&lt;p&gt;So, we can compute &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial f}{\partial x_1}&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial f}{\partial x_2}&lt;/script&gt; with very elementary operations.&lt;/p&gt;
 
-&lt;p&gt;By keeping track of stages in the forward pass of the reverse AD, the bottleneck of computing &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial f}{\partial x_1}&lt;/script&gt; and  &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial f}{\partial x_2}&lt;/script&gt; is reduced to computing &lt;script type=&quot;math/tex&quot;&gt;\bar v_6&lt;/script&gt;, which is only dependent on the complexity of the final stage of computation in &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;.&lt;/p&gt;
+&lt;p&gt;To calculate these decompositions of our gradient, we begin at the output &lt;script type=&quot;math/tex&quot;&gt;f = v_6&lt;/script&gt; and propagate its derivative backwards:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+&amp; \bar v_6 = \bar f\\
+&amp; \bar v_5 = \bar v_6 \frac{\partial v_6}{\partial v_5} = \bar v_6 \frac{-v_4}{v_5^2}\\
+&amp; \bar v_4 = \bar v_6 \frac{\partial v_6}{\partial v_4} = \bar v_6 \frac{1}{v_5}  \\
+&amp; \bar v_3 = \bar v_4 \frac{\partial v_4}{\partial v_3} = \bar v_4 \textbf{1} \\
+&amp; \bar v_2 = \bar v_4 \frac{\partial v_4}{\partial v_2} = \bar v_4 \textbf{1}\\
+&amp; \bar v_1 = \bar v_3 \frac{\partial v_3}{\partial v_1} = \bar v_3 2v_1\\
+&amp; \bar v_0 = \bar v_2 \frac{\partial v_2}{\partial v_0} = \bar v_2 \frac{1}{v_0}\\
+&amp; \bar x_2 = \bar v_1\\
+&amp; \bar x_1 = \bar v_0\\
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;By keeping track of stages in the forward pass of the reverse AD, the bottleneck of computing &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial f}{\partial x_1}&lt;/script&gt; and  &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial f}{\partial x_2}&lt;/script&gt; is reduced to computing &lt;script type=&quot;math/tex&quot;&gt;\bar v_6&lt;/script&gt;, which is only dependent on the complexity of the final stage of computation in &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;. As an exercise, set &lt;script type=&quot;math/tex&quot;&gt;\bar v_6 = 1&lt;/script&gt; and compute the gradient of &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;.&lt;/p&gt;
 
 &lt;p&gt;Reverse autodifferentation is known as &lt;em&gt;backpropagation&lt;/em&gt; in deep learning, and forms the basic way that we update parameters of a neural network during learning. In the next section, we’ll dive into how to apply reverse autodifferentation to train neural networks.&lt;/p&gt;
 
