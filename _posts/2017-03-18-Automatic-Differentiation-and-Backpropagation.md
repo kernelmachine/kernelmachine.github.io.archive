@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Autodifferentiation and Backpropagation
+title: Automatic differentiation and Backpropagation
 comments: true
 ---
 
@@ -34,9 +34,9 @@ $$ \frac{\partial}{\partial x}(\frac{f(x)}{g(x)}) = \frac{g(x)\frac{\partial f}{
 
 Symbolic differentiation is a representational problem, and can quickly become extremely complex, depending on the function to be manipulated. But once the representation is achieved, derivatives can be computed much more accurately than with finite differences approximation. I won't be going into more detail on symbolic differentiation's internals, mainly because it's complex, but I'll point you [here](http://homepage.divms.uiowa.edu/~stroyan/CTLC3rdEd/3rdCTLCText/Chapters/ch6.pdf) if you want more details.
 
-## Forward Autodifferentiation
+## Automatic Differentiation in Forward Mode
 
-Autodifferentiation (AD) is a method that is both exact and simple. The basic motivation for AD is that *any arbitrary function can be represented as a composition of simpler ones*. Under functional composition, one can compute the derivative of a function using the *chain rule*:
+Automatic Differentiation (AD) is a method that is both exact and simple. The basic motivation for AD is that *any arbitrary function can be represented as a composition of simpler ones*. Under functional composition, one can compute the derivative of a function using the *chain rule*:
 
 $$ f(x) = g(h(x)) \implies f'(x) = g'(h(x)) h'(x)$$
 
@@ -105,7 +105,7 @@ When $$ N << M $$, then the forward pass is extremely efficient in computing the
 
 However, when $$ N >> M $$, another version of AD, called *reverse AD*, is more efficent to compute derivatives of $$f$$ with respect to each input dimension. We'll dig into that next.
 
-## Reverse Autodifferentiation
+## Automatic Differentiation in Reverse Mode
 
 As opposed to forward autodifferentiation, which involves staged computations from the input to the output, reverse autodifferentiation evolves backwards from the function output.
 

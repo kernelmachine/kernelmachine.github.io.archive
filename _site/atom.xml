@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="https://suchin.co/atom.xml" rel="self"/>
  <link href="https://suchin.co/"/>
- <updated>2017-03-21T09:13:00-07:00</updated>
+ <updated>2017-03-21T09:16:19-07:00</updated>
  <id>https://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -13,10 +13,10 @@
 
  
  <entry>
-   <title>Autodifferentiation and Backpropagation</title>
-   <link href="https://suchin.co/2017/03/18/Autodifferentiation-and-Backpropagation/"/>
+   <title>Automatic differentiation and Backpropagation</title>
+   <link href="https://suchin.co/2017/03/18/Automatic-Differentiation-and-Backpropagation/"/>
    <updated>2017-03-18T00:00:00-07:00</updated>
-   <id>https://suchin.co/2017/03/18/Autodifferentiation-and-Backpropagation</id>
+   <id>https://suchin.co/2017/03/18/Automatic-Differentiation-and-Backpropagation</id>
    <content type="html">&lt;p&gt;&lt;em&gt;Much of this blog post was inspired by &lt;a href=&quot;http://cs231n.github.io&quot;&gt;CS231n&lt;/a&gt; and &lt;a href=&quot;https://arxiv.org/abs/1502.05767&quot;&gt;this&lt;/a&gt; paper. Highly recommended reads.&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;The derivative is an important operation in machine learning, primarily for parameter optimization with loss functions. However, computing analytic derivatives in the finite context of 32 or 64 bits has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we’ll discuss numerical differentiation, which, while simple and intuitive, suffers from floating point errors. Then, we’ll discuss symbolic differentiation, which suffers from complexity problems. Finally, we’ll discuss auto-differentiation, the most popular method to compute derivatives with both exactness and simplicity. We’ll also discuss &lt;em&gt;backpropagation&lt;/em&gt;, an analogue of auto-differentiation that is the primary method of learning in neural networks.&lt;/p&gt;
@@ -47,9 +47,9 @@
 
 &lt;p&gt;Symbolic differentiation is a representational problem, and can quickly become extremely complex, depending on the function to be manipulated. But once the representation is achieved, derivatives can be computed much more accurately than with finite differences approximation. I won’t be going into more detail on symbolic differentiation’s internals, mainly because it’s complex, but I’ll point you &lt;a href=&quot;http://homepage.divms.uiowa.edu/~stroyan/CTLC3rdEd/3rdCTLCText/Chapters/ch6.pdf&quot;&gt;here&lt;/a&gt; if you want more details.&lt;/p&gt;
 
-&lt;h2 id=&quot;forward-autodifferentiation&quot;&gt;Forward Autodifferentiation&lt;/h2&gt;
+&lt;h2 id=&quot;automatic-differentiation-in-forward-mode&quot;&gt;Automatic Differentiation in Forward Mode&lt;/h2&gt;
 
-&lt;p&gt;Autodifferentiation (AD) is a method that is both exact and simple. The basic motivation for AD is that &lt;em&gt;any arbitrary function can be represented as a composition of simpler ones&lt;/em&gt;. Under functional composition, one can compute the derivative of a function using the &lt;em&gt;chain rule&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;Automatic Differentiation (AD) is a method that is both exact and simple. The basic motivation for AD is that &lt;em&gt;any arbitrary function can be represented as a composition of simpler ones&lt;/em&gt;. Under functional composition, one can compute the derivative of a function using the &lt;em&gt;chain rule&lt;/em&gt;:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;f(x) = g(h(x)) \implies f&#39;(x) = g&#39;(h(x)) h&#39;(x)&lt;/script&gt;
 
@@ -123,7 +123,7 @@ N &lt;&lt; M %]]&gt;&lt;/script&gt;, then the forward pass is extremely efficien
 
 &lt;p&gt;However, when &lt;script type=&quot;math/tex&quot;&gt;N &gt;&gt; M&lt;/script&gt;, another version of AD, called &lt;em&gt;reverse AD&lt;/em&gt;, is more efficent to compute derivatives of &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; with respect to each input dimension. We’ll dig into that next.&lt;/p&gt;
 
-&lt;h2 id=&quot;reverse-autodifferentiation&quot;&gt;Reverse Autodifferentiation&lt;/h2&gt;
+&lt;h2 id=&quot;automatic-differentiation-in-reverse-mode&quot;&gt;Automatic Differentiation in Reverse Mode&lt;/h2&gt;
 
 &lt;p&gt;As opposed to forward autodifferentiation, which involves staged computations from the input to the output, reverse autodifferentiation evolves backwards from the function output.&lt;/p&gt;
 
