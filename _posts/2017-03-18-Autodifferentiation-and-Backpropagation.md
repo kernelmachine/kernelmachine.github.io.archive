@@ -6,7 +6,7 @@ comments: true
 
 *Much of this blog post was inspired by [CS231n](http://cs231n.github.io) and [this](https://arxiv.org/abs/1502.05767) paper. Highly recommended reads.*
 
-The derivative is an important operation in machine learning, primarily for parameter optimization with loss functions. However, computing analytic derivatives in the finite context of 32 or 64 bit computers has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we'll discuss numerical differentiation, which, while simple and intuitive, suffers from floating point errors. Then, we'll discuss symbolic differentiation, which suffers from complexity problems. Finally, we'll discuss auto-differentiation, the most popular method to compute derivatives with both exactness and simplicity. We'll also discuss *backpropagation*, an analogue of auto-differentiation that is the primary method of learning in neural networks.
+The derivative is an important operation in machine learning, primarily for parameter optimization with loss functions. However, computing analytic derivatives in the finite context of 32 or 64 bits has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we'll discuss numerical differentiation, which, while simple and intuitive, suffers from floating point errors. Then, we'll discuss symbolic differentiation, which suffers from complexity problems. Finally, we'll discuss auto-differentiation, the most popular method to compute derivatives with both exactness and simplicity. We'll also discuss *backpropagation*, an analogue of auto-differentiation that is the primary method of learning in neural networks.
 
 ## Numerical differentiation
 
@@ -368,7 +368,7 @@ grads['b1'] = np.sum(dhidden, axis = 0)
 
 Finally, remember to add in the backpropagation onto the regularization loss:
 
-```
+```python
 # don't forget regularization loss
 grads['W2'] += reg * W2
 grads['W1'] += reg * W1

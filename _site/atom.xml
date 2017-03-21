@@ -4,7 +4,7 @@
  <title>suchin</title>
  <link href="https://suchin.co/atom.xml" rel="self"/>
  <link href="https://suchin.co/"/>
- <updated>2017-03-19T19:30:01-07:00</updated>
+ <updated>2017-03-21T09:06:59-07:00</updated>
  <id>https://suchin.co</id>
  <author>
    <name>Suchin Gururangan</name>
@@ -19,7 +19,7 @@
    <id>https://suchin.co/2017/03/18/Autodifferentiation-and-Backpropagation</id>
    <content type="html">&lt;p&gt;&lt;em&gt;Much of this blog post was inspired by &lt;a href=&quot;http://cs231n.github.io&quot;&gt;CS231n&lt;/a&gt; and &lt;a href=&quot;https://arxiv.org/abs/1502.05767&quot;&gt;this&lt;/a&gt; paper. Highly recommended reads.&lt;/em&gt;&lt;/p&gt;
 
-&lt;p&gt;The derivative is an important operation in machine learning, primarily for parameter optimization with loss functions. However, computing analytic derivatives in the finite context of 32 or 64 bit computers has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we’ll discuss numerical differentiation, which, while simple and intuitive, suffers from floating point errors. Then, we’ll discuss symbolic differentiation, which suffers from complexity problems. Finally, we’ll discuss auto-differentiation, the most popular method to compute derivatives with both exactness and simplicity. We’ll also discuss &lt;em&gt;backpropagation&lt;/em&gt;, an analogue of auto-differentiation that is the primary method of learning in neural networks.&lt;/p&gt;
+&lt;p&gt;The derivative is an important operation in machine learning, primarily for parameter optimization with loss functions. However, computing analytic derivatives in the finite context of 32 or 64 bits has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we’ll discuss numerical differentiation, which, while simple and intuitive, suffers from floating point errors. Then, we’ll discuss symbolic differentiation, which suffers from complexity problems. Finally, we’ll discuss auto-differentiation, the most popular method to compute derivatives with both exactness and simplicity. We’ll also discuss &lt;em&gt;backpropagation&lt;/em&gt;, an analogue of auto-differentiation that is the primary method of learning in neural networks.&lt;/p&gt;
 
 &lt;h2 id=&quot;numerical-differentiation&quot;&gt;Numerical differentiation&lt;/h2&gt;
 
@@ -370,9 +370,9 @@ N &lt;&lt; M %]]&gt;&lt;/script&gt;, then the forward pass is extremely efficien
 
 &lt;p&gt;Finally, remember to add in the backpropagation onto the regularization loss:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# don&#39;t forget regularization loss
-grads[&#39;W2&#39;] += reg * W2
-grads[&#39;W1&#39;] += reg * W1
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# don&#39;t forget regularization loss&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;grads&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;W2&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;W2&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;grads&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;W1&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;W1&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
