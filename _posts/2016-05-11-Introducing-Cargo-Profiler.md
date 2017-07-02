@@ -4,7 +4,7 @@ title: Introducing Cargo Profiler
 comments: true
 ---
 
-Profiling tools can help you write fast and efficient code. However, whether you use perf, oprofile, or valgrind, you have to exit the Rust ecosystem to profile your applications. This has always been a little cumbersome to me, so I built a cargo subcommand to perform the job: [cargo-profiler](https://github.com/pegasos1/cargo-profiler).
+Profiling tools can help you write fast and efficient code. However, whether you use perf, oprofile, or valgrind, you have to exit the Rust ecosystem to profile your applications. This has always been a little cumbersome to me, so I built a cargo subcommand to perform the job: [cargo-profiler](https://github.com/kernelmachine/cargo-profiler).
 
 Cargo-profiler interfaces with Linux-based profiling tools to:
 
@@ -16,13 +16,13 @@ For example, instead of this gross cachegrind output:
 
 `valgrind --tool=cachegrind $BINARY && cg_annotate $OUT_FILE`
 
-<img src="http://pegasos1.github.io/public/20160511/cachegrind_pic.png" width="900" height="400">
+<img src="http://kernelmachine.github.io/public/20160511/cachegrind_pic.png" width="900" height="400">
 
 You get this prettier cachegrind output:
 
 `cargo profiler cachegrind --bin=$BINARY -n 10`
 
-![Cargo profiler](http://pegasos1.github.io/public/20160511/cargoprofiler.png)
+![Cargo profiler](http://kernelmachine.github.io/public/20160511/cargoprofiler.png)
 
 Since cargo-profiler parses performance statistics into machine-readable, structured objects, we can do a lot more with the data, even in a programmatic way.
 

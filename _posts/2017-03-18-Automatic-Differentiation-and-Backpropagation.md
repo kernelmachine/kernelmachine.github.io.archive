@@ -16,7 +16,7 @@ $$ \frac{\partial f}{\partial x_i} \approx \lim_{h \rightarrow 0} \frac{f(x_i + 
 
 where $$h > 0$$ is some small step size. Essentially, given some tangent line between $$f(x_i)$$ and $$f(x_i + h)$$, we estimate its slope by calculating the slope of *secant line*  between $$(x, f(x))$$ and $$(x_i + h , f(x_i + h))$$, and say that as $$h$$ approaches 0, the derivative of the secant line approaches the derivative of the tangent line. Here's a graphic of that process:
 
-<img src="https://pegasos1.github.io/public/20170318/num_diff.png">
+<img src="https://kernelmachine.github.io/public/20170318/num_diff.png">
 
 The issue with numerical differentiation is that it is inherently ill-conditioned and unstable. It cannot be exactly fitted to a finite representation without rounding or truncation, thus introducing approximation errors in the computation. The size of $$h$$ directly correlates with the amount of instability in the differentiation. If $$h$$ is too small, then the subtraction from $$x_i$$ will yield a larger rounding error. On the other hand, if $$h$$ is too large, the estimate of the slope of the tangent could be worse. Most people advise against using the finite differences approximation of the derivative in machine learning systems.
 
@@ -149,7 +149,7 @@ To compute $$\bar x_1 = \frac{\partial f}{\partial x_1}$$ and $$\bar x_2 = \frac
 
 In fact, it is helpful to view the forward pass as a computation graph, to visualize this point:
 
-<img src="https://pegasos1.github.io/public/20170318/graph.png">
+<img src="https://kernelmachine.github.io/public/20170318/graph.png">
 
 $$x_1$$ only affects $$f$$ through $$v_2$$ and $$v_5$$, which means that through the multi-dimensional chain rule:
 
@@ -195,7 +195,7 @@ Consider a two layer neural network. Given an input matrix $$X \in R^{N x M}$$ a
 
 Here's a rough diagram of the network we'll be working with.
 
-<img src="https://pegasos1.github.io/public/20170318/nnet.png">
+<img src="https://kernelmachine.github.io/public/20170318/nnet.png">
 
 During learning, we want to provide input to the neural network, and then update the weights at each layer depending on the error computed by the loss function at the output. We'll use reverse AD (or *backpropagation*) to find the gradients of the loss function with respect to each weight matrix. Note that all the layers can be updated by merely knowing the derivative of the *last stage of computation*, because as we saw in the last section, all previous stages' derivatives can then be computed. This means that we'll have to figure out what the derivative of our the softmax loss function is, and then we're golden.
 

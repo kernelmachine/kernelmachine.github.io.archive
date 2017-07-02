@@ -4,7 +4,7 @@ title: Matrix Multiplication in Rust (Part 1)
 comments: true
 ---
 
-*Thanks to staticassert for feedback, and bluss for conversations. Source code can be found [here](http://github.com/pegasos1/rsmat).*
+*Thanks to staticassert for feedback, and bluss for conversations. Source code can be found [here](http://github.com/kernelmachine/rsmat).*
 
 *This post is the first of a series.*
 
@@ -249,7 +249,7 @@ I was interested in how Rayon matrix multiplication performance depended on `BLO
 
 As you can see, with smaller blocksizes, Rayon does consistently worse than single-threaded multiplication.
 
-<img src="http://pegasos1.github.io/public/20160424/fig1.png" width="700">
+<img src="http://kernelmachine.github.io/public/20160424/fig1.png" width="700">
 
 
 ## Fun experiment on EC2

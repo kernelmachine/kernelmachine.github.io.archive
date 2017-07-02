@@ -14,7 +14,7 @@ Our RustConf talk, entitled *[The PlayRust Classifier](https://slides.com/suchin
 Most data science teams face the basic problem of moving between research and production-level machine learning. These two types of data science have very different motivations and goals. Research data science is usually one-off and includes a lot of proof-of-concept work, while production-level machine learning may run in the cloud or on a low-memory device, and has the same engineering constraints as any other software product. Most technical debt is accrued in the transition between these phases, especially during feature engineering.
 
 <div style="margin-left:175px">
-  <img src="http://pegasos1.github.io/public/20160913/datapic.jpg" width="400" height="400">
+  <img src="http://kernelmachine.github.io/public/20160913/datapic.jpg" width="400" height="400">
 </div>
 
 The unfortunate reality is that data often sucks in most applicable domains of machine learning.   This means that data scientists spent 99% of their time doing feature engineering -- munging through data, building and cleaning features -- and only a minority of their time working with machine learning algorithms.
@@ -36,7 +36,7 @@ How can Rust help us pay off technical debt in machine learning during the featu
 From time to time, someone mistakenly publishes a post in the *[/r/rust](http://reddit.com/r/rust)* subreddit that was intended for the *[/r/playrust](http://reddit.com/r/playrust)* subreddit, a community for a popular video game *Rust*. We built a classifier to detect these mistakenly published posts.
 
 <div style="text-align:center">
-  <img src="http://pegasos1.github.io/public/20160913/playrust.png" width="780" height="400">
+  <img src="http://kernelmachine.github.io/public/20160913/playrust.png" width="780" height="400">
 </div>
 
 This toy problem was an optimal medium to explore Rust data science, because we were gifted with naturally labeled training data: posts collected from both subreddits. This let us focus on the implementation details.
@@ -64,19 +64,19 @@ We then trained a Random Forest with the crate *rustlearn* to perform the predic
 We achieved good accuracy in our model. The model had a >98% AUC in prediction, as seen below.
 
 <div style="margin-left:100px">
-  <img src="http://pegasos1.github.io/public/20160913/roccurve.png" width="550" height="400">
+  <img src="http://kernelmachine.github.io/public/20160913/roccurve.png" width="550" height="400">
 </div>
 
 The model was primarily driven by the frequencies of words related to the */r/rust* subreddit. Notice the word "amp", ie "&". Haha.
 
 <div style="margin-left:100px">
-  <img src="http://pegasos1.github.io/public/20160913/featimps.png" width="580" height="400">
+  <img src="http://kernelmachine.github.io/public/20160913/featimps.png" width="580" height="400">
 </div>
 
 The model outputs a score between 0 and 1 that represents the likelihood that the post in question is part of the */r/rust* subreddit. Some example outputs are below. Notice the third post, with the slightly confusing title, is also slightly confusing to the model.
 
 <div style="margin-left:50px">
-  <img src="http://pegasos1.github.io/public/20160913/examples.png" width="700" height="400">
+  <img src="http://kernelmachine.github.io/public/20160913/examples.png" width="700" height="400">
 </div>
 
 

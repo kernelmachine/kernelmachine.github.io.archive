@@ -8,24 +8,24 @@ Massive data breaches are becoming more and more common these days. How can you 
 
 The recently launched [Have I Been Pwned](https://haveibeenpwned.com) (HIBP) service can help. HIBP is a free resource to quickly assess if an account or domain has been compromised in a data breach. The project helps victims become aware of these security situations as fast as possible, and highlights the severity of Internet-wide attacks.
 
-To make HIBP accessible to developers, I built a Python wrapper around its API: [hibp](http://github.com/pegasos1/haveibeenpwned).
+To make HIBP accessible to developers, I built a Python wrapper around its API: [hibp](http://github.com/kernelmachine/haveibeenpwned).
 
 With this library you can access a number of HIBP services from Python, including:
 
 * breaches on a particular domain (linkedin.com, ashleymadison.com)
-* breaches on a user account or email (pegasos1, example@gmail.com)
+* breaches on a user account or email (kernelmachine, example@gmail.com)
 * all historical breaches of a particular name (adobe, linkedin)
 
 Each service request object contains a response attribute that holds the raw data in JSON format. To perform a query, just setup a service request object, and then execute it:
 
 ```python
 >> from hibp import HIBP
->> req = HIBP.get_account_breaches("pegasos1")
+>> req = HIBP.get_account_breaches("kernelmachine")
 >> req.execute()
 >> req.response
 ```
 
-You can see a full example script of how to use the API [here](https://github.com/pegasos1/haveibeenpwned/blob/master/hibp/example.py).
+You can see a full example script of how to use the API [here](https://github.com/kernelmachine/haveibeenpwned/blob/master/hibp/example.py).
 
 Here's some example data we get back when we query for data breaches on `adobe.com`:
 
@@ -83,7 +83,7 @@ Concurrent queries are much faster than serial ones:
 ```python
 # random set of query parameters
 names = ['adobe','ashleymadison', 'linkedin', 'myspace']*20
-accounts = ["ssgrn", "pegasos1","barackobama"]*20
+accounts = ["ssgrn", "kernelmachine","barackobama"]*20
 domains = ['twitter.com', 'facebook.com','github.com','adobe.com']*20
 
 # setup HIBP objects for request executions

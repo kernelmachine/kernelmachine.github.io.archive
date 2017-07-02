@@ -28,7 +28,7 @@ $$\delta$$ is called the *margin*, and corresponds to the euclidean distance bet
  This is an example of a *soft margin* SVM. There is also a *hard margin* version, in which the margin is completely determined by the closest data-points to the decision boundary,  called the *support vectors*.
 
 
-<img src="http://pegasos1.github.io/public/20170304/svm.png">
+<img src="http://kernelmachine.github.io/public/20170304/svm.png">
 
 
 Note that it can be shown that the canonical binary classification SVM problem is just a special case of the multi-class formulation above. In particular, it can be shown that in the binary case the above formulation reduces to
@@ -71,7 +71,7 @@ $$ L_i = \sum\limits_{j \neq y_i} max (0, w^T_{j}x_i - w^T_{y_i}x_i + \delta) + 
 
 By adding the regularization term to the loss function, we are saying that we prefer score vectors that have a lower $$L_2$$-norm, which  corresponds to scores that are *lower and diffuse*. Lower, diffuse scores improve model generalization because a single dimension doesn't have overwhelming contribution to the overall prediction.
 
-<img src="http://pegasos1.github.io/public/20170304/reg.png">
+<img src="http://kernelmachine.github.io/public/20170304/reg.png">
 
 The final loss function for the SVM is just the average loss over *all* data samples:
 

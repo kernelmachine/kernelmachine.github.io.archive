@@ -11,7 +11,7 @@ Recently, I've been working on a Rust crate for tabular data manipulation. I'm e
 
 Languages like [Python](http://pandas.pydata.org/), [R](http://www.r-tutor.com/r-introduction/data-frame), and [Julia](https://github.com/JuliaStats/DataFrames.jl) have popularized the  _dataframe_, which is an abstraction over a collection of _named_ arrays. The dataframe allows users to access, transform, and compute over two-dimensional data that may have mixed types.
 
-[**Utah**](https://github.com/pegasos1/utah) is a dataframe crate backed by [ndarray](https://github.com/bluss/rust-ndarray) for type-conscious tabular data manipulation with an expressive, functional interface.
+[**Utah**](https://github.com/kernelmachine/utah) is a dataframe crate backed by [ndarray](https://github.com/bluss/rust-ndarray) for type-conscious tabular data manipulation with an expressive, functional interface.
 
 ## Overall goals of project
 
