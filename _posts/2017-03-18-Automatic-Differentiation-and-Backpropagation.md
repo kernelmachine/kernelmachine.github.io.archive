@@ -280,9 +280,9 @@ When $$ j = y_i $$,
 
 $$ \frac{\partial H}{\partial f_{y_i}} = -\frac{1}{N} \sum_i \frac{\partial}{\partial f_{y_i}} log(p_{y_i}) \frac{\partial p_{y_i}}{\partial f_{y_i}}$$
 
-$$  = -\frac{1}{N} \sum_i \frac{1}{p_{y_i}}  \frac{\sum_j e^{f_{j}} e^{f_{y_i}} - e^{f_{y_i}} e^{f_{y_i}} } {\sum_j e^{f_j}}$$
+$$  = -\frac{1}{N} \sum_i \frac{1}{p_{y_i}}  \frac{\sum_j e^{f_{j}} e^{f_{y_i}} - e^{f_{y_i}} e^{f_{y_i}} } {(\sum_j e^{f_j})^2}$$
 
-$$  = -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} \frac{e^{f_{y_i}} (\sum_j e^{f_{j}}  - e^{f_{y_i}})}{\sum_j e^{f_j}}$$
+$$  = -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} \frac{e^{f_{y_i}} (\sum_j e^{f_{j}}  - e^{f_{y_i}})}{(\sum_j e^{f_j})^2}$$
 
 $$  = -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} p_{y_i}(1 - p_{y_i})$$
 
@@ -294,7 +294,7 @@ When $$ j \neq y_i $$,
 
 $$ \frac{\partial H}{\partial f_{j}} = -\frac{1}{N} \sum_i \frac{\partial}{\partial f_{j}} log(p_{y_i}) \frac{\partial p_{y_i}}{\partial f_{j}}$$
 
-$$  = -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} \frac{0 - e^{f_{y_i}}e^{f_{j}}}{\sum_j e^{f_j}}$$
+$$  = -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} \frac{0 - e^{f_{y_i}}e^{f_{j}}}{(\sum_j e^{f_j})^2}$$
 
 $$  = -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} (- p_{y_i}p_j)$$
 
