@@ -1,66 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 
   <head>
-  <meta charset="UTF-8">
   <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
   <!-- Enable responsiveness on mobile devices-->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
   <title>
     
-      Matrix Multiplication in Rust (Part 1) &middot; suchin
+      Matrix Multiplication in Rust (Part 1) &middot; Suchin
     
   </title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/styles.css">
-  <!-- <link rel="stylesheet" href="/googlecode.css"> -->
-
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
   <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
-
+  
   <!-- Icons -->
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
-  <link rel="shortcut icon" href="/public/square-outline.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="/public/favicon.ico">
 
   <!-- RSS -->
-  <link rel="alternate" type="application/atom+xml" title="suchin" href="/atom.xml">
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-75615851-1', 'auto');
-    ga('send', 'pageview');
-
-  </script>
-
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
 </head>
 
 
-  <body>
+  <body class="theme-base-08">
 
-    <div class="container content">
-      <header class="masthead">
-        <h3 class="masthead-title">
-          <a href="/" title="Home" style="text-decoration: none;">suchin</a>
-          <small><a href="/" style="text-decoration: none; color: #C0C0C0">writings</a></small>
-          <div class="links">
-          <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
-          <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
-          <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
-          <a  href="http://twitter.com/ssgrn" > <img style="display: inline; margin-left: 15px;" src="https://upload.wikimedia.org/wikipedia/de/thumb/9/9f/Twitter_bird_logo_2012.svg/1000px-Twitter_bird_logo_2012.svg.png"   height="50px" width="50px"></img></a>
-        </div>
-        </h3>
-      </header>
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="/">
+          Suchin
+        </a>
+      </h1>
+      <p class="lead">சச்சின் | ساشين | sʌʧɪn</p>
+      <p class="lead">Graduate student at the University of Washington studying NLP.</p>
+    </div>
 
-      <main>
-        <article class="post">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="/">Home</a>
+
+      
+
+      
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/about/">About</a>
+          
+        
+      
+        
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/publications/">Publications</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/talks/">Talks and Conferences</a>
+          
+        
+      
+
+      <a class="sidebar-nav-item" href="https://twitter.com/ssgrn">Twitter</a>
+      <a class="sidebar-nav-item" href="https://github.com/kernelmachine">GitHub</a>
+    </nav>
+
+    <p>&copy; 2018. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
   <h1 class="post-title">Matrix Multiplication in Rust (Part 1)</h1>
-  <time datetime="2016-04-25T00:00:00-07:00" class="post-date">25 Apr 2016</time>
-  <p><em>Thanks to staticassert for feedback, and bluss for conversations. Source code can be found <a href="http://github.com/pegasos1/rsmat">here</a>.</em></p>
+  <span class="post-date">25 Apr 2016</span>
+  <p><em>Thanks to staticassert for feedback, and bluss for conversations. Source code can be found <a href="http://github.com/kernelmachine/rsmat">here</a>.</em></p>
 
 <p><em>This post is the first of a series.</em></p>
 
@@ -83,25 +117,23 @@
 
 <p>We’ll use the following type aliases:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>pub type VectorView&lt;'a, A&gt; = ArrayView&lt;'a, A, Ix&gt;;
+<pre><code>pub type VectorView&lt;'a, A&gt; = ArrayView&lt;'a, A, Ix&gt;;
 pub type MatView&lt;'a, A&gt; = ArrayView&lt;'a, A, (Ix, Ix)&gt;;
 pub type MatViewMut&lt;'a, A&gt; = ArrayViewMut&lt;'a, A, (Ix, Ix)&gt;;
 </code></pre>
-</div>
 
 <p>ArrayView(Mut)s are (mutable) references to a matrix, or part of it. They’re good objects to use if you want to  work with modular subviews of a matrix.</p>
 
-<p>We begin with a naive implementation of the dot product, in which we fold a multiplicative sum of values in vectors <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code>.</p>
+<p>We begin with a naive implementation of the dot product, in which we fold a multiplicative sum of values in vectors <code>a</code> and <code>b</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>pub fn vector_dot(a : VectorView&lt;f64&gt;,b:  VectorView&lt;f64&gt;) -&gt; f64 {
+<pre><code>pub fn vector_dot(a : VectorView&lt;f64&gt;,b:  VectorView&lt;f64&gt;) -&gt; f64 {
         (0..a.len()).fold(0.0, |x, y| x + a.get(y).unwrap() * b.get(y).unwrap() )
 }
 </code></pre>
-</div>
 
 <p>We then define a matrix dot product like so:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>pub fn matrix_dot( a : &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;, c : &amp;mut MatViewMut&lt;f64&gt;){
+<pre><code>pub fn matrix_dot( a : &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;, c : &amp;mut MatViewMut&lt;f64&gt;){
     let ((m,k1),(k2,n)) = (a.dim(),b.dim());
     assert_eq!(k1,k2);
     for ix in 0..m{
@@ -114,36 +146,33 @@ pub type MatViewMut&lt;'a, A&gt; = ArrayViewMut&lt;'a, A, (Ix, Ix)&gt;;
     }
 }
 </code></pre>
-</div>
 
-<p>In the code above, we first check whether the inner and outer dimensions of <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> (respectively) are the same. Then we loop through the matrices’ rows and columns, applying our <code class="highlighter-rouge">vector_dot</code> function and updating a separate matrix <code class="highlighter-rouge">c</code> with the corresponding output.</p>
+<p>In the code above, we first check whether the inner and outer dimensions of <code>a</code> and <code>b</code> (respectively) are the same. Then we loop through the matrices’ rows and columns, applying our <code>vector_dot</code> function and updating a separate matrix <code>c</code> with the corresponding output.</p>
 
 <p>Here are the benchmarks, compared to OpenBLAS, on multiplying <script type="math/tex">128 \times 100</script> and <script type="math/tex">100 \times 128</script> matrices:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>test bench_dot_dumb        ... bench:   2,843,823 ns/iter (+/- 110,881)
+<pre><code>test bench_dot_dumb        ... bench:   2,843,823 ns/iter (+/- 110,881)
 
 test bench_dot_openblas    ... bench:   201,170 ns/iter (+/- 18,666)
 </code></pre>
-</div>
 
 <p>Wow, that sucks. We’re at least 10x slower than OpenBLAS. But the above implementation is called naive for a reason; we can do a lot better.</p>
 
 <h2 id="unsafe-indexing">Unsafe indexing</h2>
 <hr />
-<p><code class="highlighter-rouge">get()</code> and <code class="highlighter-rouge">get_mut()</code>  checks matrix dimensions before returning the indexed value. This makes for safe code, since ndarray will throw an error if the supplied index falls outside of the matrix dimensions (hence the <code class="highlighter-rouge">unwrap</code>). However, index checking wastes time, and we’re trying to make things as fast as possible.</p>
+<p><code>get()</code> and <code>get_mut()</code>  checks matrix dimensions before returning the indexed value. This makes for safe code, since ndarray will throw an error if the supplied index falls outside of the matrix dimensions (hence the <code>unwrap</code>). However, index checking wastes time, and we’re trying to make things as fast as possible.</p>
 
-<p>The first thing we could do is index the matrix <code class="highlighter-rouge">c</code> with unsafe methods <code class="highlighter-rouge">uget()</code> and <code class="highlighter-rouge">uget_mut()</code>. These don’t check the bounds of the matrix when indexing, and will save us time.</p>
+<p>The first thing we could do is index the matrix <code>c</code> with unsafe methods <code>uget()</code> and <code>uget_mut()</code>. These don’t check the bounds of the matrix when indexing, and will save us time.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>pub fn vector_dot_unsafe(a : VectorView&lt;f64&gt;,b:  VectorView&lt;f64&gt;) -&gt; f64 {
+<pre><code>pub fn vector_dot_unsafe(a : VectorView&lt;f64&gt;,b:  VectorView&lt;f64&gt;) -&gt; f64 {
     unsafe{
         (0..a.len()).fold(0.0, |x, y| x + a.uget(y) * b.uget(y))
     }
 
 }
 </code></pre>
-</div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>pub fn matrix_dot_unsafe( a : &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;,
+<pre><code>pub fn matrix_dot_unsafe( a : &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;,
                         c : &amp;mut MatViewMut&lt;f64&gt;){
     let ((m,k1),(k2,n)) = (a.dim(),b.dim());
     assert_eq!(k1,k2);
@@ -159,15 +188,13 @@ test bench_dot_openblas    ... bench:   201,170 ns/iter (+/- 18,666)
     }
 }
 </code></pre>
-</div>
 
 <p>We achieve about a 2x speedup with this change.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>test bench_dot_dumb        ... bench:   1,518,253 ns/iter (+/- 24,523)
+<pre><code>test bench_dot_dumb        ... bench:   1,518,253 ns/iter (+/- 24,523)
 
 test bench_dot_openblas    ... bench:   201,170 ns/iter (+/- 18,666)
 </code></pre>
-</div>
 
 <h2 id="improve-matrix-multiplication">Improve matrix multiplication</h2>
 <hr />
@@ -175,9 +202,9 @@ test bench_dot_openblas    ... bench:   201,170 ns/iter (+/- 18,666)
 
 <p>The matrixmultiply crate<sup id="fnref:4"><a href="#fn:4" class="footnote">4</a></sup> computes the dot product by decomposing the full computation into a layered set of mini subproblems that can be efficiently packed into the cache. For an in-depth review of the algorithm and its implementation, I’ll refer you to another post on the subject <sup id="fnref:5"><a href="#fn:5" class="footnote">5</a></sup>.</p>
 
-<p>By replacing the naive dot product with this smarter version, natively supported in ndarray via the method <code class="highlighter-rouge">dot</code>, we achieve significant speed up:</p>
+<p>By replacing the naive dot product with this smarter version, natively supported in ndarray via the method <code>dot</code>, we achieve significant speed up:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>pub fn matrix_dot( left : &amp;MatView&lt;f64&gt;, right: &amp;MatView&lt;f64&gt;,
+<pre><code>pub fn matrix_dot( left : &amp;MatView&lt;f64&gt;, right: &amp;MatView&lt;f64&gt;,
                   init : &amp;mut MatViewMut&lt;f64&gt;){
     let dot_prod = left.dot(right);
     for ix in 0..m{
@@ -191,13 +218,11 @@ test bench_dot_openblas    ... bench:   201,170 ns/iter (+/- 18,666)
     }
 }
 </code></pre>
-</div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>test bench_dot_matrixmultiply      ... bench:     370,281 ns/iter (+/- 14,179)
+<pre><code>test bench_dot_matrixmultiply      ... bench:     370,281 ns/iter (+/- 14,179)
 
 test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
 </code></pre>
-</div>
 
 <p>Nice! We’ve increased the speed almost 4x. Now let’s try to get our algorithm even closer to OpenBLAS performance.</p>
 
@@ -205,17 +230,16 @@ test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
 <hr />
 <p>Let’s revisit the indexing issue in the loop. We gained some significant speedups by making our code unsafe, but this isn’t ideal. Let’s see if we can get speed <em>and</em> safety.</p>
 
-<p>The trick here is that matrix elements in ndarray implement <code class="highlighter-rouge">Iterator</code>, and <em>iteration naturally lends itself to bounds checking elimination optimization</em>. It’s implicitly safe to iterate over the matrix. We can assign the values of our dot product to <code class="highlighter-rouge">c</code> safely without having to make sure we’re within the matrix dimensions.</p>
+<p>The trick here is that matrix elements in ndarray implement <code>Iterator</code>, and <em>iteration naturally lends itself to bounds checking elimination optimization</em>. It’s implicitly safe to iterate over the matrix. We can assign the values of our dot product to <code>c</code> safely without having to make sure we’re within the matrix dimensions.</p>
 
-<p>With this in mind, we can simplify the loop to a one-liner that involves the iterator method <code class="highlighter-rouge">zip</code>:</p>
+<p>With this in mind, we can simplify the loop to a one-liner that involves the iterator method <code>zip</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>c.zip_mut_with(&amp;dot_prod, |x, y| *x = *y)
+<pre><code>c.zip_mut_with(&amp;dot_prod, |x, y| *x = *y)
 </code></pre>
-</div>
 
 <p>This results in a smarter, faster matrix multiplication below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>pub fn matrix_dot_safe(a: &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;,
+<pre><code>pub fn matrix_dot_safe(a: &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;,
   c: &amp;mut MatViewMut&lt;f64&gt;) {
     let ((_,k1),(k2,_)) = (a.dim(),b.dim());
     assert_eq!(k1,k2);
@@ -223,17 +247,15 @@ test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
     c.zip_mut_with(&amp;dot_prod, |x, y| *x = *y)
 }
 </code></pre>
-</div>
 
-<p>Because ndarray matrices implement <code class="highlighter-rouge">Iterator</code>, we can use array methods to achieve safety without sacrificing speed. And we get simplicity for free.</p>
+<p>Because ndarray matrices implement <code>Iterator</code>, we can use array methods to achieve safety without sacrificing speed. And we get simplicity for free.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nb">test </span>bench_dot_safe            ... bench:     346,677 ns/iter <span class="o">(</span>+/- 13,246<span class="o">)</span>
+<pre><code class="language-bash">test bench_dot_safe            ... bench:     346,677 ns/iter (+/- 13,246)
 
-<span class="nb">test </span>bench_dot_openblas        ... bench:   201,170 ns/iter <span class="o">(</span>+/- 18,666<span class="o">)</span>
+test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
 </code></pre>
-</div>
 
-<p>Why are we still assigning the dot product of  <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> to <code class="highlighter-rouge">c</code>? Well, we’re just thinking one step ahead - towards parallelization.</p>
+<p>Why are we still assigning the dot product of  <code>a</code> and <code>b</code> to <code>c</code>? Well, we’re just thinking one step ahead - towards parallelization.</p>
 
 <h2 id="parallelization">Parallelization</h2>
 <hr />
@@ -248,9 +270,9 @@ test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
 
 <p><img src="http://www.catonmat.net/blog/wp-content/uploads/2009/12/matrix-multiplication-blocks.gif" width="700" /></p>
 
-<p>We call <code class="highlighter-rouge">join</code> on recursively divided matrices, spawning threads to perform multiplication on blocks when we reach some minimum dimension, called <code class="highlighter-rouge">BLOCKSIZE</code>. The next section will detail the effects of the <code class="highlighter-rouge">BLOCKSIZE</code> parameter on performance, but for now we arbitrarily set it to 64.</p>
+<p>We call <code>join</code> on recursively divided matrices, spawning threads to perform multiplication on blocks when we reach some minimum dimension, called <code>BLOCKSIZE</code>. The next section will detail the effects of the <code>BLOCKSIZE</code> parameter on performance, but for now we arbitrarily set it to 64.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>pub const BLOCKSIZE: usize = 64;
+<pre><code>pub const BLOCKSIZE: usize = 64;
 
 pub fn matrix_dot_rayon(a: &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;,
                         c: &amp;mut MatViewMut&lt;f64&gt;) {
@@ -280,27 +302,25 @@ pub fn matrix_dot_rayon(a: &amp;MatView&lt;f64&gt;, b: &amp;MatView&lt;f64&gt;,
     }
 }
 </code></pre>
-</div>
 
-<p>As before, we first make sure dimensions of <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> are consistent. Then we enter into the rayon loop. The program recursively divides <code class="highlighter-rouge">a</code>, <code class="highlighter-rouge">b</code> and <code class="highlighter-rouge">c</code> until it reaches the minimum threshold for blocksize, at which point the spawned thread(s) begin multiplication on the blocks of <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> and update the corresponding blocks of <code class="highlighter-rouge">c</code> accordingly.</p>
+<p>As before, we first make sure dimensions of <code>a</code> and <code>b</code> are consistent. Then we enter into the rayon loop. The program recursively divides <code>a</code>, <code>b</code> and <code>c</code> until it reaches the minimum threshold for blocksize, at which point the spawned thread(s) begin multiplication on the blocks of <code>a</code> and <code>b</code> and update the corresponding blocks of <code>c</code> accordingly.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>test bench_dot_rayon           ... bench:     224,570 ns/iter (+/- 45,483)
+<pre><code>test bench_dot_rayon           ... bench:     224,570 ns/iter (+/- 45,483)
 test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
 </code></pre>
-</div>
 
 <p>It now looks like we’re competitive with OpenBLAS on my machine.</p>
 
 <h2 id="rayon-performance-graph">Rayon Performance Graph</h2>
 <hr />
 
-<p>I was interested in how Rayon matrix multiplication performance depended on <code class="highlighter-rouge">BLOCKSIZE</code> and the overall dimensions of <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code>.</p>
+<p>I was interested in how Rayon matrix multiplication performance depended on <code>BLOCKSIZE</code> and the overall dimensions of <code>a</code> and <code>b</code>.</p>
 
 <p>First,  I looked at two <script type="math/tex">128 \times 100</script> and <script type="math/tex">100 \times 128</script> matrices. I varied the inner dimension of both matrices in lockstep, and computed benchmarks with/without rayon.</p>
 
 <p>As you can see, with smaller blocksizes, Rayon does consistently worse than single-threaded multiplication.</p>
 
-<p><img src="http://pegasos1.github.io/public/20160424/fig1.png" width="700" /></p>
+<p><img src="http://kernelmachine.github.io/public/20160424/fig1.png" width="700" /></p>
 
 <h2 id="fun-experiment-on-ec2">Fun experiment on EC2</h2>
 <hr />
@@ -311,11 +331,10 @@ test bench_dot_openblas        ... bench:   201,170 ns/iter (+/- 18,666)
 
 <p>Here are the results of multiplying <script type="math/tex">128 \times 100</script> and <script type="math/tex">100 \times 128</script> matrices on that machine.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>test bench_dot ... bench: 323,867 ns/iter (+/- 4,005)
+<pre><code>test bench_dot ... bench: 323,867 ns/iter (+/- 4,005)
 test bench_dot_rayon ... bench: 195,585 ns/iter (+/- 15,530)
 test bench_dot_openblas ... bench: 91,242 ns/iter (+/- 686)
 </code></pre>
-</div>
 
 <p>Rayon’s performance improved quite a bit! But, it gets blown out of the water by OpenBLAS. No competition here.</p>
 
@@ -323,7 +342,7 @@ test bench_dot_openblas ... bench: 91,242 ns/iter (+/- 686)
 
 <h2 id="things-to-consider">Things to consider</h2>
 <hr />
-<p>It’s hard to interpret/generalize the results of concurrent programs because, as I showed above, they’re highly dependent on a variety of parameters, like the size of the data, the number of threads, the power of the CPU, and the cache size. On top of that, Rayon’s <em>potential parallelism</em> concept, while really useful for development, makes the overall program a  bit of a black box. For example, why exactly does rayon performance degrade with a smaller <code class="highlighter-rouge">BLOCKSIZE</code>? Maybe each computation was so ephemeral on a smaller <code class="highlighter-rouge">BLOCKSIZE</code> that rayon didn’t spawn enough threads. Or perhaps I had a random background process that suddenly limited the amount of threads I could allocate. Or perhaps cache lines are the primary determinant of which <code class="highlighter-rouge">BLOCKSIZE</code> is optimal.</p>
+<p>It’s hard to interpret/generalize the results of concurrent programs because, as I showed above, they’re highly dependent on a variety of parameters, like the size of the data, the number of threads, the power of the CPU, and the cache size. On top of that, Rayon’s <em>potential parallelism</em> concept, while really useful for development, makes the overall program a  bit of a black box. For example, why exactly does rayon performance degrade with a smaller <code>BLOCKSIZE</code>? Maybe each computation was so ephemeral on a smaller <code>BLOCKSIZE</code> that rayon didn’t spawn enough threads. Or perhaps I had a random background process that suddenly limited the amount of threads I could allocate. Or perhaps cache lines are the primary determinant of which <code>BLOCKSIZE</code> is optimal.</p>
 
 <p>In the next post of this series, we’ll go under the hood by investigating the CPU and cache to understand <em>why</em> our code improvements resulted in faster performance, hopefully answering some of these questions and controlling for the many factors that can affect the algorithm’s speed.</p>
 
@@ -363,49 +382,8 @@ test bench_dot_openblas ... bench: 91,242 ns/iter (+/- 686)
   </ol>
 </div>
 
-</article>
-<!--
-<aside class="related">
-  <h2>Related Posts</h2>
-  <ul class="related-posts">
-    
-      <li>
-        <h3>
-          <a href="/2017/03/18/Automatic-Differentiation-and-Backpropagation/">
-            Automatic differentiation and Backpropagation
-            <small><time datetime="2017-03-18T00:00:00-07:00">18 Mar 2017</time></small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2017/03/04/The-Support-Vector-Machine/">
-            Crash Course on Support Vector Machines
-            <small><time datetime="2017-03-04T00:00:00-08:00">04 Mar 2017</time></small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2016/12/28/Introducing-Utah/">
-            Introducing Utah
-            <small><time datetime="2016-12-28T00:00:00-08:00">28 Dec 2016</time></small>
-          </a>
-        </h3>
-      </li>
-    
-  </ul>
-</aside> -->
+</div>
 
-      </main>
-
-      <footer class="footer">
-        <small>
-          &copy; <time datetime="2017-06-25T16:33:12-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
-        </small>
-      </footer>
     </div>
 
   </body>

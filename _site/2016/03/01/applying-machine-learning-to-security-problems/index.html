@@ -1,65 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 
   <head>
-  <meta charset="UTF-8">
   <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
   <!-- Enable responsiveness on mobile devices-->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
   <title>
     
-      Applying Machine Learning to Security Problems &middot; suchin
+      Applying Machine Learning to Security Problems &middot; Suchin
     
   </title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/styles.css">
-  <!-- <link rel="stylesheet" href="/googlecode.css"> -->
-
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
   <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
-
+  
   <!-- Icons -->
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
-  <link rel="shortcut icon" href="/public/square-outline.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="/public/favicon.ico">
 
   <!-- RSS -->
-  <link rel="alternate" type="application/atom+xml" title="suchin" href="/atom.xml">
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-75615851-1', 'auto');
-    ga('send', 'pageview');
-
-  </script>
-
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
 </head>
 
 
-  <body>
+  <body class="theme-base-08">
 
-    <div class="container content">
-      <header class="masthead">
-        <h3 class="masthead-title">
-          <a href="/" title="Home" style="text-decoration: none;">suchin</a>
-          <small><a href="/" style="text-decoration: none; color: #C0C0C0">writings</a></small>
-          <div class="links">
-          <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
-          <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
-          <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
-          <a  href="http://twitter.com/ssgrn" > <img style="display: inline; margin-left: 15px;" src="https://upload.wikimedia.org/wikipedia/de/thumb/9/9f/Twitter_bird_logo_2012.svg/1000px-Twitter_bird_logo_2012.svg.png"   height="50px" width="50px"></img></a>
-        </div>
-        </h3>
-      </header>
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="/">
+          Suchin
+        </a>
+      </h1>
+      <p class="lead">சச்சின் | ساشين | sʌʧɪn</p>
+      <p class="lead">Graduate student at the University of Washington studying NLP.</p>
+    </div>
 
-      <main>
-        <article class="post">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="/">Home</a>
+
+      
+
+      
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/about/">About</a>
+          
+        
+      
+        
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/publications/">Publications</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/talks/">Talks and Conferences</a>
+          
+        
+      
+
+      <a class="sidebar-nav-item" href="https://twitter.com/ssgrn">Twitter</a>
+      <a class="sidebar-nav-item" href="https://github.com/kernelmachine">GitHub</a>
+    </nav>
+
+    <p>&copy; 2018. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
   <h1 class="post-title">Applying Machine Learning to Security Problems</h1>
-  <time datetime="2016-03-01T00:00:00-08:00" class="post-date">01 Mar 2016</time>
+  <span class="post-date">01 Mar 2016</span>
   <p>Anomaly detection is a hard process ridden with false alarms. The security community has been increasingly interested in the potential for data-driven tools to filter out noise and automatically detect malicious activity in large networks. However, while capable of overcoming the limitations of static, rule-based techniques, machine learning is not a silver bullet solution to detecting and responding to attacks.</p>
 
 <p>Adaptable models require a continuous flow of labeled data to train with. Unfortunately, the creation of such labeled data is the most expensive and time-consuming part of the data science process. Data is usually messy, incomplete, and inconsistent. While there are many tools to experiment with different algorithms and their parameters, there are few tools to help one develop clean, comprehensive datasets. Often times this means asking practitioners with deep domain expertise to help label existing datasets. But ground truth be hard to come by in the security context, and may go stale very quickly.</p>
@@ -150,49 +184,8 @@ positives to achieve this accuracy.</p>
   </ol>
 </div>
 
-</article>
-<!--
-<aside class="related">
-  <h2>Related Posts</h2>
-  <ul class="related-posts">
-    
-      <li>
-        <h3>
-          <a href="/2017/03/18/Automatic-Differentiation-and-Backpropagation/">
-            Automatic differentiation and Backpropagation
-            <small><time datetime="2017-03-18T00:00:00-07:00">18 Mar 2017</time></small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2017/03/04/The-Support-Vector-Machine/">
-            Crash Course on Support Vector Machines
-            <small><time datetime="2017-03-04T00:00:00-08:00">04 Mar 2017</time></small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2016/12/28/Introducing-Utah/">
-            Introducing Utah
-            <small><time datetime="2016-12-28T00:00:00-08:00">28 Dec 2016</time></small>
-          </a>
-        </h3>
-      </li>
-    
-  </ul>
-</aside> -->
+</div>
 
-      </main>
-
-      <footer class="footer">
-        <small>
-          &copy; <time datetime="2017-06-25T16:33:12-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
-        </small>
-      </footer>
     </div>
 
   </body>

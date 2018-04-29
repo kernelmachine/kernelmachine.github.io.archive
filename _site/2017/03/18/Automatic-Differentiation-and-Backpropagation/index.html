@@ -1,65 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 
   <head>
-  <meta charset="UTF-8">
   <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
   <!-- Enable responsiveness on mobile devices-->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
   <title>
     
-      Automatic differentiation and Backpropagation &middot; suchin
+      Automatic differentiation and Backpropagation &middot; Suchin
     
   </title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/styles.css">
-  <!-- <link rel="stylesheet" href="/googlecode.css"> -->
-
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
   <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
-
+  
   <!-- Icons -->
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
-  <link rel="shortcut icon" href="/public/square-outline.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="/public/favicon.ico">
 
   <!-- RSS -->
-  <link rel="alternate" type="application/atom+xml" title="suchin" href="/atom.xml">
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-75615851-1', 'auto');
-    ga('send', 'pageview');
-
-  </script>
-
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
 </head>
 
 
-  <body>
+  <body class="theme-base-08">
 
-    <div class="container content">
-      <header class="masthead">
-        <h3 class="masthead-title">
-          <a href="/" title="Home" style="text-decoration: none;">suchin</a>
-          <small><a href="/" style="text-decoration: none; color: #C0C0C0">writings</a></small>
-          <div class="links">
-          <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
-          <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
-          <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
-          <a  href="http://twitter.com/ssgrn" > <img style="display: inline; margin-left: 15px;" src="https://upload.wikimedia.org/wikipedia/de/thumb/9/9f/Twitter_bird_logo_2012.svg/1000px-Twitter_bird_logo_2012.svg.png"   height="50px" width="50px"></img></a>
-        </div>
-        </h3>
-      </header>
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="/">
+          Suchin
+        </a>
+      </h1>
+      <p class="lead">சச்சின் | ساشين | sʌʧɪn</p>
+      <p class="lead">Graduate student at the University of Washington studying NLP.</p>
+    </div>
 
-      <main>
-        <article class="post">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="/">Home</a>
+
+      
+
+      
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/about/">About</a>
+          
+        
+      
+        
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/publications/">Publications</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/talks/">Talks and Conferences</a>
+          
+        
+      
+
+      <a class="sidebar-nav-item" href="https://twitter.com/ssgrn">Twitter</a>
+      <a class="sidebar-nav-item" href="https://github.com/kernelmachine">GitHub</a>
+    </nav>
+
+    <p>&copy; 2018. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
   <h1 class="post-title">Automatic differentiation and Backpropagation</h1>
-  <time datetime="2017-03-18T00:00:00-07:00" class="post-date">18 Mar 2017</time>
+  <span class="post-date">18 Mar 2017</span>
   <p><em>Much of this blog post was inspired by <a href="http://cs231n.github.io">CS231n</a> and <a href="https://arxiv.org/abs/1502.05767">this</a> paper. Highly recommended reads.</em></p>
 
 <p>The derivative is an important operation in machine learning, primarily for parameter optimization with loss functions. However, computing analytic derivatives in the finite context of 32 or 64 bits has required significant work. This post will detail the various approaches that we can take to compute the derivative of arbitrary functions. First, we’ll discuss numerical differentiation, which, while simple and intuitive, suffers from floating point errors. Then, we’ll discuss symbolic differentiation, which suffers from complexity problems. Finally, we’ll discuss auto-differentiation, the most popular method to compute derivatives with both exactness and simplicity. We’ll also discuss <em>backpropagation</em>, an analogue of auto-differentiation that is the primary method of learning in neural networks.</p>
@@ -72,7 +106,7 @@
 
 <p>where <script type="math/tex">h > 0</script> is some small step size. Essentially, given some tangent line between <script type="math/tex">f(x_i)</script> and <script type="math/tex">f(x_i + h)</script>, we estimate its slope by calculating the slope of <em>secant line</em>  between <script type="math/tex">(x, f(x))</script> and <script type="math/tex">(x_i + h , f(x_i + h))</script>, and say that as <script type="math/tex">h</script> approaches 0, the derivative of the secant line approaches the derivative of the tangent line. Here’s a graphic of that process:</p>
 
-<p><img src="https://pegasos1.github.io/public/20170318/num_diff.png" /></p>
+<p><img src="https://kernelmachine.github.io/public/20170318/num_diff.png" /></p>
 
 <p>The issue with numerical differentiation is that it is inherently ill-conditioned and unstable. It cannot be exactly fitted to a finite representation without rounding or truncation, thus introducing approximation errors in the computation. The size of <script type="math/tex">h</script> directly correlates with the amount of instability in the differentiation. If <script type="math/tex">h</script> is too small, then the subtraction from <script type="math/tex">x_i</script> will yield a larger rounding error. On the other hand, if <script type="math/tex">h</script> is too large, the estimate of the slope of the tangent could be worse. Most people advise against using the finite differences approximation of the derivative in machine learning systems.</p>
 
@@ -208,7 +242,7 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <p>In fact, it is helpful to view the forward pass as a computation graph, to visualize this point:</p>
 
-<p><img src="https://pegasos1.github.io/public/20170318/graph.png" /></p>
+<p><img src="https://kernelmachine.github.io/public/20170318/graph.png" /></p>
 
 <p><script type="math/tex">x_1</script> only affects <script type="math/tex">f</script> through <script type="math/tex">v_2</script> and <script type="math/tex">v_5</script>, which means that through the multi-dimensional chain rule:</p>
 
@@ -253,7 +287,7 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <p>Here’s a rough diagram of the network we’ll be working with.</p>
 
-<p><img src="https://pegasos1.github.io/public/20170318/nnet.png" /></p>
+<p><img src="https://kernelmachine.github.io/public/20170318/nnet.png" /></p>
 
 <p>During learning, we want to provide input to the neural network, and then update the weights at each layer depending on the error computed by the loss function at the output. We’ll use reverse AD (or <em>backpropagation</em>) to find the gradients of the loss function with respect to each weight matrix. Note that all the layers can be updated by merely knowing the derivative of the <em>last stage of computation</em>, because as we saw in the last section, all previous stages’ derivatives can then be computed. This means that we’ll have to figure out what the derivative of our the softmax loss function is, and then we’re golden.</p>
 
@@ -269,14 +303,13 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <p>Here’s what the forward pass (prior to the loss function) would look like in Python, computing the class scores for the input.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span>  <span class="kn">as</span> <span class="nn">np</span>
+<pre><code class="language-python">import numpy  as np
 
-<span class="n">Y1</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b1</span> <span class="c"># first layer</span>
-<span class="n">A1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Y1</span><span class="p">)</span> <span class="c">#  ReLU activation</span>
-<span class="n">Y2</span> <span class="o">=</span> <span class="n">A1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W2</span><span class="p">)</span><span class="o">+</span> <span class="n">b2</span> <span class="c"># second layer</span>
-<span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Y2</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Y2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c"># softmax</span>
+Y1 = X.dot(W1) + b1 # first layer
+A1 = np.maximum(0, Y1) #  ReLU activation
+Y2 = A1.dot(W2)+ b2 # second layer
+scores = np.exp(Y2) / np.sum(np.exp(Y2), axis=1, keepdims=True) # softmax
 </code></pre>
-</div>
 
 <p>How do we define the <script type="math/tex">SoftmaxLoss</script> function in the output?</p>
 
@@ -296,13 +329,12 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <p>Rounding out the code for the forward pass, here’s what the loss function looks like in Python:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span>  <span class="kn">as</span> <span class="nn">np</span>
+<pre><code class="language-python">import numpy  as np
 
-<span class="n">data_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">y</span><span class="p">])</span>
-<span class="n">reg_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">W1</span> <span class="o">*</span> <span class="n">W1</span><span class="p">)</span>  <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">W2</span> <span class="o">*</span> <span class="n">W2</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">data_loss</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span> <span class="o">+</span> <span class="n">reg_loss</span>
+data_loss = -np.log(scores[range(N), y])
+reg_loss = 0.5 * reg * np.sum(W1 * W1)  + 0.5 * reg * np.sum(W2 * W2)
+loss = np.sum(data_loss) / N + reg_loss
 </code></pre>
-</div>
 
 <p>During learning, we use gradient descent to optimize the network’s weight matrices <script type="math/tex">W_1</script> and <script type="math/tex">W_2</script>. We update the weights with their gradients on <script type="math/tex">L</script> , <script type="math/tex">\partial L \over \partial W_1</script> and <script type="math/tex">\partial L \over \partial W_2</script>.</p>
 
@@ -331,9 +363,9 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <script type="math/tex; mode=display">\frac{\partial H}{\partial f_{y_i}} = -\frac{1}{N} \sum_i \frac{\partial}{\partial f_{y_i}} log(p_{y_i}) \frac{\partial p_{y_i}}{\partial f_{y_i}}</script>
 
-<script type="math/tex; mode=display">= -\frac{1}{N} \sum_i \frac{1}{p_{y_i}}  \frac{\sum_j e^{f_{j}} e^{f_{y_i}} - e^{f_{y_i}} e^{f_{y_i}} } {\sum_j e^{f_j}}</script>
+<script type="math/tex; mode=display">= -\frac{1}{N} \sum_i \frac{1}{p_{y_i}}  \frac{\sum_j e^{f_{j}} e^{f_{y_i}} - e^{f_{y_i}} e^{f_{y_i}} } {(\sum_j e^{f_j})^2}</script>
 
-<script type="math/tex; mode=display">= -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} \frac{e^{f_{y_i}} (\sum_j e^{f_{j}}  - e^{f_{y_i}})}{\sum_j e^{f_j}}</script>
+<script type="math/tex; mode=display">= -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} \frac{e^{f_{y_i}} (\sum_j e^{f_{j}}  - e^{f_{y_i}})}{(\sum_j e^{f_j})^2}</script>
 
 <script type="math/tex; mode=display">= -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} p_{y_i}(1 - p_{y_i})</script>
 
@@ -343,7 +375,7 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <script type="math/tex; mode=display">\frac{\partial H}{\partial f_{j}} = -\frac{1}{N} \sum_i \frac{\partial}{\partial f_{j}} log(p_{y_i}) \frac{\partial p_{y_i}}{\partial f_{j}}</script>
 
-<script type="math/tex; mode=display">= -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} \frac{0 - e^{f_{y_i}}e^{f_{j}}}{\sum_j e^{f_j}}</script>
+<script type="math/tex; mode=display">= -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} \frac{0 - e^{f_{y_i}}e^{f_{j}}}{(\sum_j e^{f_j})^2}</script>
 
 <script type="math/tex; mode=display">= -\frac{1}{N} \sum_i \frac{1}{p_{y_i}} (- p_{y_i}p_j)</script>
 
@@ -365,12 +397,11 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <p>Now we can code the backpropagation onto the softmax loss function:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c"># backprop onto loss function</span>
-<span class="n">dscores</span> <span class="o">=</span> <span class="n">scores</span>
-<span class="n">dscores</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span><span class="n">y</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
-<span class="n">dscores</span> <span class="o">/=</span> <span class="n">N</span>
+<pre><code class="language-python"># backprop onto loss function
+dscores = scores
+dscores[range(N),y] -= 1
+dscores /= N
 </code></pre>
-</div>
 
 <p>Taking into account the gradient of the regularization term in <script type="math/tex">L</script>,</p>
 
@@ -380,12 +411,11 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <p>With the gradient of the loss function, we can easily calculate <script type="math/tex">\bar W_2</script> and <script type="math/tex">\bar b_2</script></p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="n">grads</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="c"># backprop onto W2 and b2</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'W2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dscores</span><span class="p">)</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'b2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">dscores</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<pre><code class="language-python">grads = {}
+# backprop onto W2 and b2
+grads['W2'] = a1.T.dot(dscores)
+grads['b2'] = np.sum(dscores, axis = 0)
 </code></pre>
-</div>
 
 <p>Now we have to compute <script type="math/tex">\bar W_1</script>.</p>
 
@@ -397,113 +427,68 @@ N << M %]]></script>, then the forward pass is extremely efficient in computing 
 
 <p>Combined with the chain rule, we see that the ReLU unit lets the gradient pass through unchanged if its input was greater than 0, but kills it if its input was less than zero during the forward pass.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c"># backprop onto ReLU activation</span>
-<span class="n">dhidden</span> <span class="o">=</span> <span class="n">dscores</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-<span class="n">dhidden</span><span class="p">[</span><span class="n">a1</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<pre><code class="language-python"># backprop onto ReLU activation
+dhidden = dscores.dot(W2.T)
+dhidden[a1 &lt;= 0] = 0
 </code></pre>
-</div>
 
 <p>Now we can calculate <script type="math/tex">\bar W_1</script> and <script type="math/tex">\bar b_1</script>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c"># backprop onto W1 and b2</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'W1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dhidden</span><span class="p">)</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'b1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">dhidden</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<pre><code class="language-python"># backprop onto W1 and b2
+grads['W1'] = X.T.dot(dhidden)
+grads['b1'] = np.sum(dhidden, axis = 0)
 </code></pre>
-</div>
 
 <p>Finally, remember to add in the backpropagation onto the regularization loss:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c"># don't forget regularization loss</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'W2'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">W2</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'W1'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">W1</span>
+<pre><code class="language-python"># don't forget regularization loss
+grads['W2'] += reg * W2
+grads['W1'] += reg * W1
 </code></pre>
-</div>
 
 <p>Here’s the full code to compute the backpropagation on our network:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span>  <span class="kn">as</span> <span class="nn">np</span>
+<pre><code class="language-python">import numpy  as np
 
-<span class="c">## forward pass</span>
-<span class="n">Y1</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b1</span> <span class="c"># first layer</span>
-<span class="n">A1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Y1</span><span class="p">)</span> <span class="c">#  ReLU activation</span>
-<span class="n">Y2</span> <span class="o">=</span> <span class="n">A1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W2</span><span class="p">)</span><span class="o">+</span> <span class="n">b2</span> <span class="c"># second layer</span>
-<span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Y2</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Y2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c"># softmax</span>
+## forward pass
+Y1 = X.dot(W1) + b1 # first layer
+A1 = np.maximum(0, Y1) #  ReLU activation
+Y2 = A1.dot(W2)+ b2 # second layer
+scores = np.exp(Y2) / np.sum(np.exp(Y2), axis=1, keepdims=True) # softmax
 
-<span class="c">## loss function</span>
-<span class="n">data_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">y</span><span class="p">])</span>
-<span class="n">reg_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">W1</span> <span class="o">*</span> <span class="n">W1</span><span class="p">)</span>  <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">W2</span> <span class="o">*</span> <span class="n">W2</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">data_loss</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span> <span class="o">+</span> <span class="n">reg_loss</span>
+## loss function
+data_loss = -np.log(scores[range(N), y])
+reg_loss = 0.5 * reg * np.sum(W1 * W1)  + 0.5 * reg * np.sum(W2 * W2)
+loss = np.sum(data_loss) / N + reg_loss
 
-<span class="n">grads</span> <span class="o">=</span> <span class="p">{}</span>
+grads = {}
 
-<span class="c"># backprop onto loss function</span>
-<span class="n">dscores</span> <span class="o">=</span> <span class="n">scores</span>
-<span class="n">dscores</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span><span class="n">y</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
-<span class="n">dscores</span> <span class="o">/=</span> <span class="n">N</span>
+# backprop onto loss function
+dscores = scores
+dscores[range(N),y] -= 1
+dscores /= N
 
-<span class="c"># backprop onto W2 and b2</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'W2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dscores</span><span class="p">)</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'b2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">dscores</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+# backprop onto W2 and b2
+grads['W2'] = a1.T.dot(dscores)
+grads['b2'] = np.sum(dscores, axis = 0)
 
-<span class="c"># backprop onto ReLU activation</span>
-<span class="n">dhidden</span> <span class="o">=</span> <span class="n">dscores</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">W2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-<span class="n">dhidden</span><span class="p">[</span><span class="n">a1</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+# backprop onto ReLU activation
+dhidden = dscores.dot(W2.T)
+dhidden[a1 &lt;= 0] = 0
 
-<span class="c"># backprop onto W1 and b2</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'W1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dhidden</span><span class="p">)</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'b1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">dhidden</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+# backprop onto W1 and b2
+grads['W1'] = X.T.dot(dhidden)
+grads['b1'] = np.sum(dhidden, axis = 0)
 
-<span class="c"># don't forget regularization loss</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'W2'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">W2</span>
-<span class="n">grads</span><span class="p">[</span><span class="s">'W1'</span><span class="p">]</span> <span class="o">+=</span> <span class="n">reg</span> <span class="o">*</span> <span class="n">W1</span>
+# don't forget regularization loss
+grads['W2'] += reg * W2
+grads['W1'] += reg * W1
 </code></pre>
-</div>
 
 <p>We would use these gradients to then update <script type="math/tex">W_1</script> and <script type="math/tex">W_2</script> with gradient descent.</p>
 
-</article>
-<!--
-<aside class="related">
-  <h2>Related Posts</h2>
-  <ul class="related-posts">
-    
-      <li>
-        <h3>
-          <a href="/2017/03/04/The-Support-Vector-Machine/">
-            Crash Course on Support Vector Machines
-            <small><time datetime="2017-03-04T00:00:00-08:00">04 Mar 2017</time></small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2016/12/28/Introducing-Utah/">
-            Introducing Utah
-            <small><time datetime="2016-12-28T00:00:00-08:00">28 Dec 2016</time></small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2016/09/13/The-PlayRust-Classifier/">
-            The PlayRust Classifier
-            <small><time datetime="2016-09-13T00:00:00-07:00">13 Sep 2016</time></small>
-          </a>
-        </h3>
-      </li>
-    
-  </ul>
-</aside> -->
+</div>
 
-      </main>
-
-      <footer class="footer">
-        <small>
-          &copy; <time datetime="2017-06-25T16:33:12-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
-        </small>
-      </footer>
     </div>
 
   </body>

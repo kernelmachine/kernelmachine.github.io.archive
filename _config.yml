@@ -1,37 +1,29 @@
+# Dependencies
+markdown:         redcarpet
+highlighter:      pygments
+
 # Permalinks
-#
-# Use of `relative_permalinks` ensures post links from the index work properly.
-permalink:           pretty
-
-# Setup
-title:               suchin
-tagline:             writings
-url:                 https://suchin.co
-paginate:            3
-baseurl:             ""
-about:               "about"
-
-# Gems
+permalink:        pretty
 gems:
     - jekyll-paginate
     - jekyll-gist
-# Assets
-#
-# We specify the directory for Jekyll so we can use @imports.
-sass:
-  sass_dir:          _sass
-  style:            :compressed
 
-# About/contact
+# Setup
+title:            Suchin
+tagline:          சச்சின் | ساشين | sʌʧɪn
+description:      Graduate student at the University of Washington studying NLP.
+url:              
+baseurl:          /
+
 author:
-  name:              Suchin Gururangan
-  url:               https://suchin.co
-  email:
+  name:           'Suchin'
+  url:            https://twitter.com/ssgrn
+
+paginate:         100
 
 # Custom vars
-version:             1.0.0
 github:
-  repo:              https://github.com/pegasos1/pegasos1.github.io
+  repo:           https://github.com/kernelmachine
 
 markdown: kramdown
 kramdown:

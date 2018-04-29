@@ -1,65 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 
   <head>
-  <meta charset="UTF-8">
   <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
   <!-- Enable responsiveness on mobile devices-->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
   <title>
     
-      The Topology of Malicious Activity on IPv4 &middot; suchin
+      The Topology of Malicious Activity on IPv4 &middot; Suchin
     
   </title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/styles.css">
-  <!-- <link rel="stylesheet" href="/googlecode.css"> -->
-
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
   <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
-
+  
   <!-- Icons -->
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
-  <link rel="shortcut icon" href="/public/square-outline.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="/public/favicon.ico">
 
   <!-- RSS -->
-  <link rel="alternate" type="application/atom+xml" title="suchin" href="/atom.xml">
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-75615851-1', 'auto');
-    ga('send', 'pageview');
-
-  </script>
-
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
 </head>
 
 
-  <body>
+  <body class="theme-base-08">
 
-    <div class="container content">
-      <header class="masthead">
-        <h3 class="masthead-title">
-          <a href="/" title="Home" style="text-decoration: none;">suchin</a>
-          <small><a href="/" style="text-decoration: none; color: #C0C0C0">writings</a></small>
-          <div class="links">
-          <a  href="http://github.com/pegasos1"> <img style="display: inline" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png"   href="http://github.com/pegasos1" height="50px" width="50px"></img></a>
-          <a  href="http://angel.co/suchin-gururangan"> <img style="display: inline" src="https://angel.co/images/shared/peace_large.jpg"   href="http://angel.co/ssgrn" height="50px" width="50px"></img></a>
-          <a  href="http://linkedin.com/in/ssgrn" > <img style="display: inline" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/768px-LinkedIn_logo_initials.png"   height="50px" width="50px"></img></a>
-          <a  href="http://twitter.com/ssgrn" > <img style="display: inline; margin-left: 15px;" src="https://upload.wikimedia.org/wikipedia/de/thumb/9/9f/Twitter_bird_logo_2012.svg/1000px-Twitter_bird_logo_2012.svg.png"   height="50px" width="50px"></img></a>
-        </div>
-        </h3>
-      </header>
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="/">
+          Suchin
+        </a>
+      </h1>
+      <p class="lead">சச்சின் | ساشين | sʌʧɪn</p>
+      <p class="lead">Graduate student at the University of Washington studying NLP.</p>
+    </div>
 
-      <main>
-        <article class="post">
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="/">Home</a>
+
+      
+
+      
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/about/">About</a>
+          
+        
+      
+        
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/publications/">Publications</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/talks/">Talks and Conferences</a>
+          
+        
+      
+
+      <a class="sidebar-nav-item" href="https://twitter.com/ssgrn">Twitter</a>
+      <a class="sidebar-nav-item" href="https://github.com/kernelmachine">GitHub</a>
+    </nav>
+
+    <p>&copy; 2018. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
   <h1 class="post-title">The Topology of Malicious Activity on IPv4</h1>
-  <time datetime="2016-03-23T00:00:00-07:00" class="post-date">23 Mar 2016</time>
+  <span class="post-date">23 Mar 2016</span>
   <p>At Rapid7, we’re building tools that help us investigate the threat landscape across the Internet. Projects Sonar<sup id="fnref:1"><a href="#fn:1" class="footnote">1</a></sup> and Heisenberg<sup id="fnref:2"><a href="#fn:2" class="footnote">2</a></sup> give us global exposure to common vulnerabilities and patterns in offensive attacks. Our machine learning projects can detect and characterize phishing URLs and SSL certificates. Our threat intelligence repository is growing with datasets that resolve malicious activity to address blocks and autonomous systems.</p>
 
 <p>We have recently focused our research on how these tools can work together to provide unique insights on the state of the Internet. In this post, we’ll present the beginning of our explorations to identify stable, macro-level attacks trends invisible on the scale of IP addresses.</p>
@@ -67,7 +101,7 @@
 <h3 id="ipv4-topology">IPv4 Topology</h3>
 <p>First, a quick primer on IPv4, the fourth version of the Internet Protocol. The topology of IPv4 is characterized by three levels of hierarchy, from smallest to largest: IP addresses, subnets, and autonomous systems (ASes). IP addresses on IPv4 are 32-bit sequences that identify hosts or network interfaces. Subnets are groups of IP addresses, and ASes are blocks of subnets managed by public institutions and private enterprises. IPv4 is divided into about 65,000 ASes, at least 30M subnets, and <script type="math/tex">2^{32}</script> IP addresses.</p>
 
-<p><img src="http://pegasos1.github.io/public/20160215/fig1.png" alt="Phishing Activity" /></p>
+<p><img src="http://kernelmachine.github.io/public/20160215/fig1.png" alt="Phishing Activity" /></p>
 
 <h3 id="malicious-ases">Malicious ASes</h3>
 <p>There has been a great deal of academic and industry focus on identifying malicious activity across
@@ -77,13 +111,13 @@ amount of malicious activity</em>. In particular, 200 ASes hosted 70% of phishin
 (data: cleanmx archives<sup id="fnref:7"><a href="#fn:7" class="footnote">7</a></sup>). We wanted to understand what makes some autonomous systems more
 likely to host malicious activity.</p>
 
-<p><img src="http://pegasos1.github.io/public/20160215/fig2.png" alt="IPv4 fragmentation" /></p>
+<p><img src="http://kernelmachine.github.io/public/20160215/fig2.png" alt="IPv4 fragmentation" /></p>
 
 <h3 id="ipv4-fragmentation">IPv4 Fragmentation</h3>
 
 <p>We gathered historical mappings between IP addresses and ASes from 2007 to 2015 to understand the history of IPv4. The data clearly suggested that IPv4 has been fragmenting. The total number of ASes has grown about 60% in the past decade, and during the same period, there has been a rise in the number of small ASes and a decline in the number of large ones. These results make sense given that the IPV4 address space has been exhausted. This means that growth in IPv4 access requires the reallocation of existing address space into smaller and smaller independent blocks.</p>
 
-<p><img src="http://pegasos1.github.io/public/20160215/fig3.png" alt="AS fragmentation" /></p>
+<p><img src="http://kernelmachine.github.io/public/20160215/fig3.png" alt="AS fragmentation" /></p>
 
 <h3 id="as-fragmentation">AS Fragmentation</h3>
 
@@ -97,7 +131,7 @@ likely to host malicious activity.</p>
 
 <p>These results suggest that malicious ASes are large and deeply fragmented into small subnets. ARIN fee schedules showed that smaller subnets are significantly less expensive to purchase.<sup id="fnref:8:1"><a href="#fn:8" class="footnote">8</a></sup> Cheap, small subnets may allow malicious registrars to purchase many IP blocks for traffic redirection or proxy servers, so they can better float under the radar.</p>
 
-<p><img src="http://pegasos1.github.io/public/20160215/fig5.png" alt="topologies" /></p>
+<p><img src="http://kernelmachine.github.io/public/20160215/fig5.png" alt="topologies" /></p>
 
 <h3 id="conclusion">Conclusion</h3>
 
@@ -115,7 +149,7 @@ likely to host malicious activity.</p>
 
 <p>As seen below, it’s also possible to analyze SSL certificates to uncover the distribution of devices hosted in ASes across IPv4.</p>
 
-<p><img src="http://pegasos1.github.io/public/20160215/fig4.png" alt="malicious infrastructure" /></p>
+<p><img src="http://kernelmachine.github.io/public/20160215/fig4.png" alt="malicious infrastructure" /></p>
 
 <p>Each square above shows the probability distribution of device counts of a particular type. Most ASes host fewer than 100 devices across a majority of categories. Are there skews in the types of devices used to propagate phishing attacks from these malicious ASes?</p>
 
@@ -152,49 +186,8 @@ likely to host malicious activity.</p>
   </ol>
 </div>
 
-</article>
-<!--
-<aside class="related">
-  <h2>Related Posts</h2>
-  <ul class="related-posts">
-    
-      <li>
-        <h3>
-          <a href="/2017/03/18/Automatic-Differentiation-and-Backpropagation/">
-            Automatic differentiation and Backpropagation
-            <small><time datetime="2017-03-18T00:00:00-07:00">18 Mar 2017</time></small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2017/03/04/The-Support-Vector-Machine/">
-            Crash Course on Support Vector Machines
-            <small><time datetime="2017-03-04T00:00:00-08:00">04 Mar 2017</time></small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2016/12/28/Introducing-Utah/">
-            Introducing Utah
-            <small><time datetime="2016-12-28T00:00:00-08:00">28 Dec 2016</time></small>
-          </a>
-        </h3>
-      </li>
-    
-  </ul>
-</aside> -->
+</div>
 
-      </main>
-
-      <footer class="footer">
-        <small>
-          &copy; <time datetime="2017-06-25T16:33:12-07:00">2017</time>. All rights reserved. Built with Jekyll and Mathjax.
-        </small>
-      </footer>
     </div>
 
   </body>
