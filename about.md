@@ -5,12 +5,12 @@ title: About
 
 
 
-I am a masters student in natural language processing at the University of Washington, advised by [Noah Smith](https://homes.cs.washington.edu/~nasmith/). 
+I am a young investigator in natural language processing (NLP) at the [Allen Institute for AI](http://allenai.org). I work on the [AllenNLP](http://allennlp.org) team, where we are building an open-source platform for performing and packaging research in deep learning and NLP.
 
-My current research involves multilingual representation learning and generative modeling. I'm interested in how we can share and transfer the structure of text across multiple languages.
+I completed my masters in NLP at the University of Washington. My thesis was on *Polyglot Text Classification with Neural Document Models* -- performing text classification in many languages using crosslingual parameter sharing and unlabeled data. I also helped unravel [fundamental biases](https://arxiv.org/abs/1803.02324) in NLP datasets that inflate our success on difficult AI tasks.
 
-Before graduate school, I was a data scientist and software engineer at several enterprises in Seattle and Boston. I built scalable, persistent machine learning systems for venture capital, security, and churn prediction. I particularly enjoy the intersection of engineering and machine learning.
+Before graduate school, I was a data scientist and software engineer at several enterprises in Seattle and Boston. I worked on scalable machine learning products for venture capital, security, and churn prediction. I particularly enjoy the unique intersection of software engineering and machine learning.
 
-Before that, I did research in computational neuroscience. I worked on mapping the neocortex and building brain-machine interfaces.
+Before that, I did research in computational neuroscience. I worked on data-intensive research in [mapping the neocortex](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003710) and building [brain-machine interfaces](https://www.physiology.org/doi/pdf/10.1152/jn.00982.2016).
 
-If you'd like to get in touch, reach out on [Twitter](http://twitter.com/ssgrn).
+If you'd like to get in touch, reach out on [Twitter](http://twitter.com/ssgrn). I'm quite active on open source,so you can also reach out on [Github](http://github.com/kernelmachine)
