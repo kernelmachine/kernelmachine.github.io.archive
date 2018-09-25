@@ -13,4 +13,4 @@ Before graduate school, I was a data scientist and software engineer at several 
 
 Before that, I did research in computational neuroscience. I worked on data-intensive research in [mapping the neocortex](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003710) and building [brain-machine interfaces](https://www.physiology.org/doi/pdf/10.1152/jn.00982.2016).
 
-If you'd like to get in touch, reach out on [Twitter](http://twitter.com/ssgrn). I'm quite active on open source, so you can also reach out on [Github](http://github.com/kernelmachine).
+If you'd like to get in touch, reach out on [Twitter](http://twitter.com/ssgrn) or [Github](http://github.com/kernelmachine).
